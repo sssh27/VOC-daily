@@ -36,6 +36,11 @@ class Cards extends Table {
 
   /// 是否已被拉霸放進學習循環。false = 在倉庫裡,還沒開始學。
   BoolColumn get isIntroduced => boolean().withDefault(const Constant(false))();
+
+  /// 【v3】四選一測驗時不可與哪些 word 同時出現在選項裡(避免語意過近造成
+  /// 不公平的假陰性,見 SPEC.md 6.4「干擾項選取規則」)。JSON 編碼的字串
+  /// 陣列,例如 `["postpone"]`;沒有設定就是 null,代表不排除任何字。
+  TextColumn get avoidWith => text().nullable()();
 }
 
 /// 每日拉霸紀錄。一天只能有一筆(rollDate 為當天零點時間戳)。
@@ -53,7 +58,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.connection);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -64,6 +69,9 @@ class AppDatabase extends _$AppDatabase {
           if (from < 2) {
             await m.addColumn(cards, cards.isIntroduced);
             await m.createTable(dailyRolls);
+          }
+          if (from < 3) {
+            await m.addColumn(cards, cards.avoidWith);
           }
         },
       );

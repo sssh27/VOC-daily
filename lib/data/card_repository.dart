@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:math';
+
 import 'package:drift/drift.dart';
 import '../logic/scheduler.dart';
 import 'database.dart';
@@ -98,29 +101,37 @@ class CardRepository {
   }
 
   // ---------------------------------------------------------------------
-  // 5.6 複習佇列
+  // 6.4 學習佇列(v4:新字 + 到期字合併)
   // ---------------------------------------------------------------------
 
-  /// isIntroduced == true AND dueDate <= 今天 23:59:59,依 dueDate 由舊到新排序。
-  Future<List<Card>> reviewQueue({DateTime? now}) {
+  /// 新字:isIntroduced == true AND lastReviewed == null,依 id 由小到大。
+  /// 這些卡片今天只會以「認識卡」出現一次,不會被考。
+  Future<List<Card>> newCards() {
+    return (_db.select(_db.cards)
+          ..where((c) =>
+              c.isIntroduced.equals(true) & c.lastReviewed.isNull())
+          ..orderBy([(c) => OrderingTerm.asc(c.id)]))
+        .get();
+  }
+
+  /// 到期字:isIntroduced == true AND lastReviewed != null AND
+  /// dueDate <= 今天 23:59:59,依 dueDate 由舊到新排序。
+  Future<List<Card>> dueForStudyCards({DateTime? now}) {
     final endOfToday = _endOfDay(now ?? DateTime.now());
     return (_db.select(_db.cards)
           ..where((c) =>
               c.isIntroduced.equals(true) &
+              c.lastReviewed.isNotNull() &
               c.dueDate.isSmallerOrEqualValue(endOfToday))
           ..orderBy([(c) => OrderingTerm.asc(c.dueDate)]))
         .get();
   }
 
-  /// 待複習張數(僅供首頁顯示中性數字,見 6.1)。
-  Future<int> dueCount({DateTime? now}) async {
-    final endOfToday = _endOfDay(now ?? DateTime.now());
-    final query = _db.selectOnly(_db.cards)
-      ..addColumns([_db.cards.id.count()])
-      ..where(_db.cards.isIntroduced.equals(true) &
-          _db.cards.dueDate.isSmallerOrEqualValue(endOfToday));
-    final row = await query.getSingle();
-    return row.read(_db.cards.id.count()) ?? 0;
+  /// 學習佇列 = 新字(前)+ 到期字(後)。見 SPEC.md 6.4「佇列組成與順序」。
+  Future<List<Card>> studyQueue({DateTime? now}) async {
+    final intro = await newCards();
+    final due = await dueForStudyCards(now: now);
+    return [...intro, ...due];
   }
 
   /// 用 lib/logic/scheduler.dart 的 reviewCard() 結果寫回資料庫。
@@ -146,8 +157,74 @@ class CardRepository {
 
   Future<List<Deck>> allDecks() => _db.select(_db.decks).get();
 
-  /// 全部卡片(不分牌組/是否已引入),用來當四選一測驗的干擾選項來源。
+  /// 全部卡片(不分牌組/是否已引入)。
   Future<List<Card>> allCards() => _db.select(_db.cards).get();
+
+  static List<String> _decodeAvoidWith(String? raw) {
+    if (raw == null || raw.isEmpty) return const [];
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is List) {
+        return decoded.map((e) => e.toString()).toList();
+      }
+    } catch (_) {
+      // 壞掉的資料就當作沒有限制,不報錯(見 SPEC.md 0:「不確定時別猜」的
+      // 反面 —— 這裡資料格式錯誤不是邏輯不確定,不影響其他功能,容錯即可)。
+    }
+    return const [];
+  }
+
+  /// 四選一測驗的干擾選項(meaning)。依 SPEC.md 6.4「干擾項選取規則」:
+  /// 1. 優先從同一個 deck 挑
+  /// 2. 排除 avoidWith 標記的字(雙向 —— 這張卡列了對方,或對方列了這張卡,
+  ///    都要排除)
+  /// 3. 同 deck 湊不滿 [count] 個時,回退到全庫隨機湊滿
+  ///
+  /// 回傳的 meaning 不重複、不含 [card] 自己的 meaning。資料庫太小的話,
+  /// 回傳數量可能小於 [count],呼叫端(review_screen.dart)要能處理選項
+  /// 不足 3 個的情況。
+  Future<List<String>> distractorMeaningsFor(Card card, {int count = 3}) async {
+    final avoidWords = {card.word, ..._decodeAvoidWith(card.avoidWith)};
+    final random = Random();
+
+    bool isExcluded(Card other) {
+      if (avoidWords.contains(other.word)) return true;
+      if (_decodeAvoidWith(other.avoidWith).contains(card.word)) return true;
+      return false;
+    }
+
+    final picked = <String>{};
+
+    final sameDeck = await (_db.select(_db.cards)
+          ..where((c) => c.deckId.equals(card.deckId)))
+        .get();
+    final sameDeckCandidates = sameDeck
+        .where((c) => c.id != card.id && c.meaning != card.meaning && !isExcluded(c))
+        .toList()
+      ..shuffle(random);
+    for (final c in sameDeckCandidates) {
+      if (picked.length >= count) break;
+      picked.add(c.meaning);
+    }
+
+    if (picked.length < count) {
+      final allCards = await _db.select(_db.cards).get();
+      final globalCandidates = allCards
+          .where((c) =>
+              c.id != card.id &&
+              c.meaning != card.meaning &&
+              !picked.contains(c.meaning) &&
+              !isExcluded(c))
+          .toList()
+        ..shuffle(random);
+      for (final c in globalCandidates) {
+        if (picked.length >= count) break;
+        picked.add(c.meaning);
+      }
+    }
+
+    return picked.toList();
+  }
 
   /// 該牌組已學(isIntroduced==true)與總卡片數。
   Future<(int learned, int total)> deckProgress(int deckId) async {
@@ -173,6 +250,7 @@ class CardRepository {
   }
 
   /// 建立新牌組並寫入卡片,isIntroduced 全部為 false(見 6.6)。
+  /// [avoidWith] 是選填的四選一排除名單(見 6.4),沒有就傳空陣列。
   Future<int> createDeckWithCards({
     required String name,
     required String topic,
@@ -182,6 +260,7 @@ class CardRepository {
       String meaning,
       String example,
       String exampleZh,
+      List<String> avoidWith,
     })> cards,
   }) async {
     final deckId = await _db.into(_db.decks).insert(
@@ -197,6 +276,9 @@ class CardRepository {
               example: Value(c.example),
               exampleZh: Value(c.exampleZh),
               isIntroduced: const Value(false),
+              avoidWith: Value(
+                c.avoidWith.isEmpty ? null : jsonEncode(c.avoidWith),
+              ),
             ),
           );
     }

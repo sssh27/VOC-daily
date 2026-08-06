@@ -33,6 +33,8 @@ class StarterDeckLoader {
               meaning: c['meaning'] as String,
               example: c['example'] as String? ?? '',
               exampleZh: c['exampleZh'] as String? ?? '',
+              avoidWith: (c['avoidWith'] as List?)?.map((e) => e.toString()).toList() ??
+                  const <String>[],
             ))
         .toList();
 

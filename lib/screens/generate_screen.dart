@@ -65,6 +65,7 @@ class _GenerateScreenState extends ConsumerState<GenerateScreen> {
                   meaning: c.meaning,
                   example: c.example,
                   exampleZh: c.exampleZh,
+                  avoidWith: const <String>[],
                 ))
             .toList(),
       );
