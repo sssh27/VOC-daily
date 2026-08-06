@@ -5,7 +5,12 @@ import '../data/database.dart';
 import '../providers.dart';
 import 'generate_screen.dart';
 
-/// 牌組列表。依 SPEC.md 6.5:每個牌組顯示「已學 X / Y 字」與進度條。
+/// 單字庫(SPEC.md 6.5,v4:原「牌組列表」降級為次要畫面)。
+/// 從首頁右上角 ☰ 進入,不是主流程的一部分。用途只有兩個:看看庫存、
+/// 管理 AI 生成的批次。每個牌組顯示「已學 X / Y 字」與進度條。
+///
+/// 牌組(Deck)概念保留在資料層:AI 一次生成一批卡片需要容器管理,而且
+/// 四選一的干擾項優先從同一牌組挑選才有鑑別度(見 6.5)。
 class DecksScreen extends ConsumerStatefulWidget {
   const DecksScreen({super.key});
 
@@ -53,7 +58,7 @@ class _DecksScreenState extends ConsumerState<DecksScreen> {
     final rows = _rows;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('我的牌組')),
+      appBar: AppBar(title: const Text('單字庫')),
       body: rows == null
           ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
@@ -88,7 +93,7 @@ class _DecksScreenState extends ConsumerState<DecksScreen> {
           padding: const EdgeInsets.all(16),
           child: ElevatedButton(
             onPressed: _goToGenerate,
-            child: const Text('+ 新增牌組'),
+            child: const Text('+ AI 生成新單字'),
           ),
         ),
       ),

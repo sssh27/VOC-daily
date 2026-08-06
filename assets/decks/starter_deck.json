@@ -5,9 +5,10 @@
     {
       "word": "procrastinate",
       "phonetic": "/prəˈkræstɪneɪt/",
-      "meaning": "拖延",
+      "meaning": "拖延(該做卻遲遲不做)",
       "example": "I always procrastinate when I have a big project due.",
-      "exampleZh": "每次有大專案要交,我總是拖延。"
+      "exampleZh": "每次有大專案要交,我總是拖延。",
+      "avoidWith": ["postpone"]
     },
     {
       "word": "accomplish",
@@ -61,9 +62,10 @@
     {
       "word": "postpone",
       "phonetic": "/poʊstˈpoʊn/",
-      "meaning": "延後;延期",
+      "meaning": "延後(把預定時間往後挪)",
       "example": "The meeting was postponed until next week.",
-      "exampleZh": "會議被延到下週。"
+      "exampleZh": "會議被延到下週。",
+      "avoidWith": ["procrastinate"]
     },
     {
       "word": "curious",
