@@ -1,92 +1,160 @@
 # PROGRESS.md
 
-> 寫這份文件的人:老二(實作者)
-> 目的:對照 SPEC.md,誠實記錄目前專案的真實狀態,包含已完成、未完成、跟已知偏離規格的地方。
-> 詳細變動歷程另見 `IMPLEMENTATION_REPORT.md`(這份是給人看的完整報告,PROGRESS.md 是給老大快速對照 SPEC 用的結構化版本)。
+> 寫這份文件的人:老二(實作方)
+> 目的:對照 `docs/SPEC.md`,誠實記錄目前專案的真實狀態。
+> 舊版完整報告在 `docs/agent-sync/archive/IMPLEMENTATION_REPORT.md`。
 
 ---
 
-## 已完成(對照 SPEC.md 章節)
+## ⚠️ 流程瑕疵先說清楚
 
-| SPEC 章節 | 項目 | 狀態 | 備註 |
-|---|---|---|---|
-| 2.1 | Web WASM 資料庫設定 | ✅ 完成,但有疑慮 | 見下方「已知偏離 SPEC 之處」#2 |
-| 4.2 | Cards 表加 `isIntroduced` | ✅ 完成 | |
-| 4.3 | DailyRolls 表 | ✅ 完成 | |
-| 5.1–5.5 | 積壓量、拉霸權重、保護機制、`daily_roll.dart`、引入新卡流程 | ✅ 完成 | |
-| 5.6 | 複習佇列組成 | ✅ 完成 | |
-| 5.7 | 沒做完不懲罰 | ✅ 完成(沒實作任何懲罰機制) | |
-| 6.1 | 首頁 | ✅ 完成 | 沒有顯示積壓數字/連續天數/完成率,符合規格禁止事項 |
-| 6.2 | 拉霸畫面 | ✅ 完成 | |
-| 6.3 | Flashcard 元件(翻卡+挖空) | ✅ 完成,但**目前沒有畫面在用** | 見下方偏離 #1 |
-| 6.4 | 複習畫面 | ⚠️ **已完成,但整個互動模式偏離 SPEC** | 見下方偏離 #1,這是最重要的一項,需要老大確認方向 |
-| 6.5 | 牌組列表 | ✅ 完成 | |
-| 6.6 | AI 生成畫面 | ✅ 邏輯完成,**未接真實 API key,無法實測** | |
-| 7 | 內建牌組匯入 | ✅ 機制完成,⚠️ 內容(30 字清單)未經確認 | 見 QUESTIONS.md |
-| 8 | 檔案異動清單 | ✅ 全部檔案都有建立/修改,清單見下方 | |
-| 9.1 | 單元測試 | ✅ `flutter test` 全過(scheduler 4 個 + daily_roll 6 個 = 10 個) | |
-| 9.2 | 手動驗收流程 | ⚠️ 部分驗證過(App 能啟動、拉霸動畫、Web 持久化) | 第 7 項「複習畫面正面例句正確挖空,翻面顯示完整例句」因為互動模式改了,**這條驗收標準已經不適用**,需要老大重新定義 |
+上一輪(v3,複習畫面改成四選一+忘了按鈕+反應時間分級那輪)的 code 我做完了,
+但**忘了在那輪結束時 commit**——只在那輪開頭照 TASKS.md 第 0 項的指示 commit
+了「上上一輪(v2)」的成果(commit `3fe7bed`),之後 v3 的變動(刪 `flashcard.dart`、
+新增 `question_card.dart`、`avoidWith` 支援等)就一直停在工作目錄沒進 git。
+
+這一輪(v4)開始時發現這個狀況,已經把 v3 + v4 的變動一起補進 git 了(見下方
+commit 清單)。以後我會每完成 TASKS.md 一個小節就 commit 一次,不會再累積。
+
+---
+
+## 這一輪(v4)做了什麼
+
+依 `docs/agent-sync/TASKS.md` 指派完成 A、B、C、D、E 五個部分。
+
+### A. 版面重構
+
+- **A1** `lib/screens/daily_roll_screen.dart` 已刪除。拉霸動畫改在
+  `home_screen.dart` 就地播放(`Timer.periodic` 在首頁的圓形按鈕內跳動數字,
+  動畫結束自動呼叫 `recordRoll()` + `introduceNewCards()`,不用再多按一次
+  「開始學習」)。
+- **A2** 首頁極簡化為轉盤 + 「開始」按鈕 + 右上角 ☰。「待複習:N 張」、
+  「開始複習」、「我的牌組」按鈕都拿掉了。
+- **A3** `review_screen.dart` 的 class 從 `ReviewScreen` 改名 `StudyScreen`
+  (檔名維持不動),AppBar 標題「複習」→「學習」。佇列改成
+  `card_repository.dart` 的新方法 `studyQueue()`:新字(`lastReviewed==null`,
+  依 id 排序)在前,到期字(`lastReviewed!=null` 且到期,依 dueDate 排序)在後。
+- **A4** 新增 `lib/widgets/intro_card.dart`,新字第一次出現用這個顯示,只有
+  「下一個」按鈕,按下去固定 `reviewCard(state, 4)` 並寫回資料庫。
+- **A5** `decks_screen.dart` 標題改「單字庫」,從首頁 ☰ 進入,不在主流程。
+  Deck 概念在資料層完全保留(AI 生成批次管理 + distractor 同 deck 優先都要用到)。
+
+### B. 答錯補考機制
+
+`review_screen.dart`(`StudyScreen`)內用 `_retryQueue` / `_alreadyRetried`
+實作:
+
+- 主佇列中答錯或按「忘了」的到期字卡片,加進 `_retryQueue`,並用
+  `_alreadyRetried`(`Set<int>`)標記,同一張卡最多補考一次
+- 主佇列跑完後,若 `_retryQueue` 非空,自動接上去繼續
+- 補考階段(`_phase == _Phase.retry`)的作答結果**不呼叫 `submitReview()`**,
+  只更新畫面顯示(標色 + 顯示中譯),不碰資料庫,SM-2 排程維持第一次作答時
+  就決定好的結果
+- 補考題外觀跟一般題目完全相同,沒有加任何「這是補考」的標示
+- 新字用的認識卡不會產生補考(沒有答錯的可能,`_confirmInfo()` 固定寫回)
+
+### C. Review 出來的缺口
+
+- **C1** 新增 `test/distractor_test.dart`,用 `AppDatabase.forTesting()` +
+  `NativeDatabase.memory()` 搭配一個真的 in-memory 資料庫測
+  `distractorMeaningsFor()`,涵蓋你列的全部 7 種情況(同 deck 足夠/不足時回退、
+  avoidWith 單向與雙向排除、不重複正確答案、不重複彼此、只有 1 張卡不崩潰)。
+- **C2** `_prepareCurrent()` 依 `distractorMeaningsFor()` 回傳數量分三種行為:
+  3 個→正常四選一;1–2 個→照樣出題,選項數就是實際拿到的數量(沒有特別
+  補到 4 個);0 個→整張卡改用 `IntroCard` 顯示,按「下一個」固定
+  `reviewCard(state, 4)` 並寫回(這不是補考,是這張到期字唯一的一次結果)。
+- **C3** 停留時間:答對 1.4 秒,答錯或按「忘了」改成 3 秒
+  (`_correctRevealDuration` / `_wrongRevealDuration`)。
+
+### D. 測試
+
+我這邊 sandbox 沒有 Flutter SDK,無法自己跑 `flutter test`。預期測試數:
+
+| 檔案 | 案例數 | 狀態 |
+|---|---|---|
+| `test/scheduler_test.dart` | 4 | **完全沒動**,一如既往 |
+| `test/daily_roll_test.dart` | 6 | 沒動這輪邏輯 |
+| `test/answer_grading_test.dart` | 7 | 沒動這輪邏輯 |
+| `test/distractor_test.dart` | 7 | **這輪新增** |
+
+合計 24 個。麻煩你本機跑:
+
+```
+dart run build_runner build --delete-conflicting-outputs
+flutter test
+```
+
+`database.dart` 這次沒有加新欄位(`avoidWith` 是上一輪加的,已經在 g.dart 裡),
+理論上不用重跑 build_runner 也能過,但保險起見還是建議跑一次。
+
+### E. Commit
+
+這輪 + 補齊 v3 遺漏的變動,總共切了 6 個 commit:
+
+1. `docs: add CLAUDE.md, sync SPEC.md and TASKS.md from 老大`
+2. `refactor: remove standalone roll screen, roll inline on home`
+3. `feat: intro card, shared word-highlight helper, avoidWith distractor support`
+4. `refactor: merge new/due queue into study screen with retry logic and reaction-time grading`
+5. `refactor: rename decks screen to 單字庫; fix starter_deck.json postpone/procrastinate wording`
+6. `test: cover distractor selection logic`
+
+（這份 PROGRESS.md 更新完會是第 7 個 commit。）
+
+**`git push` 我這邊還是跑不了**(sandbox 沒有 GitHub 認證),需要你本機執行
+`git push origin main`。目前本地 `main` 領先 `origin/main` 8 個 commit。
+
+---
+
+## 額外的實作決定(沒在 TASKS.md 明講)
+
+`_prepareCurrent()` 對「1–2 個 distractor」的處理是直接照拿到的數量出題
+(2 或 3 個選項),沒有嘗試從別處硬湊到 4 個——因為 SPEC 6.4 的表格寫的是
+「顯示 2–3 個選項」,不是「湊到 4 個」,所以我照字面實作。如果你的原意是
+希望即使選項不足也盡量湊到 4 個(例如允許 distractor 重複使用正確答案以外
+的字),麻煩告訴我,這裡改起來不難。
+
+---
+
+## 累計完成項目(對照 SPEC.md 全部章節,v4)
+
+| SPEC 章節 | 項目 | 狀態 |
+|---|---|---|
+| 6.1 | 首頁極簡化 + 就地拉霸 | ✅ 完成 |
+| 6.2 | 獨立拉霸畫面 | ✅ 已刪除 |
+| 6.3 | `question_card.dart` | ✅ 完成(這輪抽出共用的 `word_highlight.dart`) |
+| 6.3b | `intro_card.dart` | ✅ 完成(新增) |
+| 6.4 | 學習畫面(合併佇列 + 認識卡 + 四選一 + 補考佇列 + 選項不足處理) | ✅ 完成 |
+| 6.5 | 單字庫(降級為次要畫面) | ✅ 完成 |
+| 6.6 | AI 生成畫面 | ✅ 邏輯完成,未接真實 API key |
+| 7 | 內建牌組 | ✅ 完成,內容已 review 過 |
+| 9.1 | 單元測試 | ✅ 應為 24 個,需你本機跑 `flutter test` 驗證 |
 
 ---
 
 ## 尚未完成
 
-1. **`sqlite3.wasm` / `drift_worker.dart.js` 的正式來源驗證** —— 目前是從本機 pub cache 裡 `drift-2.34.3` 套件內附的 devtools 用檔案複製過來的,不是官方文件明講「給 `WasmDatabase.open()` 用」的正式發布管道(因為 drift GitHub release 頁面目前已經不附這兩個編譯好的檔案)。能跑,但沒有百分之百把握版本語意完全對得上。
-2. **AI 生成功能沒有真實 API key 可測試** —— 錯誤處理(缺金鑰/網路錯誤/JSON 格式錯誤三種分類)邏輯都寫了,但沒有實際打過 API,無法確認成功路徑真的能正常運作。
-3. **SPEC 第 10 節第 10 步 — PWA manifest 調整**(圖示、名稱、可安裝到主畫面)完全沒動,SPEC 本身也註明這不在本次施工範圍。
-4. **Git commit / push** —— 目前所有變動都還沒 commit,`git status` 顯示一堆 modified 檔案沒進 repo。等老大看過這份 PROGRESS.md、確認方向後再依「一個步驟一個 commit」的規則補上。
+1. AI 生成功能沒有真實 API key 可測試
+2. SPEC 第 10 節第 10 步(PWA manifest)依指示不動
+3. `git push`,需要你本機執行
+4. 這輪的 code 我這邊沒有 Flutter/Dart 環境跑 `flutter test` 驗證,需要你本機確認全綠
 
 ---
 
-## 已知偏離 SPEC 之處(需要老大特別注意)
+## 技術債(照舊,尚未處理)
 
-### 1. 複習畫面(6.4)整個互動模式換掉了
-
-**SPEC 原本要的:**
-翻卡(正面挖空例句 → 點擊翻面看完整例句+中譯)→ 翻面後出現四個評分按鈕(忘記了=0 / 有點難=3 / 普通=4 / 簡單=5)→ 呼叫 `reviewCard(state, quality)`。
-
-**現在實際做的:**
-不翻卡。直接顯示英文單字 + 完整例句(單字本身用粗體標示,不挖空)+ 四個中文意思選項(1 正確 + 3 個隨機干擾項)。答對算 quality=5,答錯算 quality=0,直接顯示正確答案並自動跳下一題,沒有讓使用者手動評「有多難」。
-
-**為什麼會這樣:** 這是 Shawn(專案擁有者)在畫面做出來之後,看了實際成品覺得體驗不對,直接要求改的:
-1. 先是要求把翻卡+四個難度按鈕整個換成「看起來相似的單字四選一」(後來釐清是看單字選中文意思,不是選相似單字)
-2. 接著發現例句還是挖空但單字已經顯示在題目上方,挖空沒有意義,要求改成例句完整顯示、單字粗體
-
-**這造成的實際影響:**
-- `reviewCard()` 本身(scheduler.dart)完全沒被改動,規格禁止的那條線沒有跨過
-- 但 SM-2 排程現在只會吃到 quality=0 或 5 這兩個極端值,`scheduler.dart` 裡 quality=3、4 對應的「有點難/普通」中間地帶邏輯,實際上永遠不會被觸發到 —— 演算法碼還在,但複習畫面的呼叫方式讓它形同虛設
-- `lib/widgets/flashcard.dart`(6.3 規格要求的翻卡元件)還是照規格寫完了,只是現在沒有任何畫面在呼叫它,是「寫好但未使用」的狀態
-- SPEC 9.2 手動驗收第 7 條「複習畫面的正面例句有正確挖空,翻面後顯示完整例句與中譯」已經不適用於現在的畫面
-
-**我的立場:** 這是 Shawn 直接當場要求的改動,不是我自己偏離規格,但因為 SPEC.md 是 single source of truth,而且這條改動影響到 SM-2 只吃兩個極端 quality 值這件事,我覺得需要老大明確表態:要嘛正式把 SPEC.md 6.4 更新成四選一測驗版本,要嘛我們討論要不要保留翻卡評分模式當作另一種複習模式(兩者並存,使用者可選)。在老大回覆之前我不會再進一步改這塊。
-
-### 2. Web WASM 檔案來源非官方文件明講的正式管道
-
-見上方「尚未完成」#1。功能上目前可以正常運作(有跑起來、有持久化),但來源不是 100% 照官方指引走,想請老大評估這樣是否可接受,或需要換更正式的取得方式。
-
----
-
-## `flutter test` 結果
-
-```
-00:03 +10: All tests passed!
-```
-
-10 個測試(`test/scheduler_test.dart` 4 個 + `test/daily_roll_test.dart` 6 個)全部通過,`scheduler_test.dart` 裡的斷言完全沒被改動過。
-
----
-
-## 動了哪些檔案
-
-完整清單見 `IMPLEMENTATION_REPORT.md` 第 6 節「重要檔案現況總表」。簡要版:
-
-- **新增**:`lib/data/card_repository.dart`、`lib/data/database_connection/{connection_native,connection_web}.dart`、`lib/logic/daily_roll.dart`、`lib/services/starter_deck_loader.dart`、`lib/screens/{daily_roll_screen,decks_screen}.dart`、`lib/providers.dart`、`assets/decks/starter_deck.json`、`test/daily_roll_test.dart`、`web/drift_worker.dart`(+ 編譯出的 `.js`)、`web/sqlite3.wasm`
-- **修改**:`lib/data/database.dart`、`lib/main.dart`、`lib/screens/{home_screen,generate_screen,review_screen}.dart`、`lib/widgets/flashcard.dart`、`lib/services/ai_service.dart`、`pubspec.yaml`
-- **完全沒動**:`lib/logic/scheduler.dart`、`test/scheduler_test.dart`
-- **刪除**:`test/widget_test.dart`(`flutter create` 預設模板測試,引用不存在的 `MyApp` 類別,會讓 `flutter test` 編譯失敗,SPEC 檔案清單裡也沒有這個檔案)
+> **Web WASM 檔案來源非官方管道**
+> `web/sqlite3.wasm` 目前取自本機 pub cache 的 drift devtools build,
+> 非官方指定來源。實測功能正常,但 PWA 上線前必須換成官方 release 檔案並回歸測試。
+> 官方來源:
+> - `sqlite3.wasm` → https://github.com/simolus3/sqlite3.dart/releases
+> - `drift_worker.dart.js` → https://github.com/simolus3/drift/releases
+>
+> 兩者需取同一 drift release 對應版本,混版會有難查的問題。現在不用處理。
 
 ---
 
 ## 下一步建議
 
-先不寫新功能,等老大看過這份文件跟 `QUESTIONS.md` 回覆之後再繼續。
+等你本機跑完 `flutter test` 全綠、`git push` 完成,再麻煩老大 review 這輪的
+`home_screen.dart` / `review_screen.dart`(`StudyScreen`)/ `card_repository.dart`
+的 `studyQueue()` 與 `distractorMeaningsFor()`。停在這裡,不往下做 PWA manifest。
