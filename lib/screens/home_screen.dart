@@ -1,17 +1,21 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/database.dart';
+import '../logic/daily_roll.dart' as roll;
 import '../providers.dart';
-import 'daily_roll_screen.dart';
 import 'decks_screen.dart';
 import 'review_screen.dart';
 
-/// 首頁。依 SPEC.md 6.1:
-/// - 今天還沒拉霸 → 顯示拉霸按鈕(+ 若有到期卡片,顯示「開始複習」)
-/// - 今天已經拉過 → 顯示今日新字 / 待複習張數 / 開始複習 / 我的牌組
+/// 首頁(SPEC.md 6.1,v4)。整個 App 的主畫面,極簡:一個轉盤 + 一個
+/// 「開始」按鈕 + 右上角 ☰ 通往單字庫。
 ///
-/// 禁止顯示積壓數字、連續天數、完成率(見 6.1)。
+/// 拉霸就地播放動畫(不再跳到獨立畫面,見 6.2 廢止說明)。
+///
+/// 嚴格禁止顯示:積壓數字、連續天數、完成率、任何評比,以及「複習」兩個字。
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -20,9 +24,18 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  DailyRoll? _todaysRoll;
-  int _dueCount = 0;
+  static const _rollDuration = Duration(milliseconds: 1500);
+  static const _tickInterval = Duration(milliseconds: 60);
+  static const _flashCandidates = [0, 3, 4, 5, 6];
+
   bool _loading = true;
+  DailyRoll? _todaysRoll;
+  int _studyQueueCount = 0;
+
+  bool _rolling = false;
+  int _displayNumber = 0;
+  Timer? _rollTimer;
+  final _flashRandom = Random();
 
   @override
   void initState() {
@@ -30,33 +43,61 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _load();
   }
 
+  @override
+  void dispose() {
+    _rollTimer?.cancel();
+    super.dispose();
+  }
+
   Future<void> _load() async {
     final repo = ref.read(cardRepositoryProvider);
-    final roll = await repo.todaysRoll();
-    final due = await repo.dueCount();
+    final todaysRoll = await repo.todaysRoll();
+    final queue = await repo.studyQueue();
     if (!mounted) return;
     setState(() {
-      _todaysRoll = roll;
-      _dueCount = due;
+      _todaysRoll = todaysRoll;
+      _studyQueueCount = queue.length;
       _loading = false;
     });
   }
 
-  Future<void> _goToRoll() async {
+  void _startRoll() {
+    if (_rolling || _todaysRoll != null) return;
+    setState(() => _rolling = true);
+
+    final repo = ref.read(cardRepositoryProvider);
+    final stopwatch = Stopwatch()..start();
+
+    _rollTimer = Timer.periodic(_tickInterval, (timer) async {
+      if (stopwatch.elapsed >= _rollDuration) {
+        timer.cancel();
+        final backlog = await repo.backlogCount();
+        final result = roll.rollNewCardQuota(backlog);
+        await repo.recordRoll(quota: result.quota, wasCapped: result.wasCapped);
+        if (result.quota > 0) {
+          await repo.introduceNewCards(result.quota);
+        }
+        if (!mounted) return;
+        setState(() => _rolling = false);
+        await _load();
+        return;
+      }
+      if (!mounted) return;
+      setState(() {
+        _displayNumber =
+            _flashCandidates[_flashRandom.nextInt(_flashCandidates.length)];
+      });
+    });
+  }
+
+  Future<void> _goStudy() async {
     await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const DailyRollScreen()),
+      MaterialPageRoute(builder: (_) => const StudyScreen()),
     );
     _load();
   }
 
-  Future<void> _goToReview() async {
-    await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const ReviewScreen()),
-    );
-    _load();
-  }
-
-  void _goToDecks() {
+  void _goDecks() {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => const DecksScreen()),
     );
@@ -74,64 +115,99 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final roll = _todaysRoll;
     final rolledToday = roll != null;
     final isJackpot = rolledToday && roll.quota == 0 && !roll.wasCapped;
+    final wasCappedZero = rolledToday && roll.quota == 0 && roll.wasCapped;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('VOC-daily')),
+      appBar: AppBar(
+        title: const Text('VOC-daily'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: _goDecks,
+          ),
+        ],
+      ),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (!rolledToday) ...[
-              GestureDetector(
-                onTap: _goToRoll,
-                child: Container(
-                  width: 160,
-                  height: 160,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text('🎰', style: TextStyle(fontSize: 40)),
-                      SizedBox(height: 8),
-                      Text('今日轉盤'),
-                    ],
-                  ),
+            GestureDetector(
+              onTap: rolledToday ? null : _startRoll,
+              child: Container(
+                width: 160,
+                height: 160,
+                alignment: Alignment.center,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  shape: BoxShape.circle,
+                ),
+                child: _buildCircleContent(
+                  rolledToday: rolledToday,
+                  isJackpot: isJackpot,
+                  wasCappedZero: wasCappedZero,
+                  roll: roll,
                 ),
               ),
-              const SizedBox(height: 24),
-              if (_dueCount > 0)
-                ElevatedButton(
-                  onPressed: _goToReview,
-                  child: const Text('開始複習'),
-                ),
-            ] else ...[
-              Text(
-                isJackpot ? '今天放假!沒有新字' : '今日新字:${roll.quota} 個',
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                '待複習:$_dueCount 張',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _dueCount > 0 ? _goToReview : null,
-                child: const Text('開始複習'),
-              ),
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton(
+              onPressed: _studyQueueCount > 0 ? _goStudy : null,
+              child: const Text('開始'),
+            ),
+            if (_studyQueueCount == 0) ...[
               const SizedBox(height: 12),
-              OutlinedButton(
-                onPressed: _goToDecks,
-                child: const Text('我的牌組'),
+              Text(
+                '今天沒有要學的了',
+                style: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.copyWith(color: Colors.grey),
               ),
             ],
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildCircleContent({
+    required bool rolledToday,
+    required bool isJackpot,
+    required bool wasCappedZero,
+    required DailyRoll? roll,
+  }) {
+    if (_rolling) {
+      return Text('$_displayNumber', style: const TextStyle(fontSize: 40));
+    }
+    if (!rolledToday) {
+      return const Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('🎰', style: TextStyle(fontSize: 40)),
+          SizedBox(height: 8),
+          Text('轉一下'),
+        ],
+      );
+    }
+    if (isJackpot) {
+      return const Text(
+        '🎉 今天放假,\n沒有新字',
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+      );
+    }
+    if (wasCappedZero) {
+      return const Text(
+        '今天先把\n之前的做完就好',
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 14),
+      );
+    }
+    return Text(
+      '今日新字:\n${roll!.quota} 個',
+      textAlign: TextAlign.center,
+      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
     );
   }
 }
