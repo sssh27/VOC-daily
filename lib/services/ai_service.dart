@@ -1,6 +1,17 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+/// 依 SPEC.md 6.6 第 7 點分類的錯誤,generate_screen.dart 直接顯示
+/// [message] 即可,不需要自己再判斷錯誤類型。
+class AiServiceException implements Exception {
+  final String message;
+  AiServiceException(this.message);
+
+  @override
+  String toString() => message;
+}
 
 /// A single AI-generated card, before it's saved to the database.
 class GeneratedCard {
@@ -39,8 +50,7 @@ class AiService {
   }) async {
     final apiKey = dotenv.env['AI_API_KEY'];
     if (apiKey == null || apiKey.isEmpty) {
-      throw Exception(
-          'AI_API_KEY missing. Copy .env.example to .env and fill it in.');
+      throw AiServiceException('尚未設定 API 金鑰');
     }
 
     final prompt = '''
@@ -50,33 +60,48 @@ Return ONLY valid JSON in this exact shape, no extra text:
 meaning and exampleZh should be in Traditional Chinese.
 ''';
 
-    // Example uses an OpenAI-compatible chat completions endpoint.
-    // Swap the URL/body/headers if you use a different provider.
-    final response = await http.post(
-      Uri.parse('https://api.openai.com/v1/chat/completions'),
-      headers: {
-        'Authorization': 'Bearer $apiKey',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        'model': 'gpt-4o-mini',
-        'messages': [
-          {'role': 'user', 'content': prompt}
-        ],
-        'response_format': {'type': 'json_object'},
-      }),
-    );
-
-    if (response.statusCode != 200) {
-      throw Exception(
-          'AI request failed: ${response.statusCode} ${response.body}');
+    http.Response response;
+    try {
+      // Example uses an OpenAI-compatible chat completions endpoint.
+      // Swap the URL/body/headers if you use a different provider.
+      response = await http.post(
+        Uri.parse('https://api.openai.com/v1/chat/completions'),
+        headers: {
+          'Authorization': 'Bearer $apiKey',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'model': 'gpt-4o-mini',
+          'messages': [
+            {'role': 'user', 'content': prompt}
+          ],
+          'response_format': {'type': 'json_object'},
+        }),
+      );
+    } on SocketException {
+      throw AiServiceException('連線失敗,請檢查網路');
+    } on HttpException {
+      throw AiServiceException('連線失敗,請檢查網路');
+    } catch (e) {
+      // http package throws ClientException (which isn't available without
+      // importing package:http/http.dart's internals) for most other
+      // network-layer failures; treat anything not already an
+      // AiServiceException as a connectivity problem here.
+      throw AiServiceException('連線失敗,請檢查網路');
     }
 
-    final body = jsonDecode(response.body);
-    final content = body['choices'][0]['message']['content'] as String;
-    final parsed = jsonDecode(content) as Map<String, dynamic>;
-    final list = (parsed['cards'] as List).cast<Map<String, dynamic>>();
+    if (response.statusCode != 200) {
+      throw AiServiceException('連線失敗,請檢查網路');
+    }
 
-    return list.map(GeneratedCard.fromJson).toList();
+    try {
+      final body = jsonDecode(response.body);
+      final content = body['choices'][0]['message']['content'] as String;
+      final parsed = jsonDecode(content) as Map<String, dynamic>;
+      final list = (parsed['cards'] as List).cast<Map<String, dynamic>>();
+      return list.map(GeneratedCard.fromJson).toList();
+    } catch (e) {
+      throw AiServiceException('AI 回傳格式異常,請再試一次');
+    }
   }
 }

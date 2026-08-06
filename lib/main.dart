@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+import 'providers.dart';
 import 'screens/home_screen.dart';
+import 'services/starter_deck_loader.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,7 +20,41 @@ class VocabApp extends StatelessWidget {
     return MaterialApp(
       title: 'Vocab SRS',
       theme: ThemeData(colorSchemeSeed: Colors.indigo, useMaterial3: true),
-      home: const HomeScreen(),
+      home: const _AppBootstrap(),
+    );
+  }
+}
+
+/// 第一次啟動時,先確認內建牌組已匯入(見 SPEC.md 第 7 節),再顯示首頁。
+class _AppBootstrap extends ConsumerStatefulWidget {
+  const _AppBootstrap();
+
+  @override
+  ConsumerState<_AppBootstrap> createState() => _AppBootstrapState();
+}
+
+class _AppBootstrapState extends ConsumerState<_AppBootstrap> {
+  late final Future<void> _ready;
+
+  @override
+  void initState() {
+    super.initState();
+    final repo = ref.read(cardRepositoryProvider);
+    _ready = StarterDeckLoader(repo).importIfEmpty();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _ready,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        return const HomeScreen();
+      },
     );
   }
 }

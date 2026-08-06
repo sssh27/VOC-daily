@@ -1,0 +1,216 @@
+{
+  "name": "入門常用字",
+  "topic": "日常英文高頻字彙",
+  "cards": [
+    {
+      "word": "procrastinate",
+      "phonetic": "/prəˈkræstɪneɪt/",
+      "meaning": "拖延",
+      "example": "I always procrastinate when I have a big project due.",
+      "exampleZh": "每次有大專案要交,我總是拖延。"
+    },
+    {
+      "word": "accomplish",
+      "phonetic": "/əˈkʌmplɪʃ/",
+      "meaning": "完成;達成",
+      "example": "She managed to accomplish all her goals this year.",
+      "exampleZh": "她今年設法達成了所有目標。"
+    },
+    {
+      "word": "convenient",
+      "phonetic": "/kənˈviːniənt/",
+      "meaning": "方便的",
+      "example": "It's more convenient to pay by card.",
+      "exampleZh": "用卡付款比較方便。"
+    },
+    {
+      "word": "exhausted",
+      "phonetic": "/ɪɡˈzɔːstɪd/",
+      "meaning": "精疲力竭的",
+      "example": "I was exhausted after the long meeting.",
+      "exampleZh": "開完那場冗長會議後我筋疲力盡。"
+    },
+    {
+      "word": "reliable",
+      "phonetic": "/rɪˈlaɪəbl/",
+      "meaning": "可靠的",
+      "example": "He's a reliable friend who always keeps his promises.",
+      "exampleZh": "他是個可靠的朋友,總是信守承諾。"
+    },
+    {
+      "word": "appreciate",
+      "phonetic": "/əˈpriːʃieɪt/",
+      "meaning": "感激;欣賞",
+      "example": "I really appreciate your help with this.",
+      "exampleZh": "我真的很感激你在這件事上的幫忙。"
+    },
+    {
+      "word": "embarrassed",
+      "phonetic": "/ɪmˈbærəst/",
+      "meaning": "尷尬的",
+      "example": "She felt embarrassed after forgetting his name.",
+      "exampleZh": "忘記他的名字後她覺得很尷尬。"
+    },
+    {
+      "word": "negotiate",
+      "phonetic": "/nɪˈɡoʊʃieɪt/",
+      "meaning": "談判;協商",
+      "example": "We need to negotiate a better price.",
+      "exampleZh": "我們需要談判出更好的價格。"
+    },
+    {
+      "word": "postpone",
+      "phonetic": "/poʊstˈpoʊn/",
+      "meaning": "延後;延期",
+      "example": "The meeting was postponed until next week.",
+      "exampleZh": "會議被延到下週。"
+    },
+    {
+      "word": "curious",
+      "phonetic": "/ˈkjʊriəs/",
+      "meaning": "好奇的",
+      "example": "The kids were curious about the new machine.",
+      "exampleZh": "孩子們對這台新機器感到好奇。"
+    },
+    {
+      "word": "exaggerate",
+      "phonetic": "/ɪɡˈzædʒəreɪt/",
+      "meaning": "誇大;誇張",
+      "example": "Don't exaggerate the problem, it's not that bad.",
+      "exampleZh": "別誇大問題,沒那麼糟。"
+    },
+    {
+      "word": "frustrated",
+      "phonetic": "/frʌˈstreɪtɪd/",
+      "meaning": "沮喪的;挫折的",
+      "example": "He felt frustrated when the printer kept jamming.",
+      "exampleZh": "印表機一直卡紙讓他感到很挫折。"
+    },
+    {
+      "word": "essential",
+      "phonetic": "/ɪˈsenʃl/",
+      "meaning": "必要的;本質的",
+      "example": "Water is essential for survival.",
+      "exampleZh": "水對生存是必要的。"
+    },
+    {
+      "word": "tremendous",
+      "phonetic": "/trəˈmendəs/",
+      "meaning": "極大的;驚人的",
+      "example": "She made a tremendous effort to finish on time.",
+      "exampleZh": "她付出極大的努力才準時完成。"
+    },
+    {
+      "word": "anticipate",
+      "phonetic": "/ænˈtɪsɪpeɪt/",
+      "meaning": "預期;期待",
+      "example": "We anticipate strong sales this quarter.",
+      "exampleZh": "我們預期這一季的銷售會很好。"
+    },
+    {
+      "word": "reluctant",
+      "phonetic": "/rɪˈlʌktənt/",
+      "meaning": "不情願的",
+      "example": "He was reluctant to admit his mistake.",
+      "exampleZh": "他不情願承認自己的錯誤。"
+    },
+    {
+      "word": "sufficient",
+      "phonetic": "/səˈfɪʃnt/",
+      "meaning": "足夠的",
+      "example": "We don't have sufficient time to finish this today.",
+      "exampleZh": "我們沒有足夠時間今天完成這件事。"
+    },
+    {
+      "word": "ambitious",
+      "phonetic": "/æmˈbɪʃəs/",
+      "meaning": "有野心的;有抱負的",
+      "example": "She's an ambitious young manager.",
+      "exampleZh": "她是個有抱負的年輕經理。"
+    },
+    {
+      "word": "inevitable",
+      "phonetic": "/ɪnˈevɪtəbl/",
+      "meaning": "不可避免的",
+      "example": "Some delays are simply inevitable.",
+      "exampleZh": "有些延誤根本無可避免。"
+    },
+    {
+      "word": "hesitate",
+      "phonetic": "/ˈhezɪteɪt/",
+      "meaning": "猶豫",
+      "example": "Don't hesitate to ask if you have questions.",
+      "exampleZh": "有問題別猶豫,儘管問。"
+    },
+    {
+      "word": "persuade",
+      "phonetic": "/pərˈsweɪd/",
+      "meaning": "說服",
+      "example": "It took a while to persuade him to join us.",
+      "exampleZh": "花了一段時間才說服他加入我們。"
+    },
+    {
+      "word": "overwhelmed",
+      "phonetic": "/ˌoʊvərˈwelmd/",
+      "meaning": "不知所措的;被淹沒的",
+      "example": "She felt overwhelmed by all the emails.",
+      "exampleZh": "大量的郵件讓她感到不知所措。"
+    },
+    {
+      "word": "genuine",
+      "phonetic": "/ˈdʒenjuɪn/",
+      "meaning": "真誠的;真正的",
+      "example": "His apology sounded genuine.",
+      "exampleZh": "他的道歉聽起來很真誠。"
+    },
+    {
+      "word": "flexible",
+      "phonetic": "/ˈfleksəbl/",
+      "meaning": "有彈性的",
+      "example": "My work schedule is pretty flexible.",
+      "exampleZh": "我的工作時間表相當有彈性。"
+    },
+    {
+      "word": "compromise",
+      "phonetic": "/ˈkɑːmprəmaɪz/",
+      "meaning": "妥協",
+      "example": "They reached a compromise after a long discussion.",
+      "exampleZh": "經過長時間討論後他們達成了妥協。"
+    },
+    {
+      "word": "dedicate",
+      "phonetic": "/ˈdedɪkeɪt/",
+      "meaning": "奉獻;致力於",
+      "example": "He dedicated years to this research.",
+      "exampleZh": "他為這項研究奉獻了好幾年。"
+    },
+    {
+      "word": "skeptical",
+      "phonetic": "/ˈskeptɪkl/",
+      "meaning": "懷疑的",
+      "example": "I'm a bit skeptical about that claim.",
+      "exampleZh": "我對那個說法有點懷疑。"
+    },
+    {
+      "word": "inconvenient",
+      "phonetic": "/ˌɪnkənˈviːniənt/",
+      "meaning": "不方便的",
+      "example": "It's inconvenient to travel during rush hour.",
+      "exampleZh": "尖峰時間出門很不方便。"
+    },
+    {
+      "word": "thorough",
+      "phonetic": "/ˈθʌroʊ/",
+      "meaning": "徹底的;周全的",
+      "example": "She did a thorough review of the report.",
+      "exampleZh": "她對報告做了徹底的檢查。"
+    },
+    {
+      "word": "reassure",
+      "phonetic": "/ˌriːəˈʃʊr/",
+      "meaning": "使安心;向...保證",
+      "example": "He reassured her that everything would be fine.",
+      "exampleZh": "他向她保證一切都會沒事。"
+    }
+  ]
+}
