@@ -91,6 +91,29 @@ class CardRepository {
     return candidates.length;
   }
 
+  /// 【v5】補位機制:再從倉庫(isIntroduced == false)引入 1 張新卡,接在
+  /// 認識卡佇列最後面。倉庫沒有卡片時回傳 null,呼叫端不需要另外檢查
+  /// notIntroducedCount(),直接看回傳值是不是 null 即可。見 SPEC.md 6.4
+  /// 「額度補位機制」。
+  Future<Card?> replenishOneNewCard({DateTime? now}) async {
+    final today = _startOfDay(now ?? DateTime.now());
+    final candidate = await (_db.select(_db.cards)
+          ..where((c) => c.isIntroduced.equals(false))
+          ..limit(1))
+        .getSingleOrNull();
+    if (candidate == null) return null;
+
+    await (_db.update(_db.cards)..where((c) => c.id.equals(candidate.id)))
+        .write(
+      CardsCompanion(
+        isIntroduced: const Value(true),
+        dueDate: Value(today),
+      ),
+    );
+    return (_db.select(_db.cards)..where((c) => c.id.equals(candidate.id)))
+        .getSingle();
+  }
+
   /// 倉庫裡還有多少張未引入的卡片(用來判斷是否要提示「單字庫快用完了」)。
   Future<int> notIntroducedCount() async {
     final query = _db.selectOnly(_db.cards)
