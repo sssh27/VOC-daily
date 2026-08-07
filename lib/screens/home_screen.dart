@@ -155,7 +155,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               onPressed: _studyQueueCount > 0 ? _goStudy : null,
               child: const Text('開始'),
             ),
-            if (_studyQueueCount == 0) ...[
+            if (rolledToday && _studyQueueCount == 0) ...[
               const SizedBox(height: 12),
               Text(
                 '今天沒有要學的了',
