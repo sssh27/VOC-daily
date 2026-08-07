@@ -1,129 +1,120 @@
 # TASKS.md
 
-> 老大(規格方)指派的工作順序。由上往下做,做完更新 `PROGRESS.md`。
+> 老大(規格方)指派的工作。由上往下做,做完更新 `PROGRESS.md`。
 > 有疑問寫進 `QUESTIONS.md`(標題用 `## [未回答] ...`),不要自己猜。
 
 ---
 
 ## 上一輪 review 結果
 
-v3 的實作品質不錯:規格有照做、`scheduler.dart` 沒被動、分級邏輯有抽成純函式方便測試。
-以下是這一輪要處理的事,分成「Shawn 的版面調整」和「我 review 出來的缺口」。
+v4 實作品質good:規格都照做了,拉霸就地轉、認識卡、單一流程、補考機制、
+7 個 distractor 測試都補上,commit 也切得乾淨。Shawn 本機已跑過 `flutter test`,24 個全過。
+
+以下是這輪要處理的事:**兩個 bug 修正 + 一個新功能。**
 
 ---
 
-## A. 版面重構(Shawn 指定)
+## A. Bug 修正
 
-核心原則:**整潔俐落。整個 App 只有兩個主要畫面。**
+### A1. 首頁文案在轉盤前就誤導使用者
 
-`docs/SPEC.md` 的 6.1 / 6.2 / 6.3b / 6.4 / 6.5 已更新為 **v4**,請重讀那幾節。
+**現況:** 今天還沒轉盤、且沒有到期字時,`_studyQueueCount == 0`,
+首頁顯示「開始」按鈕禁用 + 「今天沒有要學的了」。
 
-### A1. 刪除獨立拉霸畫面,改成首頁就地轉
+**問題:** 使用者只要轉一下轉盤就會有新字。這行文案在轉盤前跳出來等於謊報。
 
-- **刪除** `lib/screens/daily_roll_screen.dart`
-- 拉霸動畫改在 `home_screen.dart` 就地播放
-- 理由:首頁本來就有轉盤圖示,點下去卻跳到另一頁看第二個轉盤,是無意義的重複
+**修法:** 「今天沒有要學的了」這行只有在 `rolledToday == true` 時才可能顯示。
+還沒轉盤時不顯示這行(轉盤本身就是明確的行動指引,不需要額外文案)。
 
-### A2. 首頁極簡化
+### A2. 補考可能洗掉失敗紀錄
 
-只保留三個元素:轉盤、`[開始]` 按鈕、右上角 ☰(通往單字庫)。
+**現況:** `_confirmInfo()` 沒有判斷目前是不是補考階段。
 
-**移除**:「待複習:N 張」這行、「開始複習」按鈕、「我的牌組」按鈕。
+**問題路徑:** 卡片答錯 → 進補考佇列 → 補考時 `distractorMeaningsFor()` 回傳空陣列
+→ `_mode = _Mode.info` → 使用者按「下一個」→ `_confirmInfo()` 以 quality 4 寫回資料庫
+→ **剛才的失敗紀錄被洗掉**,該卡被排到很久以後。
 
-### A3. 新字與到期字合併成單一流程
+這違反 SPEC 6.4「補考結果不寫回資料庫」。
 
-- `review_screen.dart` 的 class 改名 `ReviewScreen` → `StudyScreen`(檔名不動,避免大量 import 改動)
-- 畫面標題「複習」→「學習」
-- 佇列 = 新字(前)+ 到期字(後),見 SPEC 6.4
-- **全 App 任何地方都不得出現「複習」兩個字**(Shawn 說那讓他感覺像在上課)
+**修法:** `_confirmInfo()` 開頭加判斷,`_phase == _Phase.retry` 時只前進不寫回資料庫。
 
-### A4. 新字改用「認識卡」,不考
-
-- **新增** `lib/widgets/intro_card.dart`(見 SPEC 6.3b)
-- 新字第一次出現只給看,底部一個「下一個」按鈕
-- 按下時呼叫 `reviewCard(state, 4)`,結果是 interval=1、easiness 維持 2.5、明天開始考
-- 理由:第一次見到的字直接考四選一,使用者只能亂猜,產生的是雜訊而非有效訊號
-
-### A5. 牌組列表降級為「單字庫」
-
-- 從主流程移除,改由首頁右上角 ☰ 進入
-- 標題「我的牌組」→「單字庫」
-- **資料層的 Deck 概念保留**,不要拿掉。它有兩個實際用途:
-  1. AI 一次生成一批,需要容器才能後續管理/刪除
-  2. 四選一的干擾項優先從同 deck 挑,語意接近才有鑑別度
+**觸發機率極低**(需要整個牌組只剩一張卡),但這是規格明文禁止的行為,補一行判斷即可。
 
 ---
 
-## B. 答錯補考機制(新增)
+## B. 新功能:「我會了」按鈕 + 額度補位機制
 
-見 SPEC 6.4「答錯補考機制」。重點:
+`docs/SPEC.md` 的 5.5、6.3b、6.4 已更新為 **v5**,請重讀。
 
-1. 答錯或按「忘了」的卡,排到本次流程**最後補考一次**
-2. 每張卡一次流程**最多補考一次**,補考再錯不再排入
-3. **補考結果不寫回資料庫** —— 排程已在第一次作答時決定,不能讓使用者靠補考洗掉失敗紀錄
-4. 補考題外觀與一般題目完全相同,不要標示「這是補考」
+### B1. 認識卡加第二個按鈕
 
----
+```
+   [ 下一個 ]        [ 我會了 ]
+```
 
-## C. 我 review 出來的缺口(必修)
+**「我會了」的實作:連續呼叫 `reviewCard(state, 5)` 三次**,前一次的回傳當下一次的輸入:
 
-### C1. `distractorMeaningsFor()` 零測試覆蓋 —— 最優先
+```dart
+var st = currentState;
+for (var i = 0; i < 3; i++) {
+  st = reviewCard(st, 5);
+}
+// 結果:repetitions = 3, easiness = 2.8, interval = 16, dueDate = 今天 + 16 天
+```
 
-這是目前最複雜的新邏輯(同 deck 優先 + `avoidWith` 雙向排除 + 回退全庫),
-卻一個測試都沒有。這種選取邏輯出錯很難察覺,使用者只會覺得「選項怪怪的」。
+**絕對不要新增 `isMastered` 之類的欄位,也不要直接寫死 dueDate。**
+一律透過 `reviewCard()`,維持 SM-2 單一入口。這點很重要,不要自作聰明簡化。
 
-用 `AppDatabase.forTesting()` 搭配 in-memory database 寫測試,至少涵蓋:
+### B2. 額度補位機制
 
-1. 同 deck 有足夠卡片時,3 個 distractor 全部來自同 deck
-2. 同 deck 不足時,會回退到其他 deck 補滿
-3. `avoidWith` 排除有效:A 標記了 B,B 不會出現在 A 的選項裡
-4. `avoidWith` **雙向**有效:B 標記了 A,A 也不會出現在 B 的選項裡
-5. 不會回傳與正確答案相同的 meaning
-6. 不會回傳重複的 meaning
-7. 全庫只有 1 張卡時,回傳空陣列(不 crash)
+拉霸骰出的額度代表「**今天要真正學會的新字數量**」,不是「今天會看到幾張新字卡」。
 
-### C2. 選項不足 3 個時沒處理
+| 使用者行為 | 是否計入額度 | 後續動作 |
+|---|---|---|
+| 按「下一個」 | ✅ 計入 | 前進下一張 |
+| 按「我會了」 | ❌ 不計入 | **立刻從倉庫再引入 1 張**,接在認識卡佇列最後面 |
 
-見 SPEC 6.4「選項不足時的處理」:
+**不設補位次數上限。** 天然停止條件已足夠:倉庫空了、額度滿了、使用者自己關掉。
 
-| distractor 數 | 行為 |
-|---|---|
-| 3 | 正常四選一 |
-| 1–2 | 顯示 2–3 個選項,照常計分 |
-| 0 | 改用認識卡顯示,按「下一個」以 quality 4 計 |
+**不要因為 `starter_deck.json` 只有 30 個字就加人工上限。** 那是佔位用的測試資料,
+不該讓它的限制影響主程式設計。
 
-### C3. 答錯的停留時間拉長
+### B3. 倉庫用盡的提示
 
-目前答對/答錯都停 1.4 秒。答錯時要看清楚正確答案 + 中譯,1.4 秒不夠。
+若倉庫已無未引入卡片、無法補位,在該次流程的**結束畫面**加一行:
 
-- 答對 → 1.4 秒
-- 答錯或按「忘了」 → **3 秒**
+> 單字庫快用完了,去生成新的吧
 
----
-
-## D. 測試與驗證
-
-`flutter test` 必須全綠。預期測試數:
-
-- `scheduler_test.dart` 4 個(**禁止修改**)
-- `daily_roll_test.dart` 6 個
-- `answer_grading_test.dart` 7 個
-- `distractor_test.dart` 7 個(C1 新增)
-
-如果你的環境沒有 Flutter SDK 跑不了測試,在 `PROGRESS.md` 明確註明,由 Shawn 本機驗證。
+不要用彈窗或任何阻斷式互動。
 
 ---
 
-## E. Commit
+## C. 測試
 
-照「一個步驟一個 commit」做。建議切成:
+新增測試涵蓋:
 
-1. `refactor: remove standalone roll screen, roll inline on home`
-2. `feat: intro card for first exposure to new words`
-3. `refactor: merge new and due cards into single study flow`
-4. `feat: retry queue for failed cards within session`
-5. `test: cover distractor selection logic`
-6. `fix: handle insufficient distractors, longer reveal on wrong answer`
+1. 「我會了」連呼叫三次 `reviewCard(_, 5)` 後,`interval == 16`、`repetitions == 3`、
+   `easiness` 約 2.8(浮點數用 `closeTo`)
+2. 額度計數:按「下一個」計入、按「我會了」不計入
+3. 補位邏輯:按「我會了」時會從倉庫引入 1 張(用 in-memory DB 測 repository 層)
+4. 倉庫空時補位不會 crash,回傳 null 或空
+
+建議把額度計數與補位判斷的邏輯抽成可測試的純函式或 repository method,
+不要全部塞在 `StudyScreen` 的 State 裡,否則沒辦法測。
+
+`flutter test` 必須全綠,`test/scheduler_test.dart` 依然**禁止修改**。
+
+---
+
+## D. Commit
+
+一個步驟一個 commit,建議切成:
+
+1. `fix: only show empty-state text after the daily roll`
+2. `fix: do not persist review result during retry phase`
+3. `feat: add "already know it" button on intro card`
+4. `feat: quota counts only newly learned words, replenish on skip`
+5. `test: cover already-know grading and quota replenishment`
 
 `git push` 若你的環境沒有認證,在 `PROGRESS.md` 註明,由 Shawn 本機執行。
 
