@@ -3,17 +3,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/database.dart';
 import '../logic/answer_grading.dart';
+import '../logic/intro_queue.dart';
 import '../logic/scheduler.dart';
 import '../providers.dart';
 import '../widgets/intro_card.dart';
 import '../widgets/question_card.dart';
 
-/// 學習畫面(SPEC.md 6.4,v4)。檔名維持 `review_screen.dart` 不變(避免大量
-/// import 改動),但 class 改名 `StudyScreen`,畫面標題「學習」——全 App
+/// 學習畫面(SPEC.md 6.4,v5)。檔名維持 `review_screen.dart` 不變(避免大量
+/// import 改動),但 class 是 `StudyScreen`,畫面標題「學習」——全 App
 /// 任何地方都不得出現「複習」兩個字。
 ///
-/// 佇列 = 新字(前,認識卡模式,只給看不考)+ 到期字(後,四選一測驗模式)。
-/// 答錯或按「忘了」的到期字會排到本次流程最後補考一次,補考結果不寫回資料庫。
+/// 流程:
+/// 1. **新字(認識卡)**——`IntroQueue` 管理,只給看不考。「下一個」計入
+///    當日新字額度;「我會了」連呼叫 3 次 `reviewCard(_, 5)`、不計入額度、
+///    立刻從倉庫補位 1 張接到佇列最後面。
+/// 2. **到期字(四選一測驗)**——答錯或按「忘了」的卡排到本次流程最後
+///    補考一次,補考結果不寫回資料庫。
 class StudyScreen extends ConsumerStatefulWidget {
   const StudyScreen({super.key});
 
@@ -21,23 +26,28 @@ class StudyScreen extends ConsumerStatefulWidget {
   ConsumerState<StudyScreen> createState() => _StudyScreenState();
 }
 
-enum _Mode { info, quiz }
+enum _DueMode { info, quiz }
 
-enum _Phase { main, retry, done }
+enum _Phase { intro, due, retry, done }
 
 class _StudyScreenState extends ConsumerState<StudyScreen> {
   static const _correctRevealDuration = Duration(milliseconds: 1400);
   static const _wrongRevealDuration = Duration(seconds: 3);
 
-  List<Card>? _mainQueue;
-  int _mainIndex = 0;
+  IntroQueue<Card>? _introQueue;
+
+  List<Card> _dueQueue = [];
+  int _dueIndex = 0;
 
   final List<Card> _retryQueue = [];
   int _retryIndex = 0;
   final Set<int> _alreadyRetried = {};
 
-  _Phase _phase = _Phase.main;
-  _Mode? _mode;
+  _Phase _phase = _Phase.intro;
+  bool _loading = true;
+  bool _warehouseExhausted = false;
+
+  _DueMode? _dueMode;
   List<String>? _choices;
   String? _selected;
   bool _gaveUp = false;
@@ -52,62 +62,75 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
   }
 
   Card? get _currentCard {
-    if (_phase == _Phase.main) {
-      final queue = _mainQueue;
-      if (queue == null || _mainIndex >= queue.length) return null;
-      return queue[_mainIndex];
+    switch (_phase) {
+      case _Phase.intro:
+        return _introQueue?.current;
+      case _Phase.due:
+        return _dueIndex < _dueQueue.length ? _dueQueue[_dueIndex] : null;
+      case _Phase.retry:
+        return _retryIndex < _retryQueue.length
+            ? _retryQueue[_retryIndex]
+            : null;
+      case _Phase.done:
+        return null;
     }
-    if (_phase == _Phase.retry) {
-      if (_retryIndex >= _retryQueue.length) return null;
-      return _retryQueue[_retryIndex];
-    }
-    return null;
   }
 
   Future<void> _loadQueue() async {
     final repo = ref.read(cardRepositoryProvider);
-    final queue = await repo.studyQueue();
+    final intro = await repo.newCards();
+    final due = await repo.dueForStudyCards();
+    final todaysRoll = await repo.todaysRoll();
+
     if (!mounted) return;
+
+    final introQueue = IntroQueue<Card>(intro);
+    // 倉庫在拉霸當下就不夠了(見 SPEC 5.5),先記下來,結束畫面才提示。
+    final rollShortfall =
+        todaysRoll != null && intro.length < todaysRoll.quota;
+
     setState(() {
-      _mainQueue = queue;
-      _mainIndex = 0;
-      _phase = queue.isEmpty ? _Phase.done : _Phase.main;
+      _introQueue = introQueue;
+      _dueQueue = due;
+      _dueIndex = 0;
+      _warehouseExhausted = rollShortfall;
+      _phase = introQueue.isDone ? _Phase.due : _Phase.intro;
+      _loading = false;
     });
+
     await _prepareCurrent();
   }
 
+  /// 只有到期字(模式 B)需要準備選項;新字一律是認識卡,不需要準備。
   Future<void> _prepareCurrent() async {
-    final card = _currentCard;
-    if (card == null) return;
+    _settlePhase();
+    if (!mounted) return;
 
+    final card = _currentCard;
     setState(() {
       _selected = null;
       _gaveUp = false;
       _locked = false;
       _choices = null;
-      _mode = null;
+      _dueMode = null;
     });
 
-    // 新字(lastReviewed == null)一律用認識卡,不考。
-    if (card.lastReviewed == null) {
-      setState(() => _mode = _Mode.info);
+    if (card == null || _phase == _Phase.intro || _phase == _Phase.done) {
       return;
     }
 
     final repo = ref.read(cardRepositoryProvider);
     final distractors = await repo.distractorMeaningsFor(card, count: 3);
-
     if (!mounted) return;
 
     if (distractors.isEmpty) {
-      // 選項不足(0 個):改用認識卡顯示,無法出題。
-      setState(() => _mode = _Mode.info);
+      setState(() => _dueMode = _DueMode.info);
       return;
     }
 
     final choices = [card.meaning, ...distractors]..shuffle();
     setState(() {
-      _mode = _Mode.quiz;
+      _dueMode = _DueMode.quiz;
       _choices = choices;
     });
 
@@ -116,10 +139,29 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
       ..start();
   }
 
-  /// 認識卡/資訊模式的「下一個」:quality 固定 4,一律寫回資料庫。
-  Future<void> _confirmInfo() async {
-    final card = _currentCard;
-    if (card == null || _locked) return;
+  /// 把 _phase 推進到第一個「有東西可做」的階段,連續空的階段會一路跳過。
+  void _settlePhase() {
+    if (_phase == _Phase.intro && (_introQueue?.isDone ?? true)) {
+      _phase = _Phase.due;
+    }
+    if (_phase == _Phase.due && _dueIndex >= _dueQueue.length) {
+      _phase = _retryQueue.isNotEmpty ? _Phase.retry : _Phase.done;
+      _retryIndex = 0;
+    }
+    if (_phase == _Phase.retry && _retryIndex >= _retryQueue.length) {
+      _phase = _Phase.done;
+    }
+  }
+
+  // ---------------------------------------------------------------------
+  // 模式 A:認識卡(新字)
+  // ---------------------------------------------------------------------
+
+  /// 「下一個」:quality 固定 4,計入當日新字額度。
+  Future<void> _introNext() async {
+    final queue = _introQueue;
+    final card = queue?.current;
+    if (queue == null || card == null || _locked) return;
     setState(() => _locked = true);
 
     final state = ScheduleState(
@@ -132,10 +174,66 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
     final repo = ref.read(cardRepositoryProvider);
     await repo.submitReview(card.id, newState);
 
+    queue.confirmNext();
     await _advance();
   }
 
-  /// 四選一測驗作答。[choice] 為 null 代表按了「忘了」。
+  /// 「我會了」:連呼叫 3 次 reviewCard(_, 5),不計入額度,立刻補位 1 張。
+  Future<void> _introAlreadyKnown() async {
+    final queue = _introQueue;
+    final card = queue?.current;
+    if (queue == null || card == null || _locked) return;
+    setState(() => _locked = true);
+
+    var state = ScheduleState(
+      easiness: card.easiness,
+      interval: card.interval,
+      repetitions: card.repetitions,
+      dueDate: card.dueDate,
+    );
+    for (var i = 0; i < 3; i++) {
+      state = reviewCard(state, 5);
+    }
+    final repo = ref.read(cardRepositoryProvider);
+    await repo.submitReview(card.id, state);
+
+    queue.markAlreadyKnown();
+
+    final replacement = await repo.replenishOneNewCard();
+    queue.replenish(replacement);
+    if (replacement == null) {
+      _warehouseExhausted = true;
+    }
+
+    await _advance();
+  }
+
+  // ---------------------------------------------------------------------
+  // 模式 B:到期字(四選一測驗 / 選項不足時的認識卡 fallback)
+  // ---------------------------------------------------------------------
+
+  /// 到期字選項不足(0 個 distractor)時的 fallback:改用認識卡顯示,
+  /// 按「下一個」以 quality 4 計。**補考階段不寫回資料庫**(A2 修正)。
+  Future<void> _confirmDueInfo() async {
+    final card = _currentCard;
+    if (card == null || _locked) return;
+    setState(() => _locked = true);
+
+    if (_phase != _Phase.retry) {
+      final state = ScheduleState(
+        easiness: card.easiness,
+        interval: card.interval,
+        repetitions: card.repetitions,
+        dueDate: card.dueDate,
+      );
+      final newState = reviewCard(state, 4);
+      final repo = ref.read(cardRepositoryProvider);
+      await repo.submitReview(card.id, newState);
+    }
+
+    await _advanceDueOrRetry();
+  }
+
   Future<void> _answerQuiz({String? choice, required bool gaveUp}) async {
     final card = _currentCard;
     if (card == null || _locked) return;
@@ -178,43 +276,27 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
     final revealDuration =
         isCorrect ? _correctRevealDuration : _wrongRevealDuration;
     await Future.delayed(revealDuration);
+    await _advanceDueOrRetry();
+  }
+
+  Future<void> _advanceDueOrRetry() async {
+    if (_phase == _Phase.due) {
+      _dueIndex++;
+    } else if (_phase == _Phase.retry) {
+      _retryIndex++;
+    }
     await _advance();
   }
 
   Future<void> _advance() async {
     if (!mounted) return;
-
-    if (_phase == _Phase.main) {
-      final nextIndex = _mainIndex + 1;
-      if (nextIndex < (_mainQueue?.length ?? 0)) {
-        setState(() => _mainIndex = nextIndex);
-      } else if (_retryQueue.isNotEmpty) {
-        setState(() {
-          _phase = _Phase.retry;
-          _retryIndex = 0;
-        });
-      } else {
-        setState(() => _phase = _Phase.done);
-        return;
-      }
-    } else if (_phase == _Phase.retry) {
-      final nextIndex = _retryIndex + 1;
-      if (nextIndex < _retryQueue.length) {
-        setState(() => _retryIndex = nextIndex);
-      } else {
-        setState(() => _phase = _Phase.done);
-        return;
-      }
-    } else {
-      return;
-    }
-
+    setState(() {});
     await _prepareCurrent();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_mainQueue == null) {
+    if (_loading) {
       return Scaffold(
         appBar: AppBar(title: const Text('學習')),
         body: const Center(child: CircularProgressIndicator()),
@@ -229,6 +311,16 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text('今天做完了', style: TextStyle(fontSize: 20)),
+              if (_warehouseExhausted) ...[
+                const SizedBox(height: 8),
+                Text(
+                  '單字庫快用完了,去生成新的吧',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.copyWith(color: Colors.grey),
+                ),
+              ],
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst),
@@ -241,7 +333,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
     }
 
     final card = _currentCard;
-    if (card == null || _mode == null) {
+    if (card == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('學習')),
         body: const Center(child: CircularProgressIndicator()),
@@ -252,14 +344,14 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
       appBar: AppBar(title: const Text('學習')),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: _mode == _Mode.info
-            ? _buildInfoMode(card)
-            : _buildQuizMode(card),
+        child: _phase == _Phase.intro
+            ? _buildIntroMode(card)
+            : _buildDueMode(card),
       ),
     );
   }
 
-  Widget _buildInfoMode(Card card) {
+  Widget _buildIntroMode(Card card) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -271,15 +363,48 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
           exampleZh: card.exampleZh,
         ),
         const SizedBox(height: 24),
-        ElevatedButton(
-          onPressed: _locked ? null : _confirmInfo,
-          child: const Text('下一個'),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: _locked ? null : _introNext,
+                child: const Text('下一個'),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: _locked ? null : _introAlreadyKnown,
+                child: const Text('我會了'),
+              ),
+            ),
+          ],
         ),
       ],
     );
   }
 
-  Widget _buildQuizMode(Card card) {
+  Widget _buildDueMode(Card card) {
+    if (_dueMode == _DueMode.info) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          IntroCard(
+            word: card.word,
+            phonetic: card.phonetic,
+            meaning: card.meaning,
+            example: card.example,
+            exampleZh: card.exampleZh,
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: _locked ? null : _confirmDueInfo,
+            child: const Text('下一個'),
+          ),
+        ],
+      );
+    }
+
     final choices = _choices;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
