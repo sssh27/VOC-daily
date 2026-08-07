@@ -6,6 +6,96 @@
 
 ---
 
+## 這一輪(v5)做了什麼
+
+依 `docs/agent-sync/TASKS.md` 的 A(兩個 bug 修正)、B(「我會了」按鈕 + 額度補位)、
+C(測試)、D(commit)完成,細節如下。
+
+### A. Bug 修正
+
+- **A1** `home_screen.dart`:「今天沒有要學的了」這行的顯示條件從
+  `_studyQueueCount == 0` 改成 `rolledToday && _studyQueueCount == 0`,還沒轉盤前
+  不會顯示這行文案。
+- **A2** 補考不寫回資料庫:原本 `_confirmInfo()`(選項不足時的 fallback)沒有判斷
+  補考階段。這輪重寫 `review_screen.dart` 時,把這個 fallback 統一改名
+  `_confirmDueInfo()`,開頭就檢查 `if (_phase != _Phase.retry)` 才寫
+  `submitReview()`,補考階段只前進、不動資料庫。
+
+### B. 「我會了」按鈕 + 額度補位機制
+
+- **B1** `IntroCard` 底下改成兩個按鈕並排:「下一個」/「我會了」
+  (`_buildIntroMode()`)。「我會了」的實作照 TASKS.md 給的寫法,連續呼叫
+  `reviewCard(state, 5)` 三次、把最終結果整包寫回 `submitReview()`,**沒有**新增
+  `isMastered` 之類的欄位,也沒有直接寫死 `dueDate`——全部透過 `reviewCard()`
+  單一入口跑出來。
+- **B2** 額度計數與補位邏輯抽成 `lib/logic/intro_queue.dart` 的 `IntroQueue<T>`
+  (純函式風格,泛型不依賴 Drift 的 `Card`,方便單元測試):
+  - `confirmNext()`(對應「下一個」)→ `learnedCount++`,前進
+  - `markAlreadyKnown()`(對應「我會了」)→ 不動 `learnedCount`,前進
+  - `replenish(card)` → 把新卡接到佇列尾端,`card == null`(倉庫已空)時不做事
+  補位的實際查詢/寫入是新增的 `CardRepository.replenishOneNewCard()`:從
+  `isIntroduced == false` 的卡片中拿 1 張、設為已引入、`dueDate` 設今天,回傳它;
+  倉庫空了回傳 `null`。**沒有設補位次數上限**,天然停止條件(倉庫空/使用者離開)
+  已經足夠,也沒有因為 `starter_deck.json` 只有 30 個字而加任何人工上限。
+- **B3** 完成畫面(`_Phase.done`)在 `_warehouseExhausted == true` 時多顯示一行
+  「單字庫快用完了,去生成新的吧」,沒有彈窗。這個 flag 有兩個來源:一開始
+  `newCards().length < todaysRoll.quota`(拉霸當下倉庫就不夠了),或任何一次
+  `replenishOneNewCard()` 回傳 `null`。
+
+### review_screen.dart 這輪的結構調整
+
+原本新字跟到期字合併在同一條佇列裡(`_mainQueue`),這輪拆開了,因為新字現在
+需要「我會了」的補位邏輯,到期字不需要:
+
+- `_introQueue`:`IntroQueue<Card>`,裝 `repo.newCards()`
+- `_dueQueue` / `_dueIndex`:到期字,邏輯跟 v4 一樣(四選一/選項不足 fallback)
+- `_retryQueue` / `_retryIndex` / `_alreadyRetried`:補考佇列,跟 v4 一樣
+- `_Phase` 從 `{main, retry, done}` 改成 `{intro, due, retry, done}`,`_settlePhase()`
+  負責跳過空的階段
+
+### C. 測試
+
+sandbox 沒有 Flutter SDK,一樣無法自己跑 `flutter test`。這輪新增 3 個檔案:
+
+| 檔案 | 案例數 | 涵蓋什麼 |
+|---|---|---|
+| `test/already_known_test.dart` | 2 | 連續三次 `reviewCard(_, 5)` 後 interval=16/repetitions=3/easiness≈2.8,以及 dueDate 換算 |
+| `test/intro_queue_test.dart` | 8 | `IntroQueue` 的 confirmNext/markAlreadyKnown 計數、replenish、佇列跑完後的邊界行為 |
+| `test/replenish_test.dart` | 4 | `CardRepository.replenishOneNewCard()`:成功補位、dueDate 正確、倉庫空回傳 null、連續補位直到用盡 |
+
+新增 14 個,加上 v4 的 24 個,合計預期 38 個。麻煩本機跑:
+
+```
+dart run build_runner build --delete-conflicting-outputs
+flutter test
+```
+
+`test/scheduler_test.dart` 完全沒動。
+
+### D. Commit
+
+這輪切了 6 個 commit(比 TASKS.md 建議的 5 個多一個,因為 `docs/SPEC.md` /
+`docs/agent-sync/TASKS.md` 這兩份你已經更新到 v5 但還沒進 git,順手一起 commit 了):
+
+1. `docs: update SPEC and TASKS to v5 (already-know button + quota replenishment)`
+2. `fix: only show empty-state text after the daily roll`
+3. `fix: do not persist review result during retry phase`
+4. `feat: add already-know-it button on intro card with quota replenishment`
+5. `test: cover already-know grading and quota replenishment`
+
+（這份 PROGRESS.md 更新完會是第 6 個。）
+
+**有一點要老實說**:A2 修正跟 B 的 IntroQueue 整合都動到同一個檔案
+(`review_screen.dart`),我沒辦法把這個檔案的變動乾淨切成「只有 A2」跟
+「只有 B」兩個 commit——目前是整個檔案的變動塞進 commit 3(`fix: do not persist
+review result during retry phase`),commit 4 只包含新增的 `intro_queue.dart` 和
+`card_repository.dart` 的改動。如果你想要更細的切法,我可以重新排。
+
+**`git push` 一樣跑不了**(sandbox 沒有 GitHub 認證),需要你本機執行
+`git push origin main`。
+
+---
+
 ## ⚠️ 流程瑕疵先說清楚
 
 上一輪(v3,複習畫面改成四選一+忘了按鈕+反應時間分級那輪)的 code 我做完了,
