@@ -23,8 +23,8 @@
 | 角色 | 職責 |
 |---|---|
 | **Shawn**(人) | 產品決策、在本機跑 `flutter test` / `git push`、觸發兩個 agent |
-| **老大**(規格方) | 制定與維護 `docs/SPEC.md`、code review、回答問題、指派工作 |
-| **老二**(實作方) | 寫 code、跑測試、修 bug、回報進度 |
+| **國王餅**(規格方) | 制定與維護 `docs/SPEC.md`、code review、回答問題、指派工作 |
+| **聖多諾黑**(實作方) | 寫 code、跑測試、修 bug、回報進度 |
 
 ### 重要限制
 
@@ -42,10 +42,10 @@
 docs/
 ├── SPEC.md                              ← 規格書,唯一真實來源
 └── agent-sync/
-    ├── TASKS.md                         ← 老大指派給老二的工作(老大寫,老二讀)
-    ├── PROGRESS.md                      ← 老二的工作日誌(老二寫,老大讀)
-    ├── QUESTIONS.md                     ← 老二問、老大答(雙向)
-    ├── REVIEW_NOTES.md                  ← 老大的 code review 意見(選用)
+    ├── TASKS.md                         ← 國王餅指派給聖多諾黑的工作(國王餅寫,聖多諾黑讀)
+    ├── PROGRESS.md                      ← 聖多諾黑的工作日誌(聖多諾黑寫,國王餅讀)
+    ├── QUESTIONS.md                     ← 聖多諾黑問、國王餅答(雙向)
+    ├── REVIEW_NOTES.md                  ← 國王餅的 code review 意見(選用)
     └── archive/                         ← 歷史文件
 ```
 
@@ -56,7 +56,7 @@ docs/
 
 ## 開工流程
 
-### 如果你是老二(實作方)
+### 如果你是聖多諾黑(實作方)
 
 Shawn 說「繼續」或類似指令時:
 
@@ -67,9 +67,9 @@ Shawn 說「繼續」或類似指令時:
 5. 完成後更新 `docs/agent-sync/PROGRESS.md`
 6. **停下來等 review**,不要自行往下做 TASKS 沒指派的項目
 
-### 如果你是老大(規格方)
+### 如果你是國王餅(規格方)
 
-Shawn 說「老二好了」或類似指令時:
+Shawn 說「聖多諾黑好了」或類似指令時:
 
 1. 讀 `docs/agent-sync/PROGRESS.md` —— 看他做了什麼
 2. 讀 `docs/agent-sync/QUESTIONS.md` —— 看有沒有新的 `[未回答]` 問題
