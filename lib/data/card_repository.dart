@@ -272,8 +272,20 @@ class CardRepository {
     return (row.read(_db.decks.id.count()) ?? 0) > 0;
   }
 
+  /// 【v6】依名稱判斷牌組是否已存在(見 SPEC.md 7.2「多牌組載入」)。
+  /// 用來讓 `DeckLoader` 逐一判斷該匯入哪些內建牌組,而不是整庫是否為空。
+  Future<bool> deckExistsByName(String name) async {
+    final query = _db.selectOnly(_db.decks)
+      ..addColumns([_db.decks.id.count()])
+      ..where(_db.decks.name.equals(name));
+    final row = await query.getSingle();
+    return (row.read(_db.decks.id.count()) ?? 0) > 0;
+  }
+
   /// 建立新牌組並寫入卡片,isIntroduced 全部為 false(見 6.6)。
   /// [avoidWith] 是選填的四選一排除名單(見 6.4),沒有就傳空陣列。
+  /// [exampleMatch]【v6】是選填的例句粗體比對字串(見 6.3),沒有就傳 null
+  /// (AI 生成的卡片一律傳 null)。
   Future<int> createDeckWithCards({
     required String name,
     required String topic,
@@ -284,6 +296,7 @@ class CardRepository {
       String example,
       String exampleZh,
       List<String> avoidWith,
+      String? exampleMatch,
     })> cards,
   }) async {
     final deckId = await _db.into(_db.decks).insert(
@@ -302,6 +315,7 @@ class CardRepository {
               avoidWith: Value(
                 c.avoidWith.isEmpty ? null : jsonEncode(c.avoidWith),
               ),
+              exampleMatch: Value(c.exampleMatch),
             ),
           );
     }

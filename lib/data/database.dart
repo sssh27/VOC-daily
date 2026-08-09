@@ -41,6 +41,11 @@ class Cards extends Table {
   /// 不公平的假陰性,見 SPEC.md 6.4「干擾項選取規則」)。JSON 編碼的字串
   /// 陣列,例如 `["postpone"]`;沒有設定就是 null,代表不排除任何字。
   TextColumn get avoidWith => text().nullable()();
+
+  /// 【v6】例句中要標粗體的實際字串。目標字在例句裡形態改變時才需要
+  /// (例如 word=`hang out`,例句用過去式 `hung out`),見 SPEC.md 6.3。
+  /// null 代表用預設比對規則(word 本身,或詞形變化推測)。
+  TextColumn get exampleMatch => text().nullable()();
 }
 
 /// 每日拉霸紀錄。一天只能有一筆(rollDate 為當天零點時間戳)。
@@ -58,7 +63,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.connection);
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -72,6 +77,9 @@ class AppDatabase extends _$AppDatabase {
           }
           if (from < 3) {
             await m.addColumn(cards, cards.avoidWith);
+          }
+          if (from < 4) {
+            await m.addColumn(cards, cards.exampleMatch);
           }
         },
       );

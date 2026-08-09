@@ -4,7 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'providers.dart';
 import 'screens/home_screen.dart';
-import 'services/starter_deck_loader.dart';
+import 'services/deck_loader.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,7 +40,7 @@ class _AppBootstrapState extends ConsumerState<_AppBootstrap> {
   void initState() {
     super.initState();
     final repo = ref.read(cardRepositoryProvider);
-    _ready = StarterDeckLoader(repo).importIfEmpty();
+    _ready = DeckLoader(repo).importMissingDecks();
   }
 
   @override

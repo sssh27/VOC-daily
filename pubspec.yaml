@@ -32,3 +32,4 @@ flutter:
   assets:
     - .env
     - assets/decks/starter_deck.json
+    - assets/decks/cruise_travel.json

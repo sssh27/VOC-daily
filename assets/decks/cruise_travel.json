@@ -1,0 +1,1178 @@
+{
+  "name": "郵輪與旅遊實用",
+  "topic": "郵輪船上生活、岸上觀光、旅行物品與日常口語(B2)",
+  "cards": [
+    {
+      "word": "embark",
+      "phonetic": "/ɪmˈbɑːrk/",
+      "meaning": "登船;啟程",
+      "example": "We embark at three, so let's get to the terminal by noon.",
+      "exampleZh": "我們三點登船,所以中午前要到碼頭。"
+    },
+    {
+      "word": "disembark",
+      "phonetic": "/ˌdɪsɪmˈbɑːrk/",
+      "meaning": "下船;下飛機",
+      "example": "Passengers will disembark through deck four.",
+      "exampleZh": "乘客將從四號甲板下船。"
+    },
+    {
+      "word": "boarding pass",
+      "phonetic": "/ˈbɔːrdɪŋ pæs/",
+      "meaning": "登船證;登機證",
+      "example": "Keep your boarding pass handy at the gangway.",
+      "exampleZh": "在登船梯那邊把登船證拿在手上。"
+    },
+    {
+      "word": "check-in",
+      "phonetic": "/ˈtʃek ɪn/",
+      "meaning": "報到;辦理手續",
+      "example": "Check-in opens two hours before departure.",
+      "exampleZh": "出發前兩小時開始辦理報到。"
+    },
+    {
+      "word": "itinerary",
+      "phonetic": "/aɪˈtɪnəreri/",
+      "meaning": "行程表",
+      "example": "The itinerary lists three ports over seven days.",
+      "exampleZh": "行程表列出七天內停靠三個港口。"
+    },
+    {
+      "word": "muster drill",
+      "phonetic": "/ˈmʌstər drɪl/",
+      "meaning": "救生演習",
+      "example": "The muster drill is mandatory for everyone on board.",
+      "exampleZh": "救生演習船上所有人都必須參加。"
+    },
+    {
+      "word": "gangway",
+      "phonetic": "/ˈɡæŋweɪ/",
+      "meaning": "登船梯;舷梯",
+      "example": "Mind your step on the gangway.",
+      "exampleZh": "走舷梯時小心腳步。"
+    },
+    {
+      "word": "terminal",
+      "phonetic": "/ˈtɜːrmɪnl/",
+      "meaning": "航廈;客運站",
+      "example": "The cruise terminal is packed this morning.",
+      "exampleZh": "今天早上郵輪航廈擠滿了人。"
+    },
+    {
+      "word": "departure",
+      "phonetic": "/dɪˈpɑːrtʃər/",
+      "meaning": "出發;啟航",
+      "example": "Departure has been pushed back an hour.",
+      "exampleZh": "啟航時間往後延了一小時。"
+    },
+    {
+      "word": "valid",
+      "phonetic": "/ˈvælɪd/",
+      "meaning": "有效的",
+      "example": "Make sure your passport is still valid.",
+      "exampleZh": "確認你的護照還在有效期內。"
+    },
+    {
+      "word": "expire",
+      "phonetic": "/ɪkˈspaɪər/",
+      "meaning": "到期;失效",
+      "example": "My visa expires next month.",
+      "exampleZh": "我的簽證下個月到期。"
+    },
+    {
+      "word": "stamp",
+      "phonetic": "/stæmp/",
+      "meaning": "蓋章;印章",
+      "example": "They stamped my passport at immigration.",
+      "exampleZh": "他們在入境處幫我的護照蓋章。"
+    },
+    {
+      "word": "immigration",
+      "phonetic": "/ˌɪmɪˈɡreɪʃn/",
+      "meaning": "入境查驗",
+      "example": "The immigration line moved surprisingly fast.",
+      "exampleZh": "入境隊伍前進得意外地快。"
+    },
+    {
+      "word": "customs",
+      "phonetic": "/ˈkʌstəmz/",
+      "meaning": "海關",
+      "example": "You have to go through customs before leaving the port.",
+      "exampleZh": "離開港口前要先過海關。"
+    },
+    {
+      "word": "declare",
+      "phonetic": "/dɪˈkler/",
+      "meaning": "申報",
+      "example": "Do you have anything to declare?",
+      "exampleZh": "你有東西要申報嗎?"
+    },
+    {
+      "word": "crew",
+      "phonetic": "/kruː/",
+      "meaning": "船員;工作人員",
+      "example": "The crew was friendly the entire trip.",
+      "exampleZh": "整趟旅程船員都很友善。"
+    },
+    {
+      "word": "steward",
+      "phonetic": "/ˈstuːərd/",
+      "meaning": "服務員;艙房管家",
+      "example": "Our cabin steward refills the towels every day.",
+      "exampleZh": "我們的艙房管家每天補毛巾。"
+    },
+    {
+      "word": "on board",
+      "phonetic": "/ɑːn bɔːrd/",
+      "meaning": "在船上;上船",
+      "example": "There's free Wi-Fi on board, but it's slow.",
+      "exampleZh": "船上有免費 Wi-Fi,但很慢。"
+    },
+    {
+      "word": "lanyard",
+      "phonetic": "/ˈlænjərd/",
+      "meaning": "掛繩;識別證帶",
+      "example": "Put your key card on a lanyard so you don't lose it.",
+      "exampleZh": "把房卡掛在掛繩上才不會弄丟。"
+    },
+    {
+      "word": "wristband",
+      "phonetic": "/ˈrɪstbænd/",
+      "meaning": "手環",
+      "example": "The wristband shows you've paid for the drink package.",
+      "exampleZh": "手環代表你已經買了飲料方案。"
+    },
+    {
+      "word": "mandatory",
+      "phonetic": "/ˈmændətɔːri/",
+      "meaning": "強制的;必須的",
+      "example": "Attendance at the safety briefing is mandatory.",
+      "exampleZh": "安全說明會是強制參加的。"
+    },
+    {
+      "word": "board",
+      "phonetic": "/bɔːrd/",
+      "meaning": "登上(船/車/飛機)",
+      "example": "We board at noon and sail at five.",
+      "exampleZh": "我們中午登船,五點啟航。"
+    },
+    {
+      "word": "depart",
+      "phonetic": "/dɪˈpɑːrt/",
+      "meaning": "出發;離開",
+      "example": "The ship departs from pier nine.",
+      "exampleZh": "船從九號碼頭出發。"
+    },
+    {
+      "word": "cabin",
+      "phonetic": "/ˈkæbɪn/",
+      "meaning": "艙房",
+      "example": "Our cabin is on the eighth deck.",
+      "exampleZh": "我們的艙房在八樓甲板。"
+    },
+    {
+      "word": "upgrade",
+      "phonetic": "/ˈʌpɡreɪd/",
+      "meaning": "升等",
+      "example": "We got a free upgrade to a balcony cabin.",
+      "exampleZh": "我們免費升等到有陽台的艙房。"
+    },
+    {
+      "word": "stateroom",
+      "phonetic": "/ˈsteɪtruːm/",
+      "meaning": "(郵輪)客艙",
+      "example": "The stateroom is small but well designed.",
+      "exampleZh": "客艙很小但設計得不錯。"
+    },
+    {
+      "word": "balcony",
+      "phonetic": "/ˈbælkəni/",
+      "meaning": "陽台",
+      "example": "Waking up on the balcony was worth the extra money.",
+      "exampleZh": "在陽台醒來值得多花那些錢。"
+    },
+    {
+      "word": "porthole",
+      "phonetic": "/ˈpɔːrthoʊl/",
+      "meaning": "舷窗",
+      "example": "You can barely see anything through the porthole.",
+      "exampleZh": "從舷窗幾乎看不到什麼。"
+    },
+    {
+      "word": "bunk",
+      "phonetic": "/bʌŋk/",
+      "meaning": "上下鋪的床位",
+      "example": "The kids took the top bunk.",
+      "exampleZh": "小孩子搶了上鋪。"
+    },
+    {
+      "word": "thermostat",
+      "phonetic": "/ˈθɜːrməstæt/",
+      "meaning": "溫控器",
+      "example": "The thermostat in our room is broken.",
+      "exampleZh": "我們房間的溫控器壞了。"
+    },
+    {
+      "word": "outlet",
+      "phonetic": "/ˈaʊtlet/",
+      "meaning": "插座",
+      "example": "There's only one outlet next to the bed.",
+      "exampleZh": "床邊只有一個插座。"
+    },
+    {
+      "word": "adapter",
+      "phonetic": "/əˈdæptər/",
+      "meaning": "轉接頭",
+      "example": "Don't forget a universal adapter.",
+      "exampleZh": "別忘了帶萬用轉接頭。"
+    },
+    {
+      "word": "hairdryer",
+      "phonetic": "/ˈherdraɪər/",
+      "meaning": "吹風機",
+      "example": "The cabin comes with a hairdryer.",
+      "exampleZh": "艙房附吹風機。"
+    },
+    {
+      "word": "safe",
+      "phonetic": "/seɪf/",
+      "meaning": "保險箱",
+      "example": "Leave your passport in the safe.",
+      "exampleZh": "把護照放在保險箱裡。"
+    },
+    {
+      "word": "linen",
+      "phonetic": "/ˈlɪnɪn/",
+      "meaning": "床單被套等織品",
+      "example": "They change the linen every other day.",
+      "exampleZh": "他們每隔一天換一次床單。"
+    },
+    {
+      "word": "housekeeping",
+      "phonetic": "/ˈhaʊskiːpɪŋ/",
+      "meaning": "客房清潔服務",
+      "example": "Housekeeping comes by around ten.",
+      "exampleZh": "清潔人員大概十點會來。"
+    },
+    {
+      "word": "do not disturb",
+      "phonetic": "/duː nɑːt dɪˈstɜːrb/",
+      "meaning": "請勿打擾",
+      "example": "I hung the do not disturb sign on the door.",
+      "exampleZh": "我把請勿打擾的牌子掛在門上。"
+    },
+    {
+      "word": "spacious",
+      "phonetic": "/ˈspeɪʃəs/",
+      "meaning": "寬敞的",
+      "example": "The suite was surprisingly spacious.",
+      "exampleZh": "那間套房意外地寬敞。"
+    },
+    {
+      "word": "cramped",
+      "phonetic": "/kræmpt/",
+      "meaning": "狹窄擁擠的",
+      "example": "The inside cabin felt a bit cramped.",
+      "exampleZh": "內艙房感覺有點擠。"
+    },
+    {
+      "word": "stuffy",
+      "phonetic": "/ˈstʌfi/",
+      "meaning": "悶的;不通風的",
+      "example": "It gets stuffy without the air conditioning.",
+      "exampleZh": "沒開冷氣就變得很悶。"
+    },
+    {
+      "word": "soundproof",
+      "phonetic": "/ˈsaʊndpruːf/",
+      "meaning": "隔音的",
+      "example": "The walls aren't exactly soundproof.",
+      "exampleZh": "這牆壁其實不太隔音。"
+    },
+    {
+      "word": "amenities",
+      "phonetic": "/əˈmenətiz/",
+      "meaning": "便利設施;備品",
+      "example": "The cabin amenities include shampoo and lotion.",
+      "exampleZh": "艙房備品包含洗髮精和乳液。"
+    },
+    {
+      "word": "laundry",
+      "phonetic": "/ˈlɔːndri/",
+      "meaning": "洗衣;送洗衣物",
+      "example": "There's a self-service laundry on deck six.",
+      "exampleZh": "六樓甲板有自助洗衣間。"
+    },
+    {
+      "word": "towel",
+      "phonetic": "/ˈtaʊəl/",
+      "meaning": "毛巾;浴巾",
+      "example": "Grab a pool towel from the stand.",
+      "exampleZh": "從架子上拿條泳池浴巾。"
+    },
+    {
+      "word": "keycard",
+      "phonetic": "/ˈkiːkɑːrd/",
+      "meaning": "房卡",
+      "example": "Your keycard also works as your onboard payment.",
+      "exampleZh": "房卡同時也是船上的付款工具。"
+    },
+    {
+      "word": "buffet",
+      "phonetic": "/bəˈfeɪ/",
+      "meaning": "自助餐",
+      "example": "The buffet opens at six thirty.",
+      "exampleZh": "自助餐六點半開始。"
+    },
+    {
+      "word": "gratuity",
+      "phonetic": "/ɡrəˈtuːəti/",
+      "meaning": "小費;服務費",
+      "example": "Gratuities are added automatically to your bill.",
+      "exampleZh": "服務費會自動加在帳單上。",
+      "exampleMatch": "Gratuities"
+    },
+    {
+      "word": "beverage",
+      "phonetic": "/ˈbevərɪdʒ/",
+      "meaning": "飲料",
+      "example": "The beverage package covers soda and coffee.",
+      "exampleZh": "飲料方案包含汽水和咖啡。"
+    },
+    {
+      "word": "complimentary",
+      "phonetic": "/ˌkɑːmplɪˈmentri/",
+      "meaning": "免費招待的",
+      "example": "Breakfast is complimentary for suite guests.",
+      "exampleZh": "套房房客可享免費早餐。"
+    },
+    {
+      "word": "à la carte",
+      "phonetic": "/ˌɑː lə ˈkɑːrt/",
+      "meaning": "單點的",
+      "example": "The specialty restaurant is à la carte.",
+      "exampleZh": "特色餐廳是單點的。"
+    },
+    {
+      "word": "appetizer",
+      "phonetic": "/ˈæpɪtaɪzər/",
+      "meaning": "開胃菜;前菜",
+      "example": "We shared a couple of appetizers.",
+      "exampleZh": "我們分著吃了幾道前菜。"
+    },
+    {
+      "word": "entrée",
+      "phonetic": "/ˈɑːntreɪ/",
+      "meaning": "主菜",
+      "example": "I'll have the fish as my entrée.",
+      "exampleZh": "我主菜要點魚。"
+    },
+    {
+      "word": "dessert",
+      "phonetic": "/dɪˈzɜːrt/",
+      "meaning": "甜點",
+      "example": "Save some room for dessert.",
+      "exampleZh": "留點肚子吃甜點。"
+    },
+    {
+      "word": "refill",
+      "phonetic": "/ˈriːfɪl/",
+      "meaning": "續杯;補充",
+      "example": "Can I get a refill on my coffee?",
+      "exampleZh": "可以幫我的咖啡續杯嗎?"
+    },
+    {
+      "word": "dietary restriction",
+      "phonetic": "/ˈdaɪəteri rɪˈstrɪkʃn/",
+      "meaning": "飲食限制",
+      "example": "Let them know about any dietary restrictions.",
+      "exampleZh": "有任何飲食限制要跟他們說。"
+    },
+    {
+      "word": "allergic",
+      "phonetic": "/əˈlɜːrdʒɪk/",
+      "meaning": "過敏的",
+      "example": "I'm allergic to shellfish.",
+      "exampleZh": "我對甲殼類過敏。"
+    },
+    {
+      "word": "vegetarian",
+      "phonetic": "/ˌvedʒəˈteriən/",
+      "meaning": "素食的;素食者",
+      "example": "They always have a vegetarian option.",
+      "exampleZh": "他們一定會有素食選項。"
+    },
+    {
+      "word": "takeaway",
+      "phonetic": "/ˈteɪkəweɪ/",
+      "meaning": "外帶",
+      "example": "Can I get this as takeaway?",
+      "exampleZh": "這個可以外帶嗎?"
+    },
+    {
+      "word": "grab a bite",
+      "phonetic": "/ɡræb ə baɪt/",
+      "meaning": "隨便吃點東西",
+      "example": "Let's grab a bite before the show.",
+      "exampleZh": "看表演前我們隨便吃點東西吧。"
+    },
+    {
+      "word": "starving",
+      "phonetic": "/ˈstɑːrvɪŋ/",
+      "meaning": "餓壞了",
+      "example": "I'm starving — when does dinner start?",
+      "exampleZh": "我快餓死了,晚餐幾點開始?"
+    },
+    {
+      "word": "stuffed",
+      "phonetic": "/stʌft/",
+      "meaning": "吃很飽的",
+      "example": "I'm stuffed. I couldn't eat another bite.",
+      "exampleZh": "我吃超飽,一口都吃不下了。"
+    },
+    {
+      "word": "bland",
+      "phonetic": "/blænd/",
+      "meaning": "味道淡的;沒味道",
+      "example": "The soup was a little bland.",
+      "exampleZh": "那湯味道有點淡。"
+    },
+    {
+      "word": "greasy",
+      "phonetic": "/ˈɡriːsi/",
+      "meaning": "油膩的",
+      "example": "The fries were too greasy for me.",
+      "exampleZh": "那薯條對我來說太油了。"
+    },
+    {
+      "word": "crispy",
+      "phonetic": "/ˈkrɪspi/",
+      "meaning": "酥脆的",
+      "example": "I like my bacon crispy.",
+      "exampleZh": "我喜歡培根煎得酥脆。"
+    },
+    {
+      "word": "leftovers",
+      "phonetic": "/ˈleftoʊvərz/",
+      "meaning": "剩菜",
+      "example": "We packed up the leftovers.",
+      "exampleZh": "我們把剩菜打包了。"
+    },
+    {
+      "word": "bottle opener",
+      "phonetic": "/ˈbɑːtl ˈoʊpənər/",
+      "meaning": "開瓶器",
+      "example": "Does anyone have a bottle opener?",
+      "exampleZh": "有人有開瓶器嗎?"
+    },
+    {
+      "word": "corkscrew",
+      "phonetic": "/ˈkɔːrkskruː/",
+      "meaning": "紅酒開瓶器",
+      "example": "You'll need a corkscrew for that bottle.",
+      "exampleZh": "那瓶酒需要用紅酒開瓶器。"
+    },
+    {
+      "word": "straw",
+      "phonetic": "/strɔː/",
+      "meaning": "吸管",
+      "example": "Could I get a straw with that?",
+      "exampleZh": "可以給我一根吸管嗎?"
+    },
+    {
+      "word": "napkin",
+      "phonetic": "/ˈnæpkɪn/",
+      "meaning": "餐巾紙",
+      "example": "Pass me a napkin, would you?",
+      "exampleZh": "可以給我一張餐巾紙嗎?"
+    },
+    {
+      "word": "tip",
+      "phonetic": "/tɪp/",
+      "meaning": "小費;給小費",
+      "example": "We tipped the waiter at the end.",
+      "exampleZh": "最後我們給了服務生小費。"
+    },
+    {
+      "word": "deck",
+      "phonetic": "/dek/",
+      "meaning": "甲板;樓層",
+      "example": "The pool is up on deck eleven.",
+      "exampleZh": "泳池在十一樓甲板。"
+    },
+    {
+      "word": "promenade",
+      "phonetic": "/ˌprɑːməˈneɪd/",
+      "meaning": "散步大道;步道區",
+      "example": "We walked the promenade after dinner.",
+      "exampleZh": "晚餐後我們沿著步道走了走。"
+    },
+    {
+      "word": "atrium",
+      "phonetic": "/ˈeɪtriəm/",
+      "meaning": "中庭",
+      "example": "The band plays in the atrium every night.",
+      "exampleZh": "樂團每晚在中庭演出。"
+    },
+    {
+      "word": "lounge",
+      "phonetic": "/laʊndʒ/",
+      "meaning": "休息室;交誼廳",
+      "example": "There's a quiet lounge on the top deck.",
+      "exampleZh": "頂層甲板有個安靜的交誼廳。"
+    },
+    {
+      "word": "venue",
+      "phonetic": "/ˈvenjuː/",
+      "meaning": "場地;場館",
+      "example": "The show moved to a bigger venue.",
+      "exampleZh": "表演換到比較大的場地了。"
+    },
+    {
+      "word": "reservation",
+      "phonetic": "/ˌrezərˈveɪʃn/",
+      "meaning": "預約",
+      "example": "Do we need a reservation for the spa?",
+      "exampleZh": "做 SPA 需要預約嗎?"
+    },
+    {
+      "word": "book",
+      "phonetic": "/bʊk/",
+      "meaning": "預訂",
+      "example": "I booked us a table for seven.",
+      "exampleZh": "我訂了七點的位子。"
+    },
+    {
+      "word": "fully booked",
+      "phonetic": "/ˈfʊli bʊkt/",
+      "meaning": "訂滿了",
+      "example": "Sorry, we're fully booked tonight.",
+      "exampleZh": "抱歉,今晚已經訂滿了。"
+    },
+    {
+      "word": "waitlist",
+      "phonetic": "/ˈweɪtlɪst/",
+      "meaning": "候補名單",
+      "example": "They put us on the waitlist.",
+      "exampleZh": "他們把我們排進候補名單。"
+    },
+    {
+      "word": "sold out",
+      "phonetic": "/soʊld aʊt/",
+      "meaning": "賣完了;售罄",
+      "example": "The excursion is sold out.",
+      "exampleZh": "那個行程已經賣完了。"
+    },
+    {
+      "word": "yoga mat",
+      "phonetic": "/ˈjoʊɡə mæt/",
+      "meaning": "瑜珈墊",
+      "example": "Bring your own yoga mat if you have one.",
+      "exampleZh": "如果你有瑜珈墊就自己帶。"
+    },
+    {
+      "word": "treadmill",
+      "phonetic": "/ˈtredmɪl/",
+      "meaning": "跑步機",
+      "example": "All the treadmills were taken.",
+      "exampleZh": "跑步機全被佔滿了。"
+    },
+    {
+      "word": "locker",
+      "phonetic": "/ˈlɑːkər/",
+      "meaning": "置物櫃",
+      "example": "Leave your stuff in a locker.",
+      "exampleZh": "把東西放在置物櫃裡。"
+    },
+    {
+      "word": "sun lounger",
+      "phonetic": "/sʌn ˈlaʊndʒər/",
+      "meaning": "躺椅",
+      "example": "People reserve sun loungers way too early.",
+      "exampleZh": "大家都太早去佔躺椅了。"
+    },
+    {
+      "word": "hot tub",
+      "phonetic": "/hɑːt tʌb/",
+      "meaning": "按摩浴池",
+      "example": "The hot tub was packed all afternoon.",
+      "exampleZh": "按摩浴池整個下午都是人。"
+    },
+    {
+      "word": "crowded",
+      "phonetic": "/ˈkraʊdɪd/",
+      "meaning": "擁擠的",
+      "example": "The pool deck gets crowded around noon.",
+      "exampleZh": "泳池甲板中午前後會變很擠。"
+    },
+    {
+      "word": "packed",
+      "phonetic": "/pækt/",
+      "meaning": "擠滿人的",
+      "example": "The theater was absolutely packed.",
+      "exampleZh": "劇院擠得水洩不通。"
+    },
+    {
+      "word": "show up",
+      "phonetic": "/ʃoʊ ʌp/",
+      "meaning": "出現;到場",
+      "example": "Show up early if you want a good seat.",
+      "exampleZh": "想要好位子就早點到。"
+    },
+    {
+      "word": "line up",
+      "phonetic": "/laɪn ʌp/",
+      "meaning": "排隊",
+      "example": "Everyone lined up for the buffet.",
+      "exampleZh": "大家都排隊等自助餐。",
+      "exampleMatch": "lined up"
+    },
+    {
+      "word": "skip",
+      "phonetic": "/skɪp/",
+      "meaning": "跳過;略過",
+      "example": "Let's skip the show and go to bed.",
+      "exampleZh": "我們跳過表演直接去睡吧。"
+    },
+    {
+      "word": "shore excursion",
+      "phonetic": "/ʃɔːr ɪkˈskɜːrʒn/",
+      "meaning": "岸上觀光行程",
+      "example": "We booked a shore excursion in Okinawa.",
+      "exampleZh": "我們在沖繩訂了岸上觀光行程。"
+    },
+    {
+      "word": "port of call",
+      "phonetic": "/pɔːrt əv kɔːl/",
+      "meaning": "停靠港",
+      "example": "Our next port of call is Naha.",
+      "exampleZh": "我們下一個停靠港是那霸。"
+    },
+    {
+      "word": "tender",
+      "phonetic": "/ˈtendər/",
+      "meaning": "接駁小船",
+      "example": "We take a tender to get ashore.",
+      "exampleZh": "我們搭接駁小船上岸。"
+    },
+    {
+      "word": "ashore",
+      "phonetic": "/əˈʃɔːr/",
+      "meaning": "上岸;在岸上",
+      "example": "We went ashore for a few hours.",
+      "exampleZh": "我們上岸待了幾個小時。"
+    },
+    {
+      "word": "all aboard",
+      "phonetic": "/ɔːl əˈbɔːrd/",
+      "meaning": "全員登船(截止時間)",
+      "example": "All aboard time is four thirty sharp.",
+      "exampleZh": "登船截止時間是四點半整。"
+    },
+    {
+      "word": "landmark",
+      "phonetic": "/ˈlændmɑːrk/",
+      "meaning": "地標",
+      "example": "That tower is the city's main landmark.",
+      "exampleZh": "那座塔是這城市的主要地標。"
+    },
+    {
+      "word": "souvenir",
+      "phonetic": "/ˌsuːvəˈnɪr/",
+      "meaning": "紀念品",
+      "example": "I picked up a few souvenirs at the market.",
+      "exampleZh": "我在市場買了幾樣紀念品。"
+    },
+    {
+      "word": "bargain",
+      "phonetic": "/ˈbɑːrɡən/",
+      "meaning": "討價還價;便宜貨",
+      "example": "You can bargain a little at that stall.",
+      "exampleZh": "那個攤位可以稍微殺價。"
+    },
+    {
+      "word": "rip-off",
+      "phonetic": "/ˈrɪp ɔːf/",
+      "meaning": "坑人的東西;敲竹槓",
+      "example": "Forty dollars for that? What a rip-off.",
+      "exampleZh": "那個要四十塊?也太坑了吧。"
+    },
+    {
+      "word": "browse",
+      "phonetic": "/braʊz/",
+      "meaning": "隨便看看",
+      "example": "I'm just browsing, thanks.",
+      "exampleZh": "我只是隨便看看,謝謝。",
+      "exampleMatch": "browsing"
+    },
+    {
+      "word": "cash only",
+      "phonetic": "/kæʃ ˈoʊnli/",
+      "meaning": "只收現金",
+      "example": "That shop is cash only.",
+      "exampleZh": "那家店只收現金。"
+    },
+    {
+      "word": "exchange rate",
+      "phonetic": "/ɪksˈtʃeɪndʒ reɪt/",
+      "meaning": "匯率",
+      "example": "The exchange rate at the port is terrible.",
+      "exampleZh": "港口的匯率很差。"
+    },
+    {
+      "word": "head out",
+      "phonetic": "/hed aʊt/",
+      "meaning": "出發;出門",
+      "example": "Let's head out before it gets hot.",
+      "exampleZh": "趁天氣還沒熱起來出發吧。"
+    },
+    {
+      "word": "wander",
+      "phonetic": "/ˈwɑːndər/",
+      "meaning": "閒逛",
+      "example": "We just wandered around the old town.",
+      "exampleZh": "我們就在老城區隨意閒逛。"
+    },
+    {
+      "word": "get lost",
+      "phonetic": "/ɡet lɔːst/",
+      "meaning": "迷路",
+      "example": "We got lost twice looking for the shrine.",
+      "exampleZh": "我們找神社的路上迷路兩次。",
+      "exampleMatch": "got lost"
+    },
+    {
+      "word": "crowd",
+      "phonetic": "/kraʊd/",
+      "meaning": "人群",
+      "example": "The crowd thinned out after lunch.",
+      "exampleZh": "午餐後人潮就少了。"
+    },
+    {
+      "word": "worth it",
+      "phonetic": "/wɜːrθ ɪt/",
+      "meaning": "值得",
+      "example": "The hike was long but totally worth it.",
+      "exampleZh": "那段路很長但完全值得。"
+    },
+    {
+      "word": "run late",
+      "phonetic": "/rʌn leɪt/",
+      "meaning": "遲到;耽誤",
+      "example": "We're running late — the ship leaves at five.",
+      "exampleZh": "我們要遲到了,船五點開。",
+      "exampleMatch": "running late"
+    },
+    {
+      "word": "make it",
+      "phonetic": "/meɪk ɪt/",
+      "meaning": "趕上;辦到",
+      "example": "Do you think we'll make it back in time?",
+      "exampleZh": "你覺得我們來得及趕回去嗎?"
+    },
+    {
+      "word": "seasick",
+      "phonetic": "/ˈsiːsɪk/",
+      "meaning": "暈船的",
+      "example": "I get seasick if the water is rough.",
+      "exampleZh": "浪大的時候我會暈船。"
+    },
+    {
+      "word": "motion sickness",
+      "phonetic": "/ˈmoʊʃn ˈsɪknəs/",
+      "meaning": "動暈症",
+      "example": "Take something for motion sickness before boarding.",
+      "exampleZh": "登船前先吃暈船藥。"
+    },
+    {
+      "word": "queasy",
+      "phonetic": "/ˈkwiːzi/",
+      "meaning": "想吐的;噁心的",
+      "example": "I felt a little queasy this morning.",
+      "exampleZh": "我今天早上有點想吐。"
+    },
+    {
+      "word": "dizzy",
+      "phonetic": "/ˈdɪzi/",
+      "meaning": "頭暈的",
+      "example": "Standing up too fast made me dizzy.",
+      "exampleZh": "站太快讓我頭暈。"
+    },
+    {
+      "word": "choppy",
+      "phonetic": "/ˈtʃɑːpi/",
+      "meaning": "(海面)波濤起伏的",
+      "example": "The water gets choppy in the afternoon.",
+      "exampleZh": "下午海面會變得波濤起伏。"
+    },
+    {
+      "word": "sunburn",
+      "phonetic": "/ˈsʌnbɜːrn/",
+      "meaning": "曬傷",
+      "example": "I got a nasty sunburn on my shoulders.",
+      "exampleZh": "我肩膀曬傷得很嚴重。"
+    },
+    {
+      "word": "sunscreen",
+      "phonetic": "/ˈsʌnskriːn/",
+      "meaning": "防曬乳",
+      "example": "Reapply sunscreen every couple of hours.",
+      "exampleZh": "每兩個小時要補擦防曬乳。"
+    },
+    {
+      "word": "dehydrated",
+      "phonetic": "/diːˈhaɪdreɪtɪd/",
+      "meaning": "脫水的",
+      "example": "Drink water — it's easy to get dehydrated here.",
+      "exampleZh": "多喝水,這裡很容易脫水。"
+    },
+    {
+      "word": "first aid",
+      "phonetic": "/fɜːrst eɪd/",
+      "meaning": "急救",
+      "example": "There's a first aid station near the pool.",
+      "exampleZh": "泳池附近有急救站。"
+    },
+    {
+      "word": "pharmacy",
+      "phonetic": "/ˈfɑːrməsi/",
+      "meaning": "藥局",
+      "example": "Is there a pharmacy on board?",
+      "exampleZh": "船上有藥局嗎?"
+    },
+    {
+      "word": "painkiller",
+      "phonetic": "/ˈpeɪnkɪlər/",
+      "meaning": "止痛藥",
+      "example": "I took a painkiller for my headache.",
+      "exampleZh": "我吃了止痛藥治頭痛。"
+    },
+    {
+      "word": "emergency",
+      "phonetic": "/ɪˈmɜːrdʒənsi/",
+      "meaning": "緊急狀況",
+      "example": "In an emergency, head to your muster station.",
+      "exampleZh": "發生緊急狀況時,前往你的集合站。"
+    },
+    {
+      "word": "carry-on",
+      "phonetic": "/ˈkæri ɑːn/",
+      "meaning": "隨身行李",
+      "example": "Keep your medication in your carry-on.",
+      "exampleZh": "把藥放在隨身行李裡。"
+    },
+    {
+      "word": "luggage tag",
+      "phonetic": "/ˈlʌɡɪdʒ tæɡ/",
+      "meaning": "行李吊牌",
+      "example": "Attach the luggage tag before you drop it off.",
+      "exampleZh": "寄放前先把行李吊牌綁上。"
+    },
+    {
+      "word": "fanny pack",
+      "phonetic": "/ˈfæni pæk/",
+      "meaning": "腰包",
+      "example": "A fanny pack is honestly convenient for travel.",
+      "exampleZh": "腰包旅行時其實很方便。"
+    },
+    {
+      "word": "backpack",
+      "phonetic": "/ˈbækpæk/",
+      "meaning": "後背包",
+      "example": "I just brought a small backpack.",
+      "exampleZh": "我只帶了一個小後背包。"
+    },
+    {
+      "word": "packing cube",
+      "phonetic": "/ˈpækɪŋ kjuːb/",
+      "meaning": "收納袋",
+      "example": "Packing cubes keep my suitcase organized.",
+      "exampleZh": "收納袋讓我的行李箱整齊很多。"
+    },
+    {
+      "word": "power bank",
+      "phonetic": "/ˈpaʊər bæŋk/",
+      "meaning": "行動電源",
+      "example": "My power bank died halfway through the day.",
+      "exampleZh": "我的行動電源到一半就沒電了。"
+    },
+    {
+      "word": "charger",
+      "phonetic": "/ˈtʃɑːrdʒər/",
+      "meaning": "充電器",
+      "example": "I left my charger in the cabin.",
+      "exampleZh": "我把充電器忘在艙房裡了。"
+    },
+    {
+      "word": "earplugs",
+      "phonetic": "/ˈɪrplʌɡz/",
+      "meaning": "耳塞",
+      "example": "Bring earplugs if you're a light sleeper.",
+      "exampleZh": "淺眠的話記得帶耳塞。"
+    },
+    {
+      "word": "flip-flops",
+      "phonetic": "/ˈflɪp flɑːps/",
+      "meaning": "夾腳拖",
+      "example": "Flip-flops are fine for the pool deck.",
+      "exampleZh": "泳池甲板穿夾腳拖就行。"
+    },
+    {
+      "word": "swimsuit",
+      "phonetic": "/ˈswɪmsuːt/",
+      "meaning": "泳衣",
+      "example": "Don't forget to pack a swimsuit.",
+      "exampleZh": "別忘了帶泳衣。"
+    },
+    {
+      "word": "windbreaker",
+      "phonetic": "/ˈwɪndbreɪkər/",
+      "meaning": "風衣;防風外套",
+      "example": "It gets windy up top — bring a windbreaker.",
+      "exampleZh": "上面風很大,帶件防風外套。"
+    },
+    {
+      "word": "laundry bag",
+      "phonetic": "/ˈlɔːndri bæɡ/",
+      "meaning": "洗衣袋",
+      "example": "Put dirty clothes in the laundry bag.",
+      "exampleZh": "把髒衣服放進洗衣袋。"
+    },
+    {
+      "word": "toiletries",
+      "phonetic": "/ˈtɔɪlətriz/",
+      "meaning": "盥洗用品",
+      "example": "I keep my toiletries in a clear pouch.",
+      "exampleZh": "我把盥洗用品裝在透明袋裡。"
+    },
+    {
+      "word": "insect repellent",
+      "phonetic": "/ˈɪnsekt rɪˈpelənt/",
+      "meaning": "防蚊液",
+      "example": "You'll want insect repellent for the jungle tour.",
+      "exampleZh": "叢林行程會需要防蚊液。"
+    },
+    {
+      "word": "water bottle",
+      "phonetic": "/ˈwɔːtər ˈbɑːtl/",
+      "meaning": "水壺",
+      "example": "Refill your water bottle before heading out.",
+      "exampleZh": "出門前把水壺裝滿。"
+    },
+    {
+      "word": "umbrella",
+      "phonetic": "/ʌmˈbrelə/",
+      "meaning": "雨傘",
+      "example": "Take an umbrella just in case.",
+      "exampleZh": "以防萬一帶把傘。"
+    },
+    {
+      "word": "sunglasses",
+      "phonetic": "/ˈsʌnɡlæsɪz/",
+      "meaning": "太陽眼鏡",
+      "example": "I sat on my sunglasses. Again.",
+      "exampleZh": "我又坐到我的太陽眼鏡了。"
+    },
+    {
+      "word": "passport holder",
+      "phonetic": "/ˈpæspɔːrt ˈhoʊldər/",
+      "meaning": "護照套",
+      "example": "Keep everything in one passport holder.",
+      "exampleZh": "把東西都放在一個護照套裡。"
+    },
+    {
+      "word": "neck pillow",
+      "phonetic": "/nek ˈpɪloʊ/",
+      "meaning": "頸枕",
+      "example": "A neck pillow makes long flights bearable.",
+      "exampleZh": "頸枕讓長途飛行沒那麼難熬。"
+    },
+    {
+      "word": "dry bag",
+      "phonetic": "/draɪ bæɡ/",
+      "meaning": "防水袋",
+      "example": "Put your phone in a dry bag for the boat ride.",
+      "exampleZh": "搭船時把手機放進防水袋。"
+    },
+    {
+      "word": "small talk",
+      "phonetic": "/smɔːl tɔːk/",
+      "meaning": "閒聊;寒暄",
+      "example": "I'm terrible at small talk with strangers.",
+      "exampleZh": "我很不擅長跟陌生人閒聊。"
+    },
+    {
+      "word": "hang out",
+      "phonetic": "/hæŋ aʊt/",
+      "meaning": "一起消磨時間",
+      "example": "We hung out by the pool all afternoon.",
+      "exampleZh": "我們整個下午都在泳池邊消磨時間。",
+      "exampleMatch": "hung out"
+    },
+    {
+      "word": "count me in",
+      "phonetic": "/kaʊnt miː ɪn/",
+      "meaning": "算我一份",
+      "example": "Dinner at eight? Count me in.",
+      "exampleZh": "八點吃晚餐?算我一份。"
+    },
+    {
+      "word": "I'm in",
+      "phonetic": "/aɪm ɪn/",
+      "meaning": "我加入",
+      "example": "Snorkeling tomorrow? I'm in.",
+      "exampleZh": "明天去浮潛?我加入。"
+    },
+    {
+      "word": "I'll pass",
+      "phonetic": "/aɪl pæs/",
+      "meaning": "我就不了",
+      "example": "Karaoke? I'll pass, thanks.",
+      "exampleZh": "卡拉OK?我就不了,謝謝。"
+    },
+    {
+      "word": "call it a night",
+      "phonetic": "/kɔːl ɪt ə naɪt/",
+      "meaning": "今晚到此為止",
+      "example": "I'm beat — let's call it a night.",
+      "exampleZh": "我累爆了,今晚就到這吧。"
+    },
+    {
+      "word": "I'm beat",
+      "phonetic": "/aɪm biːt/",
+      "meaning": "我累壞了",
+      "example": "I'm beat after walking all day.",
+      "exampleZh": "走了一整天我累壞了。"
+    },
+    {
+      "word": "run into",
+      "phonetic": "/rʌn ˈɪntuː/",
+      "meaning": "偶然遇到",
+      "example": "We ran into our neighbors on deck.",
+      "exampleZh": "我們在甲板上巧遇鄰居。",
+      "exampleMatch": "ran into"
+    },
+    {
+      "word": "drop by",
+      "phonetic": "/drɑːp baɪ/",
+      "meaning": "順道拜訪",
+      "example": "Drop by our cabin if you're bored.",
+      "exampleZh": "無聊的話順道來我們艙房。"
+    },
+    {
+      "word": "catch up",
+      "phonetic": "/kætʃ ʌp/",
+      "meaning": "敘舊;趕上進度",
+      "example": "Let's catch up over coffee tomorrow.",
+      "exampleZh": "明天喝咖啡聊聊近況吧。"
+    },
+    {
+      "word": "no worries",
+      "phonetic": "/noʊ ˈwɜːriz/",
+      "meaning": "沒關係;別擔心",
+      "example": "No worries, we've got plenty of time.",
+      "exampleZh": "別擔心,我們時間還很多。"
+    },
+    {
+      "word": "fair enough",
+      "phonetic": "/fer ɪˈnʌf/",
+      "meaning": "有道理;好吧",
+      "example": "Fair enough, let's do it your way.",
+      "exampleZh": "有道理,就照你的方式吧。"
+    },
+    {
+      "word": "suit yourself",
+      "phonetic": "/suːt jɔːrˈself/",
+      "meaning": "隨你便",
+      "example": "Suit yourself, but you'll miss the sunset.",
+      "exampleZh": "隨你便,但你會錯過日落。"
+    },
+    {
+      "word": "I'm good",
+      "phonetic": "/aɪm ɡʊd/",
+      "meaning": "我不用了;我這樣就好",
+      "example": "More wine? I'm good, thanks.",
+      "exampleZh": "還要酒嗎?我不用了,謝謝。"
+    },
+    {
+      "word": "sounds good",
+      "phonetic": "/saʊndz ɡʊd/",
+      "meaning": "聽起來不錯",
+      "example": "Meet at six? Sounds good.",
+      "exampleZh": "六點碰面?聽起來不錯。"
+    },
+    {
+      "word": "what's up",
+      "phonetic": "/wʌts ʌp/",
+      "meaning": "怎麼了;最近如何",
+      "example": "Hey, what's up? You look tired.",
+      "exampleZh": "嘿,怎麼了?你看起來很累。"
+    },
+    {
+      "word": "never mind",
+      "phonetic": "/ˈnevər maɪnd/",
+      "meaning": "算了;沒事",
+      "example": "Never mind, I found it.",
+      "exampleZh": "算了,我找到了。"
+    },
+    {
+      "word": "hold on",
+      "phonetic": "/hoʊld ɑːn/",
+      "meaning": "等一下",
+      "example": "Hold on, I forgot my keycard.",
+      "exampleZh": "等一下,我忘了拿房卡。"
+    },
+    {
+      "word": "head back",
+      "phonetic": "/hed bæk/",
+      "meaning": "回去",
+      "example": "We should head back to the ship.",
+      "exampleZh": "我們該回船上了。"
+    },
+    {
+      "word": "check out",
+      "phonetic": "/tʃek aʊt/",
+      "meaning": "看看;退房",
+      "example": "You've got to check out the view from deck fifteen.",
+      "exampleZh": "你一定要去看看十五樓甲板的景色。"
+    },
+    {
+      "word": "figure out",
+      "phonetic": "/ˈfɪɡjər aʊt/",
+      "meaning": "弄清楚;想出辦法",
+      "example": "We'll figure out dinner later.",
+      "exampleZh": "晚餐的事我們晚點再想辦法。"
+    },
+    {
+      "word": "end up",
+      "phonetic": "/end ʌp/",
+      "meaning": "最後變成;結果",
+      "example": "We ended up staying an extra hour.",
+      "exampleZh": "我們最後多待了一小時。",
+      "exampleMatch": "ended up"
+    },
+    {
+      "word": "get around to",
+      "phonetic": "/ɡet əˈraʊnd tuː/",
+      "meaning": "抽空去做",
+      "example": "I never got around to using the gym.",
+      "exampleZh": "我一直沒抽空去健身房。",
+      "exampleMatch": "got around to"
+    },
+    {
+      "word": "look forward to",
+      "phonetic": "/lʊk ˈfɔːrwərd tuː/",
+      "meaning": "期待",
+      "example": "I'm looking forward to the last night's show.",
+      "exampleZh": "我很期待最後一晚的表演。",
+      "exampleMatch": "looking forward to"
+    },
+    {
+      "word": "put up with",
+      "phonetic": "/pʊt ʌp wɪð/",
+      "meaning": "忍受",
+      "example": "I can't put up with that noise anymore.",
+      "exampleZh": "我再也受不了那個噪音了。"
+    }
+  ]
+}
