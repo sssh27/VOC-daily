@@ -1,125 +1,148 @@
 # TASKS.md
 
-> 老大(規格方)指派的工作。由上往下做,做完更新 `PROGRESS.md`。
+> 國王餅(規格方)指派的工作。由上往下做,做完更新 `PROGRESS.md`。
 > 有疑問寫進 `QUESTIONS.md`(標題用 `## [未回答] ...`),不要自己猜。
 
 ---
 
 ## 上一輪 review 結果
 
-v4 實作品質good:規格都照做了,拉霸就地轉、認識卡、單一流程、補考機制、
-7 個 distractor 測試都補上,commit 也切得乾淨。Shawn 本機已跑過 `flutter test`,24 個全過。
+v5 全部完成,Shawn 本機測試通過。核心循環已完整可用。
 
-以下是這輪要處理的事:**兩個 bug 修正 + 一個新功能。**
-
----
-
-## A. Bug 修正
-
-### A1. 首頁文案在轉盤前就誤導使用者
-
-**現況:** 今天還沒轉盤、且沒有到期字時,`_studyQueueCount == 0`,
-首頁顯示「開始」按鈕禁用 + 「今天沒有要學的了」。
-
-**問題:** 使用者只要轉一下轉盤就會有新字。這行文案在轉盤前跳出來等於謊報。
-
-**修法:** 「今天沒有要學的了」這行只有在 `rolledToday == true` 時才可能顯示。
-還沒轉盤時不顯示這行(轉盤本身就是明確的行動指引,不需要額外文案)。
-
-### A2. 補考可能洗掉失敗紀錄
-
-**現況:** `_confirmInfo()` 沒有判斷目前是不是補考階段。
-
-**問題路徑:** 卡片答錯 → 進補考佇列 → 補考時 `distractorMeaningsFor()` 回傳空陣列
-→ `_mode = _Mode.info` → 使用者按「下一個」→ `_confirmInfo()` 以 quality 4 寫回資料庫
-→ **剛才的失敗紀錄被洗掉**,該卡被排到很久以後。
-
-這違反 SPEC 6.4「補考結果不寫回資料庫」。
-
-**修法:** `_confirmInfo()` 開頭加判斷,`_phase == _Phase.retry` 時只前進不寫回資料庫。
-
-**觸發機率極低**(需要整個牌組只剩一張卡),但這是規格明文禁止的行為,補一行判斷即可。
+**這一輪的重點是內容導入。時間敏感:Shawn 過幾天要搭郵輪,需要這批字能用。**
 
 ---
 
-## B. 新功能:「我會了」按鈕 + 額度補位機制
+## A. 【最優先】多牌組載入機制
 
-`docs/SPEC.md` 的 5.5、6.3b、6.4 已更新為 **v5**,請重讀。
+`docs/SPEC.md` 第 7 節已改版為 **v6**,請先讀。
 
-### B1. 認識卡加第二個按鈕
+我已經產好一個新牌組:`assets/decks/cruise_travel.json`(郵輪與旅遊實用,166 張)。
+但目前的 loader 載不進去,有兩個必須修的限制:
 
-```
-   [ 下一個 ]        [ 我會了 ]
-```
+| 現況 | 問題 |
+|---|---|
+| 只吃寫死的 `starter_deck.json` | 新牌組進不來 |
+| `hasAnyDeck()` 為 true 就整個跳過 | Shawn 資料庫已有資料,永遠拿不到新牌組 |
 
-**「我會了」的實作:連續呼叫 `reviewCard(state, 5)` 三次**,前一次的回傳當下一次的輸入:
+### 修法
+
+1. `lib/services/starter_deck_loader.dart` → 改名 `lib/services/deck_loader.dart`,
+   class `StarterDeckLoader` → `DeckLoader`
+2. 維護內建牌組清單:
+   ```dart
+   static const _deckAssets = [
+     'assets/decks/starter_deck.json',
+     'assets/decks/cruise_travel.json',
+   ];
+   ```
+3. 方法改名 `importIfEmpty()` → `importMissingDecks()`
+4. 逐一檢查:**依 `Deck.name` 判斷是否已存在,不存在才匯入**
+5. **已存在的牌組不要覆蓋、不要更新** —— 會洗掉 Shawn 的學習進度
+6. 單一牌組匯入失敗時記錄錯誤但不要 crash,繼續處理下一個
+7. `pubspec.yaml` 的 assets 加入 `assets/decks/cruise_travel.json`
+8. `main.dart` 及其他呼叫端同步更新
+
+### 需要新增 repository method
+
+`hasAnyDeck()` 不夠用,需要能依名稱查詢,例如:
 
 ```dart
-var st = currentState;
-for (var i = 0; i < 3; i++) {
-  st = reviewCard(st, 5);
-}
-// 結果:repetitions = 3, easiness = 2.8, interval = 16, dueDate = 今天 + 16 天
+Future<bool> deckExistsByName(String name);
 ```
-
-**絕對不要新增 `isMastered` 之類的欄位,也不要直接寫死 dueDate。**
-一律透過 `reviewCard()`,維持 SM-2 單一入口。這點很重要,不要自作聰明簡化。
-
-### B2. 額度補位機制
-
-拉霸骰出的額度代表「**今天要真正學會的新字數量**」,不是「今天會看到幾張新字卡」。
-
-| 使用者行為 | 是否計入額度 | 後續動作 |
-|---|---|---|
-| 按「下一個」 | ✅ 計入 | 前進下一張 |
-| 按「我會了」 | ❌ 不計入 | **立刻從倉庫再引入 1 張**,接在認識卡佇列最後面 |
-
-**不設補位次數上限。** 天然停止條件已足夠:倉庫空了、額度滿了、使用者自己關掉。
-
-**不要因為 `starter_deck.json` 只有 30 個字就加人工上限。** 那是佔位用的測試資料,
-不該讓它的限制影響主程式設計。
-
-### B3. 倉庫用盡的提示
-
-若倉庫已無未引入卡片、無法補位,在該次流程的**結束畫面**加一行:
-
-> 單字庫快用完了,去生成新的吧
-
-不要用彈窗或任何阻斷式互動。
 
 ---
 
-## C. 測試
+## B. 測試
 
-新增測試涵蓋:
-
-1. 「我會了」連呼叫三次 `reviewCard(_, 5)` 後,`interval == 16`、`repetitions == 3`、
-   `easiness` 約 2.8(浮點數用 `closeTo`)
-2. 額度計數:按「下一個」計入、按「我會了」不計入
-3. 補位邏輯:按「我會了」時會從倉庫引入 1 張(用 in-memory DB 測 repository 層)
-4. 倉庫空時補位不會 crash,回傳 null 或空
-
-建議把額度計數與補位判斷的邏輯抽成可測試的純函式或 repository method,
-不要全部塞在 `StudyScreen` 的 State 裡,否則沒辦法測。
+1. `deckExistsByName()` 正確回傳存在/不存在
+2. 空資料庫 → 兩個牌組都被匯入
+3. 已有「入門常用字」→ 只匯入「郵輪與旅遊實用」,原牌組的卡片數與進度不變
+4. 兩個牌組都存在 → 不重複匯入,卡片總數不變
+5. asset 路徑不存在時不會 crash,其他牌組照常匯入
 
 `flutter test` 必須全綠,`test/scheduler_test.dart` 依然**禁止修改**。
 
 ---
 
-## D. Commit
+## C. 驗證
 
-一個步驟一個 commit,建議切成:
+修完後請在 `PROGRESS.md` 註明需要 Shawn 本機驗證的項目:
 
-1. `fix: only show empty-state text after the daily roll`
-2. `fix: do not persist review result during retry phase`
-3. `feat: add "already know it" button on intro card`
-4. `feat: quota counts only newly learned words, replenish on skip`
-5. `test: cover already-know grading and quota replenishment`
+1. `flutter run -d chrome` 啟動後,單字庫頁面應看到**兩個**牌組
+2. 「郵輪與旅遊實用」卡片數為 **166**
+3. 「入門常用字」的已學進度沒有被重置
+4. 轉盤 → 開始,新字會從兩個牌組混合出現
 
-`git push` 若你的環境沒有認證,在 `PROGRESS.md` 註明,由 Shawn 本機執行。
+---
+
+## D. 不要做的事
+
+- **不要刪除** `lib/services/ai_service.dart` 或 `lib/screens/generate_screen.dart`。
+  正式版本不依賴它們,但保留作為開發階段的產字工具。檔案裡的警告註解也不要刪。
+- **不要修改** `assets/decks/cruise_travel.json` 的內容。有錯誤請寫進 `QUESTIONS.md`,
+  由國王餅修正。
+- 不要自行往下做 PWA manifest 或 SPEC 第 10 節其他步驟。
+
+---
+
+## E. Commit
+
+1. `refactor: rename starter deck loader to multi-deck loader`
+2. `feat: import missing decks by name instead of skipping when db non-empty`
+3. `feat: add cruise and travel vocabulary deck (166 cards)`
+4. `test: cover multi-deck import behaviour`
+
+`git push` 若環境沒有認證,在 `PROGRESS.md` 註明,由 Shawn 本機執行。
 
 ---
 
 ## 完成後
 
-更新 `PROGRESS.md` 後停下來等 review。不要自行往下做 PWA manifest 或 SPEC 第 10 節其他步驟。
+更新 `PROGRESS.md` 後停下來等 review。
+
+---
+
+## F. 【追加】`exampleMatch` 欄位支援
+
+我在產內容時驗證發現:166 張裡有 10 張的粗體比對會失效,幾乎全是片語動詞的時態變化
+(`hang out` → `hung out`、`run into` → `ran into`、`look forward to` → `looking forward to`)。
+含空格的片語無法套用現有的詞形變化推測。
+
+**解法:JSON 加選填欄位 `exampleMatch`,直接標明例句中要標粗的字串。**
+已經補進 `cruise_travel.json` 的那 10 張。
+
+`docs/SPEC.md` 的 4.2、6.3、7.3 已更新,請照著做:
+
+### F1. 資料庫
+
+`Cards` 表加欄位 `exampleMatch`(nullable text),`schemaVersion` 遞增,
+`onUpgrade` 加對應分支。改完記得跑:
+
+```
+dart run build_runner build --delete-conflicting-outputs
+```
+
+### F2. 比對邏輯
+
+`lib/widgets/word_highlight.dart` 的比對改成依序判斷:
+
+1. 有 `exampleMatch` → 精確比對這個字串,**優先於所有其他規則**
+2. 沒有 → 用 `word` 大小寫不敏感比對
+3. 仍找不到且 `word` 不含空格 → 現有的詞形變化推測
+4. 都找不到 → 整句原樣顯示
+
+**不要**在程式裡實作不規則動詞表或詞形還原規則。那是刻意避開的方向,
+理由寫在 SPEC 6.3。
+
+### F3. Loader 與 repository
+
+`deck_loader.dart` 解析 `exampleMatch`,`createDeckWithCards()` 簽章加對應參數
+(AI 生成的卡片傳 null)。
+
+### F4. 測試
+
+1. 有 `exampleMatch` 時,標粗的是該字串而非 `word`
+2. `exampleMatch` 不在例句裡時,不 crash,退回整句原樣顯示
+3. 沒有 `exampleMatch` 時,現有的三段式邏輯行為不變(回歸測試)
+4. 片語 `hang out` + `exampleMatch: "hung out"` + 例句 `We hung out...` → 正確標粗

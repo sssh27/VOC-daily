@@ -126,6 +126,7 @@ ScheduleState reviewCard(ScheduleState state, int quality, {DateTime? now});
 | dueDate | dateTime, default now | SM-2 欄位 |
 | lastReviewed | dateTime, nullable | |
 | **isIntroduced** | **bool, default false** | **【新增】是否已被拉霸放進學習循環** |
+| **exampleMatch** | **text, nullable(v6)** | **例句中要標粗體的實際字串,見 6.3。null 代表用預設比對** |
 
 `isIntroduced` 的意義:
 
@@ -322,11 +323,22 @@ isIntroduced == true  AND  dueDate <= 今天的 23:59:59
 └────────────────────────────┘
 ```
 
-**粗體規則:** 在 `example` 字串中,把 `word` 出現的地方套用 `FontWeight.bold`。
+**粗體規則(v6 修訂):** 在 `example` 字串中,把目標字出現的地方套用 `FontWeight.bold`。
 
-- 大小寫不敏感比對
-- 單一詞時允許詞形變化(word=`procrastinate`,句中 `procrastinating` 也要粗體)
-- 找不到就整句原樣顯示,不要報錯
+依序判斷:
+
+1. **卡片有 `exampleMatch` 欄位** → 直接對這個字串做精確比對並標粗體。**優先於以下所有規則。**
+2. 沒有 `exampleMatch` → 用 `word` 做大小寫不敏感比對
+3. 仍找不到,且 `word` 不含空格 → 允許詞形變化(句中 `procrastinating` 可對到 `procrastinate`)
+4. 都找不到 → 整句原樣顯示,不要報錯
+
+**為什麼需要 `exampleMatch`:** 片語動詞的例句常帶時態變化(`hang out` → `hung out`、
+`run into` → `ran into`),而含空格的片語無法套用詞形變化推測。
+
+在程式裡實作詞形還原(不規則動詞表、去 e 加 ing、y 變 ies)會引入猜測邏輯與誤判風險,
+且不規則動詞永遠列不完。改由內容端直接標明要標粗的字串,零猜測、零誤判。
+
+**這個欄位是選填的。** 大多數卡片不需要,只有目標字在例句中形態改變時才加。
 
 **不做挖空。** 目標單字已顯示在上方,挖空沒有意義。
 
@@ -630,35 +642,88 @@ for (var i = 0; i < 3; i++) {
 
 ---
 
-## 7. 預設牌組(內建內容)
+## 7. 內建字庫(v6 改版)
 
-App 第一次啟動時,如果資料庫是空的,要自動匯入一份內建牌組,讓使用者不需要設定 API key 就能開始用。
+### 7.1 內容策略變更
 
-1. 在 `assets/decks/` 放一個 `starter_deck.json`
-2. 格式:
+**【v6 定案】不在正式版本使用執行期 AI 生成,改為預先產好的靜態字庫。**
+
+理由:
+
+1. `.env` 的 API key 會被打包進 JavaScript,任何人都能取出。要解決就得架後端中繼,
+   對一個單人自用的 App 而言代價不成比例。
+2. 靜態字庫不需要後端、不需要金鑰、不需要網路,PWA 可直接部署到靜態託管。
+3. 內容品質可以事前審核,不受生成當下的不穩定性影響。
+
+**`lib/services/ai_service.dart` 與 `generate_screen.dart` 保留,不要刪除**,
+當作開發階段的產字工具。但正式版本的主流程不依賴它們。
+
+**規格書第 11 節的「上線前必辦」因此解除**,但檔案裡的警告註解仍不要刪。
+
+### 7.2 多牌組載入(需要改)
+
+目前 `StarterDeckLoader.importIfEmpty()` 有兩個限制,必須修正:
+
+| 現況 | 問題 |
+|---|---|
+| 只吃寫死的 `starter_deck.json` | 無法載入其他牌組 |
+| `hasAnyDeck()` 為 true 就整個跳過 | 已有資料的使用者永遠拿不到新牌組 |
+
+**改為:**
+
+1. 檔案改名 `lib/services/deck_loader.dart`,class 改名 `DeckLoader`
+2. 維護一份內建牌組清單(asset 路徑陣列)
+3. 啟動時逐一檢查:**依 `Deck.name` 判斷該牌組是否已存在**,不存在才匯入
+4. 已存在的牌組**不要覆蓋、不要更新**,避免洗掉使用者的學習進度
+5. 匯入失敗(檔案缺漏、JSON 格式錯)時,記錄錯誤但不要讓 App 崩潰,繼續處理下一個
+
+這樣之後新增字庫只要:放 json 進 `assets/decks/` → 加進 `pubspec.yaml` → 加進清單陣列。
+
+### 7.3 牌組 JSON 格式
 
 ```json
 {
-  "name": "入門常用字",
-  "topic": "日常英文高頻字彙",
+  "name": "郵輪與旅遊實用",
+  "topic": "郵輪船上生活、岸上觀光、旅行物品與日常口語(B2)",
   "cards": [
     {
-      "word": "procrastinate",
-      "phonetic": "/prəˈkræstɪneɪt/",
-      "meaning": "拖延",
-      "example": "I always procrastinate when I have a big project due.",
-      "exampleZh": "每次有大專案要交,我總是拖延。"
+      "word": "embark",
+      "phonetic": "/ɪmˈbɑːrk/",
+      "meaning": "登船;啟程",
+      "example": "We embark at three, so let's get to the terminal by noon.",
+      "exampleZh": "我們三點登船,所以中午前要到碼頭。",
+      "avoidWith": ["disembark"]
+    },
+    {
+      "word": "hang out",
+      "phonetic": "/hæŋ aʊt/",
+      "meaning": "一起消磨時間",
+      "example": "We hung out by the pool all afternoon.",
+      "exampleZh": "我們整個下午都在泳池邊消磨時間。",
+      "exampleMatch": "hung out"
     }
   ]
 }
 ```
 
-3. 在 `pubspec.yaml` 的 `assets` 區塊註冊這個路徑
-4. 在 App 啟動時檢查 Decks 表是否為空,是的話才匯入(不要每次啟動都重複匯入)
+| 欄位 | 必填 | 說明 |
+|---|---|---|
+| `word` / `meaning` | ✅ | |
+| `phonetic` / `example` / `exampleZh` | 建議填 | 缺漏時當空字串,不要 crash |
+| `avoidWith` | 選填 | 四選一的排除名單,沒有就當空陣列 |
+| `exampleMatch` | 選填 | 例句中實際要標粗體的字串。目標字在例句裡形態改變時才需要,見 6.3 |
 
-**內容準備:** 先放 30 張即可,由專案擁有者提供或請實作者依「日常英文高頻字彙」主題產出,但必須每張都有完整的 5 個欄位。
+### 7.4 目前的內建牌組
 
----
+| 檔案 | 牌組名稱 | 張數 | 用途 |
+|---|---|---|---|
+| `assets/decks/starter_deck.json` | 入門常用字 | 30 | 早期佔位測試資料,難度偏低 |
+| `assets/decks/cruise_travel.json` | 郵輪與旅遊實用 | 166 | B2,郵輪/旅遊情境、生活實物、口語表達 |
+
+後續會再補充約 850 張(日常生活會話、片語動詞與慣用語、生活實物名詞),
+目標總量 1000 張以上。
+
+**音標(IPA)為大量產出,可能存在少量錯誤,不影響排程與測驗邏輯。**
 
 ## 8. 檔案異動清單
 
@@ -669,7 +734,7 @@ App 第一次啟動時,如果資料庫是空的,要自動匯入一份內建牌�
 | `lib/data/database.dart` | 修改 | 加 `isIntroduced` 欄位、加 DailyRolls 表、Web WASM 設定 |
 | `lib/data/card_repository.dart` | 新增 | 封裝所有資料庫查詢,畫面層不直接碰 Drift |
 | `lib/services/ai_service.dart` | 修改 | 補完錯誤處理 |
-| `lib/services/starter_deck_loader.dart` | 新增 | 首次啟動匯入內建牌組 |
+| `lib/services/deck_loader.dart` | 改名+改寫(v6) | 由 `starter_deck_loader.dart` 改名,支援多牌組,見 7.2 |
 | `lib/screens/home_screen.dart` | 重寫 | 見 6.1 |
 | `lib/screens/daily_roll_screen.dart` | **刪除**(v4) | 拉霸改在首頁就地進行 |
 | `lib/screens/review_screen.dart` | 重寫 | 見 6.4 |
