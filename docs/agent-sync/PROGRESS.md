@@ -1,8 +1,108 @@
 # PROGRESS.md
 
-> 寫這份文件的人:老二(實作方)
+> 寫這份文件的人:聖多諾黑(實作方)
 > 目的:對照 `docs/SPEC.md`,誠實記錄目前專案的真實狀態。
 > 舊版完整報告在 `docs/agent-sync/archive/IMPLEMENTATION_REPORT.md`。
+
+---
+
+## 這一輪(v6)做了什麼
+
+依 `docs/agent-sync/TASKS.md` 的 A(多牌組載入)、B(測試)、F(`exampleMatch`
+欄位)完成,細節如下。時間敏感這輪(Shawn 要搭郵輪),優先把內容導入做完。
+
+### A. 多牌組載入機制
+
+- `lib/services/starter_deck_loader.dart` 已刪除,改名為
+  `lib/services/deck_loader.dart`,class `StarterDeckLoader` → `DeckLoader`。
+- 內建牌組清單 `_deckAssets`:`starter_deck.json` + `cruise_travel.json`。
+  之後新增字庫只要放 json + 註冊 `pubspec.yaml` + 加進這個清單。
+- `importIfEmpty()` → `importMissingDecks()`:不再靠「整庫是否為空」判斷,
+  改成逐一依 `Deck.name` 查詢是否已存在(新增
+  `CardRepository.deckExistsByName()`),不存在才匯入。已存在的牌組**不覆蓋、
+  不更新**,不會動到 Shawn 現有的學習進度。
+- 單一牌組匯入包在 `try/catch` 裡,失敗只印錯誤訊息、繼續處理下一個,不會讓
+  `_AppBootstrap` 卡死。
+- `DeckLoader` 建構子加了選填的 `assetPaths` 參數(預設用內建清單),單純是
+  為了讓測試能注入一個包含不存在路徑的清單,驗證失敗容錯——正式程式碼路徑
+  不會用到這個參數。
+- `main.dart`、`pubspec.yaml`(assets 加 `cruise_travel.json`)、
+  `generate_screen.dart`(`createDeckWithCards()` 的呼叫多帶一個
+  `exampleMatch: null`)都同步更新。
+
+### F. `exampleMatch` 欄位
+
+- **F1** `database.dart` 的 `Cards` 表加 `exampleMatch`(nullable text),
+  `schemaVersion` 3 → 4,`onUpgrade` 加 `from < 4` 分支補這個欄位。**這步驟
+  改完需要 Shawn 本機跑一次 `dart run build_runner build
+  --delete-conflicting-outputs` 重新產生 `database.g.dart`,否則編譯會失敗**
+  (sandbox 沒有 Dart SDK,我沒辦法自己跑)。
+- **F2** `word_highlight.dart` 的 `highlightWordSpans()` 加 `exampleMatch`
+  選填參數,比對邏輯照 SPEC 6.3 改成四步驟:有 `exampleMatch` 就精確
+  (大小寫敏感)比對且**不落回**其他規則,找不到就整句原樣顯示;沒有
+  `exampleMatch` 才走原本的 word 比對 + 詞形變化推測。刻意沒有實作任何
+  不規則動詞表。
+- **F3** `QuestionCard` / `IntroCard` 都加了 `exampleMatch`(選填)欄位並轉呼叫
+  `highlightWordSpans()`;`review_screen.dart` 三個用到這兩個元件的地方都補上
+  `exampleMatch: card.exampleMatch`。`deck_loader.dart` 解析 JSON 的
+  `exampleMatch` 欄位、`createDeckWithCards()` 的卡片參數型別多了
+  `String? exampleMatch`(AI 生成路徑傳 `null`)。
+
+### B / F4. 測試
+
+sandbox 依然沒有 Flutter SDK,新增 2 個檔案:
+
+| 檔案 | 案例數 | 涵蓋什麼 |
+|---|---|---|
+| `test/multi_deck_loader_test.dart` | 6 | `deckExistsByName()` 存在/不存在、空庫匯入兩個牌組、已有一個牌組時只匯入另一個且原牌組進度(`lastReviewed`)不變、兩個都存在不重複匯入、asset 路徑不存在不 crash |
+| `test/example_match_test.dart` | 6 | `exampleMatch` 優先比對、找不到時整句原樣(不落回 word 比對)、沒有 `exampleMatch` 時 word 比對與詞形推測不變(回歸測試)、片語過去式範例、空字串視同沒有 |
+
+新增 12 個,加上 v5 累計的 38 個,合計預期 50 個。麻煩本機跑:
+
+```
+dart run build_runner build --delete-conflicting-outputs
+flutter test
+```
+
+`test/scheduler_test.dart` 完全沒動。
+
+### 需要 Shawn 本機驗證的項目(TASKS.md C 節)
+
+1. `flutter run -d chrome` 啟動後,單字庫頁面應看到**兩個**牌組
+2. 「郵輪與旅遊實用」卡片數為 **166**
+3. 「入門常用字」的已學進度沒有被重置
+4. 轉盤 → 開始,新字會從兩個牌組混合出現
+
+### D. Commit
+
+這輪切了 5 個 commit:
+
+1. `docs: sync SPEC.md and TASKS.md to v6`
+2. `feat: multi-deck loader imports by name, adds cruise_travel deck`
+3. `feat: exampleMatch-aware bold highlighting in example sentences`
+4. `test: cover multi-deck import behaviour and exampleMatch highlighting`
+
+（這份 PROGRESS.md 更新完會是第 5 個。）
+
+跟 TASKS.md 建議的切法不太一樣,原因是 `deck_loader.dart` 這個新檔案裡
+「改名+多牌組邏輯」跟「解析 exampleMatch 欄位」是同一個檔案裡的兩行改動,
+硬切開會產生編譯不過的中間 commit,所以 commit 2 把 A(多牌組載入,含
+`database.dart` 加欄位、`card_repository.dart` 的 `deckExistsByName()`
+與 `createDeckWithCards()` 簽章)跟 F1/F3 合併處理;commit 3 只放 UI 層
+真正「用 exampleMatch 來標粗體」的部分(`word_highlight.dart` /
+`question_card.dart` / `intro_card.dart` / `review_screen.dart`)。
+
+沒有把 `cruise_travel.json` 的新增獨立切一個 commit——它跟著 asset 註冊
+(`pubspec.yaml`)一起在 commit 2 裡,因為沒有它 loader 的改動測試不完整,
+分開意義不大。
+
+**`git push` 一樣跑不了**(sandbox 沒有 GitHub 認證),需要你本機執行
+`git push origin main`。
+
+### 沒做的事
+
+- `docs/SPEC.md` 第 10 節第 10 步(PWA manifest)沒有動,依指示停在這裡等 review。
+- `assets/decks/cruise_travel.json` 內容完全沒有動過。
 
 ---
 
@@ -181,7 +281,7 @@ flutter test
 
 這輪 + 補齊 v3 遺漏的變動,總共切了 6 個 commit:
 
-1. `docs: add CLAUDE.md, sync SPEC.md and TASKS.md from 老大`
+1. `docs: add CLAUDE.md, sync SPEC.md and TASKS.md from 國王餅`
 2. `refactor: remove standalone roll screen, roll inline on home`
 3. `feat: intro card, shared word-highlight helper, avoidWith distractor support`
 4. `refactor: merge new/due queue into study screen with retry logic and reaction-time grading`
@@ -245,6 +345,6 @@ flutter test
 
 ## 下一步建議
 
-等你本機跑完 `flutter test` 全綠、`git push` 完成,再麻煩老大 review 這輪的
+等你本機跑完 `flutter test` 全綠、`git push` 完成,再麻煩國王餅 review 這輪的
 `home_screen.dart` / `review_screen.dart`(`StudyScreen`)/ `card_repository.dart`
 的 `studyQueue()` 與 `distractorMeaningsFor()`。停在這裡,不往下做 PWA manifest。
