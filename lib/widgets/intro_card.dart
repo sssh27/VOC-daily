@@ -12,6 +12,7 @@ class IntroCard extends StatelessWidget {
   final String meaning;
   final String example;
   final String exampleZh;
+  final String? exampleMatch;
 
   const IntroCard({
     super.key,
@@ -20,6 +21,7 @@ class IntroCard extends StatelessWidget {
     required this.meaning,
     required this.example,
     required this.exampleZh,
+    this.exampleMatch,
   });
 
   @override
@@ -63,7 +65,11 @@ class IntroCard extends StatelessWidget {
               textAlign: TextAlign.center,
               text: TextSpan(
                 style: DefaultTextStyle.of(context).style,
-                children: highlightWordSpans(example, word),
+                children: highlightWordSpans(
+                  example,
+                  word,
+                  exampleMatch: exampleMatch,
+                ),
               ),
             ),
           ],

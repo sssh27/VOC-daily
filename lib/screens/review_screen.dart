@@ -361,6 +361,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
           meaning: card.meaning,
           example: card.example,
           exampleZh: card.exampleZh,
+          exampleMatch: card.exampleMatch,
         ),
         const SizedBox(height: 24),
         Row(
@@ -395,6 +396,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
             meaning: card.meaning,
             example: card.example,
             exampleZh: card.exampleZh,
+            exampleMatch: card.exampleMatch,
           ),
           const SizedBox(height: 24),
           ElevatedButton(
@@ -413,6 +415,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
           word: card.word,
           phonetic: card.phonetic,
           example: card.example,
+          exampleMatch: card.exampleMatch,
         ),
         const SizedBox(height: 24),
         if (choices == null)

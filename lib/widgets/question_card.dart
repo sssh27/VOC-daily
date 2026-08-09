@@ -10,12 +10,14 @@ class QuestionCard extends StatelessWidget {
   final String word;
   final String phonetic;
   final String example;
+  final String? exampleMatch;
 
   const QuestionCard({
     super.key,
     required this.word,
     required this.phonetic,
     required this.example,
+    this.exampleMatch,
   });
 
   @override
@@ -51,7 +53,11 @@ class QuestionCard extends StatelessWidget {
               textAlign: TextAlign.center,
               text: TextSpan(
                 style: DefaultTextStyle.of(context).style,
-                children: highlightWordSpans(example, word),
+                children: highlightWordSpans(
+                  example,
+                  word,
+                  exampleMatch: exampleMatch,
+                ),
               ),
             ),
           ],
