@@ -4,6 +4,47 @@
 
 ---
 
+## [已回答] Shawn 實測:每次打開 App 都沒有記憶效果,沒有需要複習的字
+
+- **Shawn 原話:**「我實測了 他現在是不是沒有記憶效果 為什麼每次開所有東西都
+  重新 沒有需要複習的」
+- **情境:** Shawn 本機用 `flutter run -d chrome` 測試,每次重開 App,
+  資料看起來都像重新開始,沒有卡片累積到期需要複習。
+
+### ✅ 診斷結論
+
+**不是資料庫寫入邏輯壞掉,是本機測試方式的問題。**
+
+`flutter run -d chrome` 沒有指定 `--web-port` 時,每次啟動會挑一個不同的
+隨機 port。瀏覽器的持久化儲存(IndexedDB / OPFS,Drift Web 資料庫存在
+這裡)是綁定在「origin」上,origin = protocol + host + **port**。port
+一變,對瀏覽器來說就是全新的網站、全新的空儲存空間,跟資料庫本身有沒有
+正確寫入完全無關。
+
+**這個問題只在本機 `flutter run -d chrome` 測試時會發生,部署到 GitHub
+Pages 之後不會**——`https://sssh27.github.io/VOC-daily/` 是固定網址,
+origin 不會變。
+
+**已做的事:**
+
+1. `lib/data/database_connection/connection_web.dart` 加了一行 debug
+   log,啟動時瀏覽器 console 會印出 `DB storage: ..., missing features:
+   ...`,可以直接確認 Drift 實際選了哪種儲存方式(如果是 `inMemory`
+   才是真的沒有持久化,是另一個問題;`indexedDb`/`opfs` 開頭代表持久化
+   本身沒問題)。
+2. 完整診斷細節記在 `PROGRESS.md`「補丁:Shawn 回報...」那節。
+
+**建議 Shawn 本機測試時的做法:**
+
+```
+flutter run -d chrome --web-port=8080
+```
+
+每次都用同一個指令(同一個 port)重開、同一個分頁重新整理,資料應該就在。
+或者直接跳過本機持久化測試,等 push 部署後測正式網址。
+
+---
+
 ## [未回答] `word_highlight.dart` 的「詞形變化推測」分支實際上永遠不會執行到
 
 - **情境:** 這輪(v7)第一次幫 `highlightWordSpans()` 寫單元測試
