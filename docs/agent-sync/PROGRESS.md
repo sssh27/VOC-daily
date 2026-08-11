@@ -6,6 +6,43 @@
 
 ---
 
+## 補丁:Shawn 回報「每次打開都沒有記憶效果,沒有要複習的字」
+
+Shawn 實測後回報:每次重開 App,資料都像是重新開始,沒有卡片進入到期
+複習。這不是這輪(v7)動到的東西造成的,是既有的 Web WASM 持久化設定
+問題,先在這裡記錄診斷結果。
+
+**最可能的原因:`flutter run -d chrome` 預設每次啟動用不同的 port。**
+
+Drift 在瀏覽器裡的持久化儲存(IndexedDB / OPFS)是綁定在「origin」上的,
+origin = protocol + host + **port**。`flutter run -d chrome` 沒有指定
+`--web-port` 時,每次啟動 Flutter 開發伺服器會挑一個不同的隨機 port——
+等於每次都是全新的 origin,瀏覽器看到的是全新的、空的儲存空間,跟資料庫
+本身有沒有正確寫入完全無關。這完全符合「每次打開都像重新開始」的症狀。
+
+**這件事只在本機 `flutter run -d chrome` 測試時會發生,部署到 GitHub
+Pages 之後不會**,因為 `https://sssh27.github.io/VOC-daily/` 是固定網址,
+origin 不會變。
+
+**驗證方法(已經加進 code):** `lib/data/database_connection/connection_web.dart`
+加了一行 debug log,啟動時瀏覽器 console 會印出
+`DB storage: ..., missing features: ...`。如果 `chosenImplementation` 是
+`inMemory`,才是真的完全沒有持久化(那會是另一個問題,例如
+`sqlite3.wasm`/`drift_worker.dart.js` 版本不相容或瀏覽器功能缺失);
+如果是 `indexedDb` 或 `opfs` 開頭的值,代表持久化本身是好的,單純是
+port 換了。
+
+**本機測試持久化的正確做法:** 固定 port 啟動,例如:
+
+```
+flutter run -d chrome --web-port=8080
+```
+
+每次都用同一個指令(同一個 port),重新整理或關掉再開同一個分頁,資料
+就應該還在。也可以直接照 D 節建議測部署後的正式網址,那邊不會有這個問題。
+
+---
+
 ## v7 補丁:Shawn 本機跑 `flutter test`/`flutter run` 抓到的錯誤
 
 sandbox 沒有 Flutter SDK,這輪(v7)的程式碼我沒辦法自己編譯驗證,結果
