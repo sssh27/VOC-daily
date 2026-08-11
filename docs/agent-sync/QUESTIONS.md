@@ -4,6 +4,46 @@
 
 ---
 
+## [未回答] `word_highlight.dart` 的「詞形變化推測」分支實際上永遠不會執行到
+
+- **情境:** 這輪(v7)第一次幫 `highlightWordSpans()` 寫單元測試
+  (`test/example_match_test.dart`)才發現:SPEC.md 6.3 第 3 條規則
+  (「word 不含空格時允許詞形變化,例如 `procrastinate` 對到句中的
+  `procrastinating`」)對應的 `tokenRegex` fallback 分支
+  (`lib/widgets/word_highlight.dart` 第 50–60 行)實際上**永遠不會被觸發**。
+
+  原因:前面的 `lowerExample.indexOf(lowerWord)`(第 47 行)是原始子字串
+  搜尋,只要 word 是句中任何 token 的字首(這正是詞形變化推測想抓的情況,
+  例如 "procrastinating" 以 "procrastinate" 開頭),`indexOf` 就會直接
+  找到,而且回傳的長度固定是 `word.length`,不會延伸到整個 token。也就是
+  說實際結果是**只標粗 word 自己的長度**(例如 word=`clean`、句中
+  `cleaning` → 只有 `clean` 4 個字母變粗體,`ing` 不會),SPEC
+  文件裡舉的 `procrastinating` 例子其實從來沒有真的被 fallback 分支
+  處理過——因為 `procrastinate` 本身結尾是 e,`procrastinating` 是去 e
+  加 ing,`indexOf("procrastinate")` 在 `procrastinating` 裡根本找不到
+  (兩者中間就差在有沒有那個 e),所以這個特定例子反而會落到 4.
+  「整句原樣顯示」,不會有任何粗體。
+
+- **目前狀態:** 這個分支是死碼(dead code),不會造成錯誤或崩潰,只是達不到
+  文件宣稱的效果。我這輪沒有動這段邏輯(不確定產品意圖,依 CLAUDE.md
+  規則停下來問),`test/example_match_test.dart` 裡如實記錄了現在的真實
+  行為(只標 word 自己的長度),沒有照 SPEC 文件寫的行為去斷言。
+
+- **選項:**
+  1. 拿掉 `tokenRegex` fallback 分支(反正打不到),SPEC 6.3 第 3 條規則
+     改成單純說明「word 是某個較長字首時只會標到 word 自己的長度」
+  2. 修正比對邏輯,讓「word 是句中某個 token 字首」時能抓到整個 token
+     (但這樣 word=`run` 遇到句中 `running` 也會整個標粗,可能不是所有
+     場景都想要;而且如果要做「去 e 加 ing」這種真正的詞形還原,SPEC 6.3
+     本文明確禁止在程式裡猜這個)
+  3. 維持現況,反正實際案例都可以用 `exampleMatch` 精確指定,這個分支
+     只是聊勝於無的保底,不值得為它加複雜度
+- **我的傾向:** 選項 3。`exampleMatch` 已經是這類情況的正式解法
+  (v6 就是為此新增的),這個舊分支保留著沒有壞處也沒有實際效用,
+  拿掉的話要重新過一輪回歸測試才敢動,投報率不高。
+
+---
+
 ## [已回答] 複習畫面(6.4)要不要正式改成四選一測驗?
 
 - **情境:** SPEC 6.4 原本定義的是「翻卡(挖空例句→翻面看完整例句+評分按鈕:忘記了/有點難/普通/簡單,對應 quality 0/3/4/5)」。實際畫面做出來後,Shawn 直接要求改成「不翻卡,看單字+完整例句(單字粗體)+四選一中文意思選項,答對 quality=5、答錯 quality=0」。現在 repo 裡的 `review_screen.dart` 是四選一版本,不是 SPEC 原本寫的翻卡版本。`lib/widgets/flashcard.dart`(翻卡元件)還在,但沒有任何畫面在用它。

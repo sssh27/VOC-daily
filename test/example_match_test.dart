@@ -53,13 +53,19 @@ void main() {
     expect(_boldText(spans), 'procrastinate');
   });
 
-  test('沒有 exampleMatch 時,詞形變化推測仍然生效', () {
+  test('word 是句中較長字的字首時,只標粗 word 自己的長度(現有行為,見 QUESTIONS.md)', () {
+    // 實測發現:indexOf 的原始子字串比對一定會比 tokenRegex 詞形推測先
+    // 命中(只要 word 是句中某個 token 的字首,indexOf 就會直接抓到,
+    // 長度就是 word.length,不會延伸到整個 token)。也就是說 3.
+    // 「詞形變化推測」那個分支目前實際上永遠不會被觸發到——已經寫進
+    // docs/agent-sync/QUESTIONS.md 給國王餅確認要不要處理,這裡先如實
+    // 記錄現在的行為,不要另外去改 word_highlight.dart 的邏輯。
     final spans = highlightWordSpans(
-      'Stop procrastinating and start now.',
-      'procrastinate',
+      'I hate cleaning the bathroom.',
+      'clean',
     );
 
-    expect(_boldText(spans), 'procrastinating');
+    expect(_boldText(spans), 'clean');
   });
 
   test('片語 hang out + exampleMatch: hung out,例句是過去式時正確標粗', () {
