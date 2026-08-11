@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vocab_srs_app/widgets/word_highlight.dart';
 
-/// 涵蓋 highlightWordSpans() 的 exampleMatch 比對規則(SPEC.md 6.3,v6)。
+/// 涵蓋 highlightWordSpans() 的比對規則(SPEC.md 6.3,v9:三段式,
+/// 「詞形變化推測」的死碼分支已移除,見 docs/agent-sync/QUESTIONS.md)。
 
 String _boldText(List<InlineSpan> spans) {
   for (final span in spans) {
@@ -53,13 +54,11 @@ void main() {
     expect(_boldText(spans), 'procrastinate');
   });
 
-  test('word 是句中較長字的字首時,只標粗 word 自己的長度(現有行為,見 QUESTIONS.md)', () {
-    // 實測發現:indexOf 的原始子字串比對一定會比 tokenRegex 詞形推測先
-    // 命中(只要 word 是句中某個 token 的字首,indexOf 就會直接抓到,
-    // 長度就是 word.length,不會延伸到整個 token)。也就是說 3.
-    // 「詞形變化推測」那個分支目前實際上永遠不會被觸發到——已經寫進
-    // docs/agent-sync/QUESTIONS.md 給國王餅確認要不要處理,這裡先如實
-    // 記錄現在的行為,不要另外去改 word_highlight.dart 的邏輯。
+  test('word 是句中較長字的字首時,只標粗 word 自己的長度(鎖定行為,v9 定案)', () {
+    // word="clean" 出現在句中的 "cleaning" 只會標粗前 5 個字母,不會
+    // 延伸到整個單字。這是原本「詞形變化推測」死碼分支被移除後的正式
+    // 行為(該分支結構上永遠不可能被觸發到,見 QUESTIONS.md 的討論)。
+    // 需要抓到完整單字形態變化的情況一律用 exampleMatch 明確指定。
     final spans = highlightWordSpans(
       'I hate cleaning the bathroom.',
       'clean',
