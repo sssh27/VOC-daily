@@ -27,6 +27,7 @@ class _DeckRow {
 
 class _DecksScreenState extends ConsumerState<DecksScreen> {
   List<_DeckRow>? _rows;
+  int _totalIntroduced = 0;
 
   @override
   void initState() {
@@ -42,8 +43,12 @@ class _DecksScreenState extends ConsumerState<DecksScreen> {
       final (learned, total) = await repo.deckProgress(deck.id);
       rows.add(_DeckRow(deck, learned, total));
     }
+    final introduced = await repo.introducedCount();
     if (!mounted) return;
-    setState(() => _rows = rows);
+    setState(() {
+      _rows = rows;
+      _totalIntroduced = introduced;
+    });
   }
 
   Future<void> _goToGenerate() async {
@@ -63,9 +68,18 @@ class _DecksScreenState extends ConsumerState<DecksScreen> {
           ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
               padding: const EdgeInsets.all(16),
-              itemCount: rows.length,
+              itemCount: rows.length + 1,
               itemBuilder: (context, i) {
-                final row = rows[i];
+                if (i == 0) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: Text(
+                      '你認識了 $_totalIntroduced 個字',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  );
+                }
+                final row = rows[i - 1];
                 final progress = row.total == 0 ? 0.0 : row.learned / row.total;
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 16),
