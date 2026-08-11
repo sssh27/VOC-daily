@@ -6,6 +6,36 @@
 
 ---
 
+## v7 補丁:Shawn 本機跑 `flutter test`/`flutter run` 抓到的錯誤
+
+sandbox 沒有 Flutter SDK,這輪(v7)的程式碼我沒辦法自己編譯驗證,結果
+Shawn 本機一跑就抓到 5 個問題,都已修正並補了 4 個 commit:
+
+1. `lib/logic/completion_messages.dart` 的 `library` 指令寫在 `import`
+   後面——Dart 規定 `library` 必須在所有 import 之前。
+2. `lib/screens/review_screen.dart` 晃動動畫的 `const Tween(...)`——
+   `Tween` 的建構子不是 const,寫 `const` 會編譯錯誤。
+3. `test/app_settings_test.dart`、`test/replenish_test.dart` 同時
+   `import 'package:drift/drift.dart'` 和 `flutter_test`,兩者都有
+   `isNull`/`isNotNull`,名稱衝突。改成 `hide isNull, isNotNull`。
+4. `test/example_match_test.dart` 裡「詞形變化推測」那個測試案例的期望值
+   是錯的——**這順便挖出一個真的問題**:`word_highlight.dart` 裡負責
+   詞形變化推測的 `tokenRegex` fallback 分支實際上永遠執行不到(前面的
+   `indexOf` 原始子字串比對一定會先命中,而且只會標粗 word 自己的長度,
+   不會延伸到整個 token)。已經照實際行為改測試斷言,並在
+   `QUESTIONS.md` 開了一題給國王餅確認要不要處理這段死碼,**沒有**自作
+   主張去改 `word_highlight.dart` 的比對邏輯。
+5. `test/multi_deck_loader_test.dart` 的卡片數斷言是 v6 寫的,那時候
+   `deck_loader.dart` 的預設清單只有 2 個牌組;這輪清單擴到 7 個之後
+   斷言沒跟著更新(196 應該是 406)。已更新。
+
+**這次教訓:** 我這邊沒有 Dart/Flutter 環境,只能靠讀程式碼推理,推理
+不出編譯期規則(像 library 指令順序)或套件間的命名衝突。以後每輪做完
+如果有任何不確定編不編得過的地方,會在回報裡主動提醒你優先跑
+`flutter test`/`flutter run` 而不是等你自己發現。
+
+---
+
 ## 這一輪(v7)做了什麼
 
 依 `docs/agent-sync/TASKS.md` 的 G(最高優先)、A(5 個新牌組)、B(遊戲化與
