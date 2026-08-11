@@ -603,7 +603,7 @@ class _ChoiceButton extends StatelessWidget {
       );
     } else if (shake) {
       button = TweenAnimationBuilder<double>(
-        tween: const Tween(begin: 0.0, end: 1.0),
+        tween: Tween(begin: 0.0, end: 1.0),
         duration: const Duration(milliseconds: 200),
         builder: (context, t, child) {
           final offset = sin(t * pi * 4) * 6 * (1 - t);

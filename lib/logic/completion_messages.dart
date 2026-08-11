@@ -1,5 +1,3 @@
-import 'dart:math';
-
 /// 完成畫面的文案(SPEC.md 12.4,v7 新增)。
 ///
 /// 純函式,不碰 DB/UI,方便單元測試(見 test/completion_messages_test.dart)。
@@ -9,6 +7,8 @@ import 'dart:math';
 /// - 不得有督促、提醒明天再來、或任何帶有義務感的語氣
 /// - 語氣輕鬆,不要過度熱情或說教
 library completion_messages;
+
+import 'dart:math';
 
 const completionMessagePool = [
   '今天做完了',
