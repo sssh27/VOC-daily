@@ -27,9 +27,17 @@ class DeckLoader {
 
   /// 內建牌組清單。之後新增字庫只要:放 json 進 `assets/decks/` →
   /// 加進 `pubspec.yaml` → 加進這裡。
+  ///
+  /// 【v7】`starter_deck.json` 刻意排最後——那是早期佔位測試資料,
+  /// 難度偏低,見 TASKS.md v7 A2。
   static const _deckAssets = [
-    'assets/decks/starter_deck.json',
     'assets/decks/cruise_travel.json',
+    'assets/decks/kitchen_food.json',
+    'assets/decks/home_cleaning.json',
+    'assets/decks/clothing_shopping.json',
+    'assets/decks/transport_directions.json',
+    'assets/decks/health_symptoms.json',
+    'assets/decks/starter_deck.json',
   ];
 
   /// 依序檢查清單裡每個牌組,不存在的才匯入。

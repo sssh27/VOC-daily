@@ -31,3 +31,8 @@ flutter:
   assets:
     - assets/decks/starter_deck.json
     - assets/decks/cruise_travel.json
+    - assets/decks/kitchen_food.json
+    - assets/decks/home_cleaning.json
+    - assets/decks/clothing_shopping.json
+    - assets/decks/transport_directions.json
+    - assets/decks/health_symptoms.json
