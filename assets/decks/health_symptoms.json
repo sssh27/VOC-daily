@@ -1,0 +1,291 @@
+{
+  "name": "身體與小症狀",
+  "topic": "日常不適、看醫生、藥品(B2)",
+  "cards": [
+    {
+      "word": "sore throat",
+      "phonetic": "/sɔːr θroʊt/",
+      "meaning": "喉嚨痛",
+      "example": "I woke up with a sore throat.",
+      "exampleZh": "我起床就喉嚨痛。"
+    },
+    {
+      "word": "stuffy nose",
+      "phonetic": "/ˈstʌfi noʊz/",
+      "meaning": "鼻塞",
+      "example": "A stuffy nose keeps me up at night.",
+      "exampleZh": "鼻塞讓我晚上睡不著。"
+    },
+    {
+      "word": "runny nose",
+      "phonetic": "/ˈrʌni noʊz/",
+      "meaning": "流鼻水",
+      "example": "He's had a runny nose all week.",
+      "exampleZh": "他流鼻水一整個禮拜了。"
+    },
+    {
+      "word": "sneeze",
+      "phonetic": "/sniːz/",
+      "meaning": "打噴嚏",
+      "example": "I can't stop sneezing.",
+      "exampleZh": "我一直打噴嚏停不下來。",
+      "exampleMatch": "sneezing"
+    },
+    {
+      "word": "cough",
+      "phonetic": "/kɔːf/",
+      "meaning": "咳嗽",
+      "example": "That cough sounds pretty bad.",
+      "exampleZh": "那咳嗽聽起來滿嚴重的。"
+    },
+    {
+      "word": "migraine",
+      "phonetic": "/ˈmaɪɡreɪn/",
+      "meaning": "偏頭痛",
+      "example": "I get migraines when I skip meals.",
+      "exampleZh": "我沒吃飯就會偏頭痛。"
+    },
+    {
+      "word": "cramp",
+      "phonetic": "/kræmp/",
+      "meaning": "抽筋;絞痛",
+      "example": "I got a cramp in my calf.",
+      "exampleZh": "我小腿抽筋了。"
+    },
+    {
+      "word": "bloated",
+      "phonetic": "/ˈbloʊtɪd/",
+      "meaning": "脹氣的;腫脹的",
+      "example": "I feel bloated after that meal.",
+      "exampleZh": "那餐吃完我覺得脹氣。"
+    },
+    {
+      "word": "heartburn",
+      "phonetic": "/ˈhɑːrtbɜːrn/",
+      "meaning": "胃食道逆流的灼熱感",
+      "example": "Spicy food gives me heartburn.",
+      "exampleZh": "吃辣會讓我胃灼熱。"
+    },
+    {
+      "word": "indigestion",
+      "phonetic": "/ˌɪndɪˈdʒestʃən/",
+      "meaning": "消化不良",
+      "example": "I had indigestion all night.",
+      "exampleZh": "我整晚消化不良。"
+    },
+    {
+      "word": "nausea",
+      "phonetic": "/ˈnɔːziə/",
+      "meaning": "噁心想吐",
+      "example": "The nausea passed after an hour.",
+      "exampleZh": "噁心感一小時後就過了。"
+    },
+    {
+      "word": "hangover",
+      "phonetic": "/ˈhæŋoʊvər/",
+      "meaning": "宿醉",
+      "example": "I've got a terrible hangover.",
+      "exampleZh": "我宿醉得很嚴重。"
+    },
+    {
+      "word": "blister",
+      "phonetic": "/ˈblɪstər/",
+      "meaning": "水泡",
+      "example": "These shoes gave me a blister.",
+      "exampleZh": "這雙鞋讓我起水泡。"
+    },
+    {
+      "word": "bruise",
+      "phonetic": "/bruːz/",
+      "meaning": "瘀青",
+      "example": "I don't remember getting this bruise.",
+      "exampleZh": "我不記得怎麼瘀青的。"
+    },
+    {
+      "word": "sprain",
+      "phonetic": "/spreɪn/",
+      "meaning": "扭傷",
+      "example": "She sprained her wrist playing tennis.",
+      "exampleZh": "她打網球扭傷手腕。"
+    },
+    {
+      "word": "twist an ankle",
+      "phonetic": "/twɪst ən ˈæŋkl/",
+      "meaning": "扭到腳踝",
+      "example": "I twisted my ankle on the stairs.",
+      "exampleZh": "我在樓梯扭到腳踝。",
+      "exampleMatch": "twisted my ankle"
+    },
+    {
+      "word": "stiff neck",
+      "phonetic": "/stɪf nek/",
+      "meaning": "落枕;脖子僵硬",
+      "example": "I slept wrong and got a stiff neck.",
+      "exampleZh": "我睡姿不對落枕了。"
+    },
+    {
+      "word": "sore",
+      "phonetic": "/sɔːr/",
+      "meaning": "痠痛的",
+      "example": "My legs are sore from yesterday.",
+      "exampleZh": "我腿因為昨天而痠痛。"
+    },
+    {
+      "word": "itchy",
+      "phonetic": "/ˈɪtʃi/",
+      "meaning": "癢的",
+      "example": "This sweater is so itchy.",
+      "exampleZh": "這件毛衣好癢。"
+    },
+    {
+      "word": "rash",
+      "phonetic": "/ræʃ/",
+      "meaning": "疹子",
+      "example": "A rash showed up on my arm.",
+      "exampleZh": "我手臂上長了疹子。"
+    },
+    {
+      "word": "swollen",
+      "phonetic": "/ˈswoʊlən/",
+      "meaning": "腫起來的",
+      "example": "My ankle is still swollen.",
+      "exampleZh": "我腳踝還是腫的。"
+    },
+    {
+      "word": "numb",
+      "phonetic": "/nʌm/",
+      "meaning": "麻的;沒知覺的",
+      "example": "My foot went numb from sitting.",
+      "exampleZh": "我坐到腳麻了。"
+    },
+    {
+      "word": "fatigue",
+      "phonetic": "/fəˈtiːɡ/",
+      "meaning": "疲勞",
+      "example": "The fatigue hit me around three.",
+      "exampleZh": "三點左右疲勞感就上來了。"
+    },
+    {
+      "word": "insomnia",
+      "phonetic": "/ɪnˈsɑːmniə/",
+      "meaning": "失眠",
+      "example": "Jet lag gives me insomnia.",
+      "exampleZh": "時差讓我失眠。"
+    },
+    {
+      "word": "oversleep",
+      "phonetic": "/ˌoʊvərˈsliːp/",
+      "meaning": "睡過頭",
+      "example": "I overslept and missed breakfast.",
+      "exampleZh": "我睡過頭錯過早餐。",
+      "exampleMatch": "overslept"
+    },
+    {
+      "word": "yawn",
+      "phonetic": "/jɔːn/",
+      "meaning": "打呵欠",
+      "example": "You've been yawning all morning.",
+      "exampleZh": "你整個早上都在打呵欠。"
+    },
+    {
+      "word": "hiccups",
+      "phonetic": "/ˈhɪkʌps/",
+      "meaning": "打嗝",
+      "example": "I've had the hiccups for ten minutes.",
+      "exampleZh": "我打嗝打了十分鐘。"
+    },
+    {
+      "word": "shiver",
+      "phonetic": "/ˈʃɪvər/",
+      "meaning": "發抖",
+      "example": "I was shivering in the air conditioning.",
+      "exampleZh": "我在冷氣房裡發抖。"
+    },
+    {
+      "word": "chills",
+      "phonetic": "/tʃɪlz/",
+      "meaning": "發冷;打冷顫",
+      "example": "I've got chills — maybe a fever.",
+      "exampleZh": "我在發冷,可能發燒了。"
+    },
+    {
+      "word": "run a fever",
+      "phonetic": "/rʌn ə ˈfiːvər/",
+      "meaning": "發燒",
+      "example": "He's been running a fever since noon.",
+      "exampleZh": "他從中午就一直發燒。",
+      "exampleMatch": "running a fever"
+    },
+    {
+      "word": "band-aid",
+      "phonetic": "/ˈbænd eɪd/",
+      "meaning": "OK繃",
+      "example": "Do you have a band-aid?",
+      "exampleZh": "你有 OK 繃嗎?"
+    },
+    {
+      "word": "ointment",
+      "phonetic": "/ˈɔɪntmənt/",
+      "meaning": "藥膏",
+      "example": "Put some ointment on the burn.",
+      "exampleZh": "燙傷處擦點藥膏。"
+    },
+    {
+      "word": "prescription",
+      "phonetic": "/prɪˈskrɪpʃn/",
+      "meaning": "處方箋",
+      "example": "You'll need a prescription for that.",
+      "exampleZh": "那個需要處方箋。"
+    },
+    {
+      "word": "over-the-counter",
+      "phonetic": "/ˌoʊvər ðə ˈkaʊntər/",
+      "meaning": "不需處方的(成藥)",
+      "example": "It's an over-the-counter painkiller.",
+      "exampleZh": "那是不需處方的止痛藥。"
+    },
+    {
+      "word": "dose",
+      "phonetic": "/doʊs/",
+      "meaning": "劑量",
+      "example": "Don't exceed the recommended dose.",
+      "exampleZh": "不要超過建議劑量。"
+    },
+    {
+      "word": "side effect",
+      "phonetic": "/saɪd ɪˈfekt/",
+      "meaning": "副作用",
+      "example": "Drowsiness is a common side effect.",
+      "exampleZh": "嗜睡是常見的副作用。"
+    },
+    {
+      "word": "checkup",
+      "phonetic": "/ˈtʃekʌp/",
+      "meaning": "健康檢查",
+      "example": "I'm overdue for a checkup.",
+      "exampleZh": "我健檢已經拖太久了。"
+    },
+    {
+      "word": "symptom",
+      "phonetic": "/ˈsɪmptəm/",
+      "meaning": "症狀",
+      "example": "The symptoms started two days ago.",
+      "exampleZh": "症狀兩天前開始的。"
+    },
+    {
+      "word": "come down with",
+      "phonetic": "/kʌm daʊn wɪð/",
+      "meaning": "染上(小病)",
+      "example": "I think I'm coming down with a cold.",
+      "exampleZh": "我好像感冒了。",
+      "exampleMatch": "coming down with"
+    },
+    {
+      "word": "get over",
+      "phonetic": "/ɡet ˈoʊvər/",
+      "meaning": "康復;走出來",
+      "example": "It took a week to get over the flu.",
+      "exampleZh": "我花了一週才從流感康復。"
+    }
+  ]
+}

@@ -1,0 +1,282 @@
+{
+  "name": "交通與方向",
+  "topic": "交通工具、路況、方向副詞用法(B2)",
+  "cards": [
+    {
+      "word": "downtown",
+      "phonetic": "/ˌdaʊnˈtaʊn/",
+      "meaning": "市區(副詞,前面不加 to)",
+      "example": "I'm taking the bus downtown.",
+      "exampleZh": "我要搭公車去市區。"
+    },
+    {
+      "word": "head downtown",
+      "phonetic": "/hed ˌdaʊnˈtaʊn/",
+      "meaning": "前往市區",
+      "example": "Let's head downtown after lunch.",
+      "exampleZh": "午餐後我們去市區吧。"
+    },
+    {
+      "word": "abroad",
+      "phonetic": "/əˈbrɔːd/",
+      "meaning": "在國外(副詞,不加 to)",
+      "example": "She's been studying abroad for a year.",
+      "exampleZh": "她出國念書一年了。"
+    },
+    {
+      "word": "commute",
+      "phonetic": "/kəˈmjuːt/",
+      "meaning": "通勤",
+      "example": "My commute takes about forty minutes.",
+      "exampleZh": "我通勤大概四十分鐘。"
+    },
+    {
+      "word": "rush hour",
+      "phonetic": "/rʌʃ ˈaʊər/",
+      "meaning": "尖峰時段",
+      "example": "Avoid the highway during rush hour.",
+      "exampleZh": "尖峰時段避開高速公路。"
+    },
+    {
+      "word": "transfer",
+      "phonetic": "/ˈtrænsfɜːr/",
+      "meaning": "轉乘",
+      "example": "You'll transfer at the next station.",
+      "exampleZh": "你要在下一站轉乘。"
+    },
+    {
+      "word": "one-way",
+      "phonetic": "/ˌwʌn ˈweɪ/",
+      "meaning": "單程的;單行的",
+      "example": "I only need a one-way ticket.",
+      "exampleZh": "我只需要單程票。"
+    },
+    {
+      "word": "round trip",
+      "phonetic": "/raʊnd trɪp/",
+      "meaning": "來回",
+      "example": "A round trip is cheaper than two singles.",
+      "exampleZh": "來回票比兩張單程便宜。"
+    },
+    {
+      "word": "fare",
+      "phonetic": "/fer/",
+      "meaning": "車資",
+      "example": "The fare went up again.",
+      "exampleZh": "車資又漲了。"
+    },
+    {
+      "word": "platform",
+      "phonetic": "/ˈplætfɔːrm/",
+      "meaning": "月台",
+      "example": "The train leaves from platform three.",
+      "exampleZh": "火車從三號月台開。"
+    },
+    {
+      "word": "aisle seat",
+      "phonetic": "/aɪl siːt/",
+      "meaning": "走道位",
+      "example": "I always ask for an aisle seat.",
+      "exampleZh": "我都要走道位。"
+    },
+    {
+      "word": "overhead compartment",
+      "phonetic": "/ˌoʊvərˈhed kəmˈpɑːrtmənt/",
+      "meaning": "(飛機)行李置物櫃",
+      "example": "Put your bag in the overhead compartment.",
+      "exampleZh": "把包包放進上方置物櫃。"
+    },
+    {
+      "word": "delayed",
+      "phonetic": "/dɪˈleɪd/",
+      "meaning": "延誤的",
+      "example": "Our flight is delayed two hours.",
+      "exampleZh": "我們的班機延誤兩小時。"
+    },
+    {
+      "word": "catch",
+      "phonetic": "/kætʃ/",
+      "meaning": "趕上(車/班機)",
+      "example": "I barely caught the last train.",
+      "exampleZh": "我勉強趕上最後一班車。",
+      "exampleMatch": "caught"
+    },
+    {
+      "word": "miss",
+      "phonetic": "/mɪs/",
+      "meaning": "錯過(車/班機)",
+      "example": "We missed the bus by a minute.",
+      "exampleZh": "我們差一分鐘沒趕上公車。"
+    },
+    {
+      "word": "get off",
+      "phonetic": "/ɡet ɔːf/",
+      "meaning": "下車",
+      "example": "Get off at the third stop.",
+      "exampleZh": "第三站下車。"
+    },
+    {
+      "word": "hop on",
+      "phonetic": "/hɑːp ɑːn/",
+      "meaning": "跳上車;搭上",
+      "example": "Just hop on the next one.",
+      "exampleZh": "搭下一班就好。"
+    },
+    {
+      "word": "pull over",
+      "phonetic": "/pʊl ˈoʊvər/",
+      "meaning": "靠邊停",
+      "example": "Could you pull over here?",
+      "exampleZh": "可以在這裡靠邊停嗎?"
+    },
+    {
+      "word": "drop off",
+      "phonetic": "/drɑːp ɔːf/",
+      "meaning": "放下(人/物)",
+      "example": "Can you drop me off at the corner?",
+      "exampleZh": "可以在轉角放我下來嗎?",
+      "exampleMatch": "drop me off"
+    },
+    {
+      "word": "give a ride",
+      "phonetic": "/ɡɪv ə raɪd/",
+      "meaning": "載一程",
+      "example": "Can you give me a ride home?",
+      "exampleZh": "你可以載我回家嗎?",
+      "exampleMatch": "give me a ride"
+    },
+    {
+      "word": "carpool",
+      "phonetic": "/ˈkɑːrpuːl/",
+      "meaning": "共乘",
+      "example": "We carpool to work three days a week.",
+      "exampleZh": "我們一週共乘上班三天。"
+    },
+    {
+      "word": "traffic jam",
+      "phonetic": "/ˈtræfɪk dʒæm/",
+      "meaning": "塞車",
+      "example": "We got stuck in a traffic jam.",
+      "exampleZh": "我們卡在車陣裡。"
+    },
+    {
+      "word": "detour",
+      "phonetic": "/ˈdiːtʊr/",
+      "meaning": "繞道",
+      "example": "There's a detour because of construction.",
+      "exampleZh": "因為施工要繞道。"
+    },
+    {
+      "word": "shortcut",
+      "phonetic": "/ˈʃɔːrtkʌt/",
+      "meaning": "捷徑",
+      "example": "I know a shortcut through the park.",
+      "exampleZh": "我知道穿過公園的捷徑。"
+    },
+    {
+      "word": "dead end",
+      "phonetic": "/ded end/",
+      "meaning": "死路",
+      "example": "This road is a dead end.",
+      "exampleZh": "這條路是死路。"
+    },
+    {
+      "word": "intersection",
+      "phonetic": "/ˌɪntərˈsekʃn/",
+      "meaning": "十字路口",
+      "example": "Turn left at the next intersection.",
+      "exampleZh": "下個十字路口左轉。"
+    },
+    {
+      "word": "crosswalk",
+      "phonetic": "/ˈkrɔːswɔːk/",
+      "meaning": "斑馬線",
+      "example": "Cross at the crosswalk, not here.",
+      "exampleZh": "走斑馬線過,不要在這裡。"
+    },
+    {
+      "word": "sidewalk",
+      "phonetic": "/ˈsaɪdwɔːk/",
+      "meaning": "人行道",
+      "example": "The sidewalk is blocked by scooters.",
+      "exampleZh": "人行道被機車擋住了。"
+    },
+    {
+      "word": "curb",
+      "phonetic": "/kɜːrb/",
+      "meaning": "路緣;人行道邊",
+      "example": "Watch the curb when you step down.",
+      "exampleZh": "下來時小心路緣。"
+    },
+    {
+      "word": "roundabout",
+      "phonetic": "/ˈraʊndəbaʊt/",
+      "meaning": "圓環",
+      "example": "Take the second exit at the roundabout.",
+      "exampleZh": "在圓環走第二個出口。"
+    },
+    {
+      "word": "U-turn",
+      "phonetic": "/ˈjuː tɜːrn/",
+      "meaning": "迴轉",
+      "example": "You can't make a U-turn here.",
+      "exampleZh": "這裡不能迴轉。"
+    },
+    {
+      "word": "parallel park",
+      "phonetic": "/ˈpærəlel pɑːrk/",
+      "meaning": "路邊平行停車",
+      "example": "I'm terrible at parallel parking.",
+      "exampleZh": "我路邊停車超爛。"
+    },
+    {
+      "word": "parking meter",
+      "phonetic": "/ˈpɑːrkɪŋ ˈmiːtər/",
+      "meaning": "停車收費表",
+      "example": "Did you feed the parking meter?",
+      "exampleZh": "你有投停車費嗎?"
+    },
+    {
+      "word": "tow",
+      "phonetic": "/toʊ/",
+      "meaning": "拖吊",
+      "example": "They towed my car last night.",
+      "exampleZh": "我的車昨晚被拖吊了。"
+    },
+    {
+      "word": "jaywalk",
+      "phonetic": "/ˈdʒeɪwɔːk/",
+      "meaning": "任意穿越馬路",
+      "example": "Don't jaywalk here, it's dangerous.",
+      "exampleZh": "不要在這裡亂穿越,很危險。"
+    },
+    {
+      "word": "block",
+      "phonetic": "/blɑːk/",
+      "meaning": "街區",
+      "example": "It's two blocks from here.",
+      "exampleZh": "從這裡過兩個街區。"
+    },
+    {
+      "word": "around the corner",
+      "phonetic": "/əˈraʊnd ðə ˈkɔːrnər/",
+      "meaning": "轉角就到;很近",
+      "example": "The pharmacy is just around the corner.",
+      "exampleZh": "藥局就在轉角。"
+    },
+    {
+      "word": "across from",
+      "phonetic": "/əˈkrɔːs frʌm/",
+      "meaning": "在...對面",
+      "example": "The hotel is across from the station.",
+      "exampleZh": "飯店在車站對面。"
+    },
+    {
+      "word": "on foot",
+      "phonetic": "/ɑːn fʊt/",
+      "meaning": "步行",
+      "example": "It's ten minutes on foot.",
+      "exampleZh": "走路十分鐘。"
+    }
+  ]
+}

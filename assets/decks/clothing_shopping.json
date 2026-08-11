@@ -1,0 +1,287 @@
+{
+  "name": "服飾購物與付款",
+  "topic": "衣物、試穿、結帳、退換貨、金錢用語(B2)",
+  "cards": [
+    {
+      "word": "zipper",
+      "phonetic": "/ˈzɪpər/",
+      "meaning": "拉鍊",
+      "example": "The zipper on my jacket is stuck.",
+      "exampleZh": "我外套的拉鍊卡住了。"
+    },
+    {
+      "word": "collar",
+      "phonetic": "/ˈkɑːlər/",
+      "meaning": "衣領",
+      "example": "The collar is a bit tight.",
+      "exampleZh": "領子有點緊。"
+    },
+    {
+      "word": "sleeve",
+      "phonetic": "/sliːv/",
+      "meaning": "袖子",
+      "example": "Roll up your sleeves.",
+      "exampleZh": "把袖子捲起來。"
+    },
+    {
+      "word": "hoodie",
+      "phonetic": "/ˈhʊdi/",
+      "meaning": "連帽衫",
+      "example": "I live in this hoodie.",
+      "exampleZh": "我天天都穿這件連帽衫。"
+    },
+    {
+      "word": "cardigan",
+      "phonetic": "/ˈkɑːrdɪɡən/",
+      "meaning": "開襟毛衣",
+      "example": "Bring a cardigan, it gets chilly.",
+      "exampleZh": "帶件開襟毛衣,會變冷。"
+    },
+    {
+      "word": "turtleneck",
+      "phonetic": "/ˈtɜːrtlnek/",
+      "meaning": "高領衣",
+      "example": "A turtleneck makes me feel choked.",
+      "exampleZh": "高領衣讓我覺得被勒住。"
+    },
+    {
+      "word": "tank top",
+      "phonetic": "/tæŋk tɑːp/",
+      "meaning": "背心",
+      "example": "He wore a tank top to the gym.",
+      "exampleZh": "他穿背心去健身房。"
+    },
+    {
+      "word": "leggings",
+      "phonetic": "/ˈleɡɪŋz/",
+      "meaning": "內搭褲",
+      "example": "She wore leggings under her dress.",
+      "exampleZh": "她洋裝底下穿了內搭褲。"
+    },
+    {
+      "word": "sweatpants",
+      "phonetic": "/ˈswetpænts/",
+      "meaning": "運動棉褲",
+      "example": "I changed into sweatpants immediately.",
+      "exampleZh": "我馬上換上運動棉褲。"
+    },
+    {
+      "word": "fitting room",
+      "phonetic": "/ˈfɪtɪŋ ruːm/",
+      "meaning": "試衣間",
+      "example": "Can I try this in the fitting room?",
+      "exampleZh": "我可以在試衣間試這件嗎?"
+    },
+    {
+      "word": "try on",
+      "phonetic": "/traɪ ɑːn/",
+      "meaning": "試穿",
+      "example": "Do you want to try it on?",
+      "exampleZh": "你要試穿看看嗎?",
+      "exampleMatch": "try it on"
+    },
+    {
+      "word": "size up",
+      "phonetic": "/saɪz ʌp/",
+      "meaning": "換大一號",
+      "example": "You might want to size up.",
+      "exampleZh": "你可能要換大一號。"
+    },
+    {
+      "word": "snug",
+      "phonetic": "/snʌɡ/",
+      "meaning": "貼身的;剛好緊",
+      "example": "It's snug but not uncomfortable.",
+      "exampleZh": "很貼身但不會不舒服。"
+    },
+    {
+      "word": "baggy",
+      "phonetic": "/ˈbæɡi/",
+      "meaning": "寬鬆垮垮的",
+      "example": "These jeans are too baggy on me.",
+      "exampleZh": "這牛仔褲我穿太垮了。"
+    },
+    {
+      "word": "shrink",
+      "phonetic": "/ʃrɪŋk/",
+      "meaning": "縮水",
+      "example": "Wash it cold or it'll shrink.",
+      "exampleZh": "用冷水洗,不然會縮水。"
+    },
+    {
+      "word": "fade",
+      "phonetic": "/feɪd/",
+      "meaning": "褪色",
+      "example": "Black shirts fade after a few washes.",
+      "exampleZh": "黑色上衣洗幾次就褪色。"
+    },
+    {
+      "word": "stain",
+      "phonetic": "/steɪn/",
+      "meaning": "污漬",
+      "example": "There's a coffee stain on the sleeve.",
+      "exampleZh": "袖子上有咖啡漬。"
+    },
+    {
+      "word": "alterations",
+      "phonetic": "/ˌɔːltəˈreɪʃnz/",
+      "meaning": "修改衣服",
+      "example": "They do free alterations here.",
+      "exampleZh": "這裡免費修改衣服。"
+    },
+    {
+      "word": "receipt",
+      "phonetic": "/rɪˈsiːt/",
+      "meaning": "收據;發票",
+      "example": "Keep the receipt in case you return it.",
+      "exampleZh": "收據留著,萬一要退。"
+    },
+    {
+      "word": "refund",
+      "phonetic": "/ˈriːfʌnd/",
+      "meaning": "退款",
+      "example": "Can I get a refund instead of store credit?",
+      "exampleZh": "我可以退錢而不是換購物金嗎?"
+    },
+    {
+      "word": "exchange",
+      "phonetic": "/ɪksˈtʃeɪndʒ/",
+      "meaning": "換貨",
+      "example": "I'd like to exchange this for a larger size.",
+      "exampleZh": "我想換大一號。"
+    },
+    {
+      "word": "warranty",
+      "phonetic": "/ˈwɔːrənti/",
+      "meaning": "保固",
+      "example": "It's still under warranty.",
+      "exampleZh": "它還在保固期內。"
+    },
+    {
+      "word": "on sale",
+      "phonetic": "/ɑːn seɪl/",
+      "meaning": "特價中",
+      "example": "These are on sale until Sunday.",
+      "exampleZh": "這些特價到週日。"
+    },
+    {
+      "word": "discount",
+      "phonetic": "/ˈdɪskaʊnt/",
+      "meaning": "折扣",
+      "example": "Is there a student discount?",
+      "exampleZh": "有學生折扣嗎?"
+    },
+    {
+      "word": "coupon",
+      "phonetic": "/ˈkuːpɑːn/",
+      "meaning": "優惠券",
+      "example": "I have a coupon on my phone.",
+      "exampleZh": "我手機裡有優惠券。"
+    },
+    {
+      "word": "clearance",
+      "phonetic": "/ˈklɪrəns/",
+      "meaning": "出清",
+      "example": "Everything on that rack is clearance.",
+      "exampleZh": "那個架上全部是出清品。"
+    },
+    {
+      "word": "out of stock",
+      "phonetic": "/aʊt əv stɑːk/",
+      "meaning": "缺貨",
+      "example": "Sorry, that color is out of stock.",
+      "exampleZh": "抱歉,那個顏色缺貨。"
+    },
+    {
+      "word": "restock",
+      "phonetic": "/ˌriːˈstɑːk/",
+      "meaning": "補貨",
+      "example": "They restock on Tuesdays.",
+      "exampleZh": "他們星期二補貨。"
+    },
+    {
+      "word": "checkout",
+      "phonetic": "/ˈtʃekaʊt/",
+      "meaning": "結帳櫃檯",
+      "example": "The checkout line wraps around the corner.",
+      "exampleZh": "結帳隊伍排到轉角了。"
+    },
+    {
+      "word": "cashier",
+      "phonetic": "/kæˈʃɪr/",
+      "meaning": "收銀員",
+      "example": "Ask the cashier about the promotion.",
+      "exampleZh": "跟收銀員問一下優惠。"
+    },
+    {
+      "word": "self-checkout",
+      "phonetic": "/self ˈtʃekaʊt/",
+      "meaning": "自助結帳",
+      "example": "I always use self-checkout to save time.",
+      "exampleZh": "我都用自助結帳省時間。"
+    },
+    {
+      "word": "contactless",
+      "phonetic": "/ˈkɑːntæktləs/",
+      "meaning": "感應式付款的",
+      "example": "Is contactless payment okay?",
+      "exampleZh": "可以感應付款嗎?"
+    },
+    {
+      "word": "split the bill",
+      "phonetic": "/splɪt ðə bɪl/",
+      "meaning": "分攤帳單",
+      "example": "Should we split the bill?",
+      "exampleZh": "我們要分攤帳單嗎?"
+    },
+    {
+      "word": "change",
+      "phonetic": "/tʃeɪndʒ/",
+      "meaning": "零錢;找零",
+      "example": "Keep the change.",
+      "exampleZh": "不用找了。"
+    },
+    {
+      "word": "withdraw",
+      "phonetic": "/wɪðˈdrɔː/",
+      "meaning": "提款",
+      "example": "I need to withdraw some cash.",
+      "exampleZh": "我需要領一些現金。"
+    },
+    {
+      "word": "afford",
+      "phonetic": "/əˈfɔːrd/",
+      "meaning": "負擔得起",
+      "example": "I can't afford that right now.",
+      "exampleZh": "我現在負擔不起。"
+    },
+    {
+      "word": "pricey",
+      "phonetic": "/ˈpraɪsi/",
+      "meaning": "價格偏高的",
+      "example": "Nice jacket, but a bit pricey.",
+      "exampleZh": "外套不錯,但有點貴。"
+    },
+    {
+      "word": "overpriced",
+      "phonetic": "/ˌoʊvərˈpraɪst/",
+      "meaning": "定價過高的",
+      "example": "The drinks there are overpriced.",
+      "exampleZh": "那裡的飲料定價太高。"
+    },
+    {
+      "word": "in stock",
+      "phonetic": "/ɪn stɑːk/",
+      "meaning": "有現貨",
+      "example": "Let me check if it's in stock.",
+      "exampleZh": "我查一下有沒有現貨。"
+    },
+    {
+      "word": "try-on mirror",
+      "phonetic": "/ˈtraɪ ɑːn ˈmɪrər/",
+      "meaning": "試衣鏡",
+      "example": "The try-on mirror is at the back.",
+      "exampleZh": "試衣鏡在後面。"
+    }
+  ]
+}

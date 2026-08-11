@@ -1,0 +1,314 @@
+{
+  "name": "居家與清潔",
+  "topic": "家電、清潔用品、五金工具、居家問題(B2)",
+  "cards": [
+    {
+      "word": "power strip",
+      "phonetic": "/ˈpaʊər strɪp/",
+      "meaning": "延長線插座",
+      "example": "We need a power strip — there's only one outlet.",
+      "exampleZh": "我們需要延長線,這只有一個插座。"
+    },
+    {
+      "word": "extension cord",
+      "phonetic": "/ɪkˈstenʃn kɔːrd/",
+      "meaning": "延長線",
+      "example": "Run an extension cord to the balcony.",
+      "exampleZh": "拉一條延長線到陽台。"
+    },
+    {
+      "word": "light bulb",
+      "phonetic": "/laɪt bʌlb/",
+      "meaning": "燈泡",
+      "example": "The light bulb in the hallway burned out.",
+      "exampleZh": "走廊的燈泡燒掉了。"
+    },
+    {
+      "word": "remote control",
+      "phonetic": "/rɪˈmoʊt kənˈtroʊl/",
+      "meaning": "遙控器",
+      "example": "The remote control is under the couch again.",
+      "exampleZh": "遙控器又在沙發底下了。"
+    },
+    {
+      "word": "batteries",
+      "phonetic": "/ˈbætəriz/",
+      "meaning": "電池",
+      "example": "The remote needs new batteries.",
+      "exampleZh": "遙控器要換新電池。"
+    },
+    {
+      "word": "vacuum cleaner",
+      "phonetic": "/ˈvækjuːm ˈkliːnər/",
+      "meaning": "吸塵器",
+      "example": "I ran the vacuum cleaner this morning.",
+      "exampleZh": "我今天早上吸了地。"
+    },
+    {
+      "word": "broom",
+      "phonetic": "/bruːm/",
+      "meaning": "掃把",
+      "example": "Hand me the broom, would you?",
+      "exampleZh": "把掃把遞給我好嗎?"
+    },
+    {
+      "word": "dustpan",
+      "phonetic": "/ˈdʌstpæn/",
+      "meaning": "畚箕",
+      "example": "Hold the dustpan while I sweep.",
+      "exampleZh": "我掃的時候你拿著畚箕。"
+    },
+    {
+      "word": "mop",
+      "phonetic": "/mɑːp/",
+      "meaning": "拖把;拖地",
+      "example": "I'll mop the kitchen after dinner.",
+      "exampleZh": "晚餐後我拖廚房。"
+    },
+    {
+      "word": "bucket",
+      "phonetic": "/ˈbʌkɪt/",
+      "meaning": "水桶",
+      "example": "Fill the bucket with warm water.",
+      "exampleZh": "把水桶裝滿溫水。"
+    },
+    {
+      "word": "trash bag",
+      "phonetic": "/træʃ bæɡ/",
+      "meaning": "垃圾袋",
+      "example": "We're out of trash bags.",
+      "exampleZh": "垃圾袋用完了。"
+    },
+    {
+      "word": "laundry detergent",
+      "phonetic": "/ˈlɔːndri dɪˈtɜːrdʒənt/",
+      "meaning": "洗衣精",
+      "example": "Don't use too much laundry detergent.",
+      "exampleZh": "洗衣精不要用太多。"
+    },
+    {
+      "word": "fabric softener",
+      "phonetic": "/ˈfæbrɪk ˈsɔːfnər/",
+      "meaning": "柔軟精",
+      "example": "Fabric softener makes towels less absorbent.",
+      "exampleZh": "柔軟精會讓毛巾比較不吸水。"
+    },
+    {
+      "word": "hanger",
+      "phonetic": "/ˈhæŋər/",
+      "meaning": "衣架",
+      "example": "Put your coat on a hanger.",
+      "exampleZh": "把外套掛在衣架上。"
+    },
+    {
+      "word": "clothespin",
+      "phonetic": "/ˈkloʊzpɪn/",
+      "meaning": "曬衣夾",
+      "example": "A clothespin keeps it from blowing away.",
+      "exampleZh": "曬衣夾可以避免被風吹走。"
+    },
+    {
+      "word": "ironing board",
+      "phonetic": "/ˈaɪərnɪŋ bɔːrd/",
+      "meaning": "燙衣板",
+      "example": "The ironing board folds up behind the door.",
+      "exampleZh": "燙衣板收在門後。"
+    },
+    {
+      "word": "wrinkled",
+      "phonetic": "/ˈrɪŋkld/",
+      "meaning": "皺的",
+      "example": "My shirt is completely wrinkled.",
+      "exampleZh": "我襯衫皺得不像話。"
+    },
+    {
+      "word": "lint roller",
+      "phonetic": "/lɪnt ˈroʊlər/",
+      "meaning": "黏毛滾筒",
+      "example": "Use a lint roller before you go out.",
+      "exampleZh": "出門前用黏毛滾筒清一下。"
+    },
+    {
+      "word": "drawer",
+      "phonetic": "/drɔːr/",
+      "meaning": "抽屜",
+      "example": "It's in the top drawer.",
+      "exampleZh": "在最上面那個抽屜。"
+    },
+    {
+      "word": "shelf",
+      "phonetic": "/ʃelf/",
+      "meaning": "架子;層板",
+      "example": "Put it on the second shelf.",
+      "exampleZh": "放在第二層架子上。"
+    },
+    {
+      "word": "closet",
+      "phonetic": "/ˈklɑːzət/",
+      "meaning": "衣櫃;儲藏間",
+      "example": "The closet is stuffed with old clothes.",
+      "exampleZh": "衣櫃塞滿了舊衣服。"
+    },
+    {
+      "word": "curtain",
+      "phonetic": "/ˈkɜːrtn/",
+      "meaning": "窗簾",
+      "example": "Pull the curtain, the sun's in my eyes.",
+      "exampleZh": "把窗簾拉上,太陽刺眼。"
+    },
+    {
+      "word": "blinds",
+      "phonetic": "/blaɪndz/",
+      "meaning": "百葉窗",
+      "example": "I lowered the blinds a bit.",
+      "exampleZh": "我把百葉窗放低了一點。"
+    },
+    {
+      "word": "doormat",
+      "phonetic": "/ˈdɔːrmæt/",
+      "meaning": "門口地墊",
+      "example": "Wipe your shoes on the doormat.",
+      "exampleZh": "在門墊上把鞋擦一下。"
+    },
+    {
+      "word": "air freshener",
+      "phonetic": "/er ˈfreʃnər/",
+      "meaning": "空氣清新劑",
+      "example": "The air freshener is too strong.",
+      "exampleZh": "空氣清新劑味道太重。"
+    },
+    {
+      "word": "humidifier",
+      "phonetic": "/hjuːˈmɪdɪfaɪər/",
+      "meaning": "加濕器",
+      "example": "I run a humidifier in winter.",
+      "exampleZh": "冬天我會開加濕器。"
+    },
+    {
+      "word": "dehumidifier",
+      "phonetic": "/ˌdiːhjuːˈmɪdɪfaɪər/",
+      "meaning": "除濕機",
+      "example": "The dehumidifier fills up fast here.",
+      "exampleZh": "這裡除濕機很快就滿了。"
+    },
+    {
+      "word": "faucet",
+      "phonetic": "/ˈfɔːsɪt/",
+      "meaning": "水龍頭",
+      "example": "The faucet drips all night.",
+      "exampleZh": "水龍頭整晚都在滴水。"
+    },
+    {
+      "word": "drain",
+      "phonetic": "/dreɪn/",
+      "meaning": "排水孔;排水",
+      "example": "The drain is slow again.",
+      "exampleZh": "排水孔又不通了。"
+    },
+    {
+      "word": "clogged",
+      "phonetic": "/klɑːɡd/",
+      "meaning": "堵塞的",
+      "example": "The sink is clogged with hair.",
+      "exampleZh": "水槽被頭髮堵住了。"
+    },
+    {
+      "word": "plunger",
+      "phonetic": "/ˈplʌndʒər/",
+      "meaning": "通馬桶吸盤",
+      "example": "Do we own a plunger?",
+      "exampleZh": "我們有通馬桶的吸盤嗎?"
+    },
+    {
+      "word": "leak",
+      "phonetic": "/liːk/",
+      "meaning": "漏水;滲漏",
+      "example": "There's a leak under the sink.",
+      "exampleZh": "水槽下面在漏水。"
+    },
+    {
+      "word": "tissue",
+      "phonetic": "/ˈtɪʃuː/",
+      "meaning": "面紙",
+      "example": "Could you pass me a tissue?",
+      "exampleZh": "可以給我一張面紙嗎?"
+    },
+    {
+      "word": "cotton swab",
+      "phonetic": "/ˈkɑːtn swɑːb/",
+      "meaning": "棉花棒",
+      "example": "I need a cotton swab for this.",
+      "exampleZh": "這個我需要棉花棒。"
+    },
+    {
+      "word": "razor",
+      "phonetic": "/ˈreɪzər/",
+      "meaning": "刮鬍刀",
+      "example": "My razor's getting dull.",
+      "exampleZh": "我的刮鬍刀鈍了。"
+    },
+    {
+      "word": "floss",
+      "phonetic": "/flɔːs/",
+      "meaning": "牙線;用牙線",
+      "example": "I floss before bed.",
+      "exampleZh": "我睡前用牙線。"
+    },
+    {
+      "word": "screwdriver",
+      "phonetic": "/ˈskruːdraɪvər/",
+      "meaning": "螺絲起子",
+      "example": "Do you have a small screwdriver?",
+      "exampleZh": "你有小的螺絲起子嗎?"
+    },
+    {
+      "word": "hammer",
+      "phonetic": "/ˈhæmər/",
+      "meaning": "鎚子",
+      "example": "Hand me the hammer.",
+      "exampleZh": "把鎚子拿給我。"
+    },
+    {
+      "word": "tape measure",
+      "phonetic": "/teɪp ˈmeʒər/",
+      "meaning": "捲尺",
+      "example": "Grab the tape measure from the toolbox.",
+      "exampleZh": "從工具箱拿捲尺。"
+    },
+    {
+      "word": "duct tape",
+      "phonetic": "/dʌkt teɪp/",
+      "meaning": "強力膠帶",
+      "example": "Duct tape fixes almost anything.",
+      "exampleZh": "強力膠帶幾乎什麼都能修。"
+    },
+    {
+      "word": "ladder",
+      "phonetic": "/ˈlædər/",
+      "meaning": "梯子",
+      "example": "Hold the ladder steady for me.",
+      "exampleZh": "幫我把梯子扶穩。"
+    },
+    {
+      "word": "flashlight",
+      "phonetic": "/ˈflæʃlaɪt/",
+      "meaning": "手電筒",
+      "example": "Keep a flashlight by the bed.",
+      "exampleZh": "床邊放一支手電筒。"
+    },
+    {
+      "word": "mildew",
+      "phonetic": "/ˈmɪlduː/",
+      "meaning": "霉;發霉",
+      "example": "There's mildew in the bathroom corner.",
+      "exampleZh": "浴室角落發霉了。"
+    },
+    {
+      "word": "dusty",
+      "phonetic": "/ˈdʌsti/",
+      "meaning": "積灰塵的",
+      "example": "The top of the shelf is dusty.",
+      "exampleZh": "架子上面積了灰塵。"
+    }
+  ]
+}

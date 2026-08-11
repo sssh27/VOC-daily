@@ -1,0 +1,335 @@
+{
+  "name": "廚房與飲食",
+  "topic": "點餐、冰品、廚房用具、food 相關動詞(B2)",
+  "cards": [
+    {
+      "word": "scoop",
+      "phonetic": "/skuːp/",
+      "meaning": "一球(冰淇淋);挖杓",
+      "example": "Can I get two scoops in a cup?",
+      "exampleZh": "可以給我杯裝兩球嗎?"
+    },
+    {
+      "word": "cone",
+      "phonetic": "/koʊn/",
+      "meaning": "甜筒",
+      "example": "One scoop on a cone, please.",
+      "exampleZh": "一球甜筒,謝謝。"
+    },
+    {
+      "word": "sugar cone",
+      "phonetic": "/ˈʃʊɡər koʊn/",
+      "meaning": "脆皮甜筒",
+      "example": "The sugar cone stays crunchy longer.",
+      "exampleZh": "脆皮甜筒比較久才會軟。"
+    },
+    {
+      "word": "waffle cone",
+      "phonetic": "/ˈwɑːfl koʊn/",
+      "meaning": "華夫餅甜筒",
+      "example": "A waffle cone costs a dollar extra.",
+      "exampleZh": "華夫餅甜筒要多一塊錢。"
+    },
+    {
+      "word": "soft serve",
+      "phonetic": "/sɔːft sɜːrv/",
+      "meaning": "霜淇淋",
+      "example": "They only have soft serve after eight.",
+      "exampleZh": "八點後他們只剩霜淇淋。"
+    },
+    {
+      "word": "sorbet",
+      "phonetic": "/sɔːrˈbeɪ/",
+      "meaning": "雪酪(不含奶)",
+      "example": "Sorbet is dairy-free, right?",
+      "exampleZh": "雪酪是不含乳製品的對吧?"
+    },
+    {
+      "word": "gelato",
+      "phonetic": "/dʒəˈlɑːtoʊ/",
+      "meaning": "義式冰淇淋",
+      "example": "The gelato here beats any ice cream.",
+      "exampleZh": "這裡的義式冰淇淋比任何冰淇淋都好。"
+    },
+    {
+      "word": "sundae",
+      "phonetic": "/ˈsʌndeɪ/",
+      "meaning": "聖代",
+      "example": "I'll take a hot fudge sundae.",
+      "exampleZh": "我要一份熱巧克力聖代。"
+    },
+    {
+      "word": "sprinkles",
+      "phonetic": "/ˈsprɪŋklz/",
+      "meaning": "巧克力米;彩色糖粒",
+      "example": "Can you add sprinkles on top?",
+      "exampleZh": "可以在上面加巧克力米嗎?"
+    },
+    {
+      "word": "toppings",
+      "phonetic": "/ˈtɑːpɪŋz/",
+      "meaning": "配料",
+      "example": "Which toppings come free?",
+      "exampleZh": "哪些配料是免費的?"
+    },
+    {
+      "word": "syrup",
+      "phonetic": "/ˈsɪrəp/",
+      "meaning": "糖漿;淋醬",
+      "example": "Go easy on the syrup.",
+      "exampleZh": "淋醬少一點。"
+    },
+    {
+      "word": "milkshake",
+      "phonetic": "/ˈmɪlkʃeɪk/",
+      "meaning": "奶昔",
+      "example": "This milkshake is way too thick.",
+      "exampleZh": "這奶昔太濃稠了。"
+    },
+    {
+      "word": "popsicle",
+      "phonetic": "/ˈpɑːpsɪkl/",
+      "meaning": "冰棒",
+      "example": "The kids each grabbed a popsicle.",
+      "exampleZh": "小孩每人拿了一支冰棒。"
+    },
+    {
+      "word": "for here or to go",
+      "phonetic": "/fɔːr hɪr ɔːr tuː ɡoʊ/",
+      "meaning": "內用還是外帶",
+      "example": "For here or to go? — To go, please.",
+      "exampleZh": "內用還是外帶?外帶,謝謝。"
+    },
+    {
+      "word": "to go",
+      "phonetic": "/tuː ɡoʊ/",
+      "meaning": "外帶",
+      "example": "I'll get a large coffee to go.",
+      "exampleZh": "我要一杯大杯咖啡外帶。"
+    },
+    {
+      "word": "peeler",
+      "phonetic": "/ˈpiːlər/",
+      "meaning": "削皮刀",
+      "example": "Where do you keep the peeler?",
+      "exampleZh": "削皮刀放哪裡?"
+    },
+    {
+      "word": "spatula",
+      "phonetic": "/ˈspætʃələ/",
+      "meaning": "鍋鏟;刮刀",
+      "example": "Flip it with a spatula.",
+      "exampleZh": "用鍋鏟把它翻面。"
+    },
+    {
+      "word": "whisk",
+      "phonetic": "/wɪsk/",
+      "meaning": "打蛋器;攪打",
+      "example": "Whisk the eggs until they're fluffy.",
+      "exampleZh": "把蛋打到蓬鬆。"
+    },
+    {
+      "word": "tongs",
+      "phonetic": "/tɔːŋz/",
+      "meaning": "夾子",
+      "example": "Use the tongs, not your fingers.",
+      "exampleZh": "用夾子,不要用手。"
+    },
+    {
+      "word": "ladle",
+      "phonetic": "/ˈleɪdl/",
+      "meaning": "湯杓",
+      "example": "Pass me the ladle for the soup.",
+      "exampleZh": "把湯杓給我盛湯。"
+    },
+    {
+      "word": "grater",
+      "phonetic": "/ˈɡreɪtər/",
+      "meaning": "刨絲器",
+      "example": "I grated the cheese with a grater.",
+      "exampleZh": "我用刨絲器把起司刨絲。"
+    },
+    {
+      "word": "colander",
+      "phonetic": "/ˈkʌləndər/",
+      "meaning": "濾水籃",
+      "example": "Drain the pasta in a colander.",
+      "exampleZh": "用濾水籃把義大利麵瀝乾。"
+    },
+    {
+      "word": "cutting board",
+      "phonetic": "/ˈkʌtɪŋ bɔːrd/",
+      "meaning": "砧板",
+      "example": "Don't cut straight on the counter — use a cutting board.",
+      "exampleZh": "不要直接在檯面上切,用砧板。"
+    },
+    {
+      "word": "oven mitt",
+      "phonetic": "/ˈʌvn mɪt/",
+      "meaning": "隔熱手套",
+      "example": "Grab an oven mitt, that tray is hot.",
+      "exampleZh": "拿隔熱手套,那盤子很燙。"
+    },
+    {
+      "word": "kettle",
+      "phonetic": "/ˈketl/",
+      "meaning": "熱水壺",
+      "example": "The kettle takes about two minutes.",
+      "exampleZh": "熱水壺大概要兩分鐘。"
+    },
+    {
+      "word": "rice cooker",
+      "phonetic": "/raɪs ˈkʊkər/",
+      "meaning": "電鍋",
+      "example": "Just throw it in the rice cooker.",
+      "exampleZh": "丟進電鍋就好。"
+    },
+    {
+      "word": "frying pan",
+      "phonetic": "/ˈfraɪɪŋ pæn/",
+      "meaning": "平底鍋",
+      "example": "Heat the frying pan first.",
+      "exampleZh": "先把平底鍋加熱。"
+    },
+    {
+      "word": "lid",
+      "phonetic": "/lɪd/",
+      "meaning": "蓋子",
+      "example": "Put the lid on or it'll splatter.",
+      "exampleZh": "蓋上蓋子,不然會噴。"
+    },
+    {
+      "word": "cling film",
+      "phonetic": "/klɪŋ fɪlm/",
+      "meaning": "保鮮膜",
+      "example": "Cover the bowl with cling film.",
+      "exampleZh": "用保鮮膜把碗蓋起來。"
+    },
+    {
+      "word": "aluminum foil",
+      "phonetic": "/əˈluːmɪnəm fɔɪl/",
+      "meaning": "鋁箔紙",
+      "example": "Wrap the fish in aluminum foil.",
+      "exampleZh": "用鋁箔紙把魚包起來。"
+    },
+    {
+      "word": "ziplock bag",
+      "phonetic": "/ˈzɪplɑːk bæɡ/",
+      "meaning": "夾鏈袋",
+      "example": "Store the leftovers in a ziplock bag.",
+      "exampleZh": "把剩菜裝在夾鏈袋裡。"
+    },
+    {
+      "word": "container",
+      "phonetic": "/kənˈteɪnər/",
+      "meaning": "保鮮盒;容器",
+      "example": "I brought lunch in a container.",
+      "exampleZh": "我用保鮮盒裝午餐帶來。"
+    },
+    {
+      "word": "dish rack",
+      "phonetic": "/dɪʃ ræk/",
+      "meaning": "碗盤瀝水架",
+      "example": "Leave them in the dish rack to dry.",
+      "exampleZh": "放在瀝水架上晾乾。"
+    },
+    {
+      "word": "sponge",
+      "phonetic": "/spʌndʒ/",
+      "meaning": "菜瓜布;海綿",
+      "example": "That sponge smells — toss it.",
+      "exampleZh": "那塊菜瓜布有味道了,丟掉吧。"
+    },
+    {
+      "word": "thermos",
+      "phonetic": "/ˈθɜːrməs/",
+      "meaning": "保溫瓶",
+      "example": "I keep tea in a thermos all day.",
+      "exampleZh": "我一整天都用保溫瓶裝茶。"
+    },
+    {
+      "word": "tumbler",
+      "phonetic": "/ˈtʌmblər/",
+      "meaning": "隨行杯",
+      "example": "Bring a tumbler for the discount.",
+      "exampleZh": "帶隨行杯有折扣。"
+    },
+    {
+      "word": "stale",
+      "phonetic": "/steɪl/",
+      "meaning": "不新鮮的;走味的",
+      "example": "The bread went stale overnight.",
+      "exampleZh": "麵包一個晚上就不新鮮了。"
+    },
+    {
+      "word": "expired",
+      "phonetic": "/ɪkˈspaɪərd/",
+      "meaning": "過期的",
+      "example": "Check the date — this milk looks expired.",
+      "exampleZh": "看一下日期,這牛奶好像過期了。"
+    },
+    {
+      "word": "defrost",
+      "phonetic": "/ˌdiːˈfrɔːst/",
+      "meaning": "解凍",
+      "example": "Defrost the chicken before you cook it.",
+      "exampleZh": "煮之前先把雞肉解凍。"
+    },
+    {
+      "word": "reheat",
+      "phonetic": "/ˌriːˈhiːt/",
+      "meaning": "加熱",
+      "example": "Just reheat it in the microwave.",
+      "exampleZh": "用微波爐加熱一下就好。"
+    },
+    {
+      "word": "marinate",
+      "phonetic": "/ˈmærɪneɪt/",
+      "meaning": "醃漬",
+      "example": "Marinate the beef for an hour.",
+      "exampleZh": "把牛肉醃一小時。"
+    },
+    {
+      "word": "simmer",
+      "phonetic": "/ˈsɪmər/",
+      "meaning": "小火慢煮",
+      "example": "Let it simmer for twenty minutes.",
+      "exampleZh": "小火煮二十分鐘。"
+    },
+    {
+      "word": "seasoning",
+      "phonetic": "/ˈsiːznɪŋ/",
+      "meaning": "調味料",
+      "example": "It needs more seasoning.",
+      "exampleZh": "這需要多一點調味。"
+    },
+    {
+      "word": "sour",
+      "phonetic": "/ˈsaʊər/",
+      "meaning": "酸的;酸掉的",
+      "example": "The milk smells a bit sour.",
+      "exampleZh": "牛奶聞起來有點酸掉了。"
+    },
+    {
+      "word": "bitter",
+      "phonetic": "/ˈbɪtər/",
+      "meaning": "苦的",
+      "example": "This coffee is way too bitter.",
+      "exampleZh": "這咖啡太苦了。"
+    },
+    {
+      "word": "chewy",
+      "phonetic": "/ˈtʃuːi/",
+      "meaning": "有嚼勁的;咬不動的",
+      "example": "The steak was a little chewy.",
+      "exampleZh": "那牛排有點咬不動。"
+    },
+    {
+      "word": "soggy",
+      "phonetic": "/ˈsɑːɡi/",
+      "meaning": "濕軟的;糊掉的",
+      "example": "The fries got soggy in the bag.",
+      "exampleZh": "薯條在袋子裡變糊了。"
+    }
+  ]
+}
