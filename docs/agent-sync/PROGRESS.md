@@ -6,6 +6,152 @@
 
 ---
 
+## 這一輪(v7)做了什麼
+
+依 `docs/agent-sync/TASKS.md` 的 G(最高優先)、A(5 個新牌組)、B(遊戲化與
+回饋)、C(測試)完成,照建議順序 G1 → A → B → G2 做。
+
+### ⚠️ 過程中發現的問題:`.gitignore` 排除了整個 `web/`
+
+檢查 G2「確認 `.gitignore` 沒有排除 `web/icons/` 或 `.github/`」時發現實際
+狀況比 TASKS.md 描述的更糟:`.gitignore` 把**整個** `/web/` 資料夾當成
+`flutter create .` 產生的平台資料夾排除掉了(這行是專案早期就有的,那時
+`web/` 確實只有自動產生的內容)。結果是 `git ls-files web/` 回傳**零筆**——
+國王餅建好的 `manifest.json`、`icons/`、自訂 `index.html`、以及先前手動編譯的
+`drift_worker.dart.js` / `sqlite3.wasm` 全部沒有進版控。`.github/workflows/`
+也是零筆(不是被排除,單純沒被加過)。
+
+如果沒抓到這個,GitHub Actions checkout 下來的 `web/` 會是空的,`flutter
+build web` 要嘛失敗、要嘛用 Flutter 預設模板重新產生一份,拿到的絕對不是
+國王餅準備好的 PWA 資源。**這會讓部署整個是假的——workflow 可能還是綠燈,
+但產出的東西沒有正確的 manifest/icons/離線快取設定。**
+
+已修正:`.gitignore` 拿掉 `/web/` 這行(改成只排除 android/ios/macos/
+linux/windows),並把 `web/`、`.github/` 全部加進版控。同時把 `index.html`
+的 `<title>`、`apple-mobile-web-app-title` 改成 `VOC-daily`、補上
+`<meta name="theme-color">`,跟 `manifest.json` 對齊。
+
+### G. 移除 dotenv + PWA 部署
+
+- **G1** `main.dart` 移除 `dotenv.load()`,`pubspec.yaml` 移除 `.env` asset
+  與 `flutter_dotenv` 依賴,`ai_service.dart` 改用
+  `String.fromEnvironment('AI_API_KEY')`。本機要用 AI 產字工具:
+  `flutter run -d chrome --dart-define=AI_API_KEY=sk-xxxx`。安全警告註解
+  沒有刪。
+- **G2** `web/manifest.json`、`web/icons/`、`.github/workflows/deploy.yml`
+  是國王餅建好的,沒有重做或覆蓋,只確認+修正(見上面的 `.gitignore` 問題)。
+  workflow 裡的 Flutter 版本 `3.44.8` 跟 `pubspec.yaml` 的 SDK 限制相容,
+  `--base-href /VOC-daily/` 已經寫好。
+
+**G3/G4 提醒(需要你手動做):**
+
+1. GitHub repo → Settings → Pages → Source 選 **GitHub Actions**(不是
+   Deploy from a branch),只需設定一次。
+2. Push 後檢查 Actions workflow 是不是綠燈。
+3. 手機瀏覽器開 `https://sssh27.github.io/VOC-daily/`,確認能正常顯示、
+   選單有「加到主畫面」、加完桌面圖示能全螢幕開啟。
+4. **開飛航模式測試**——這是郵輪情境最重要的一項,字庫是打包 asset、
+   資料庫在瀏覽器本機,理論上斷網也能完整使用,但務必實測一次再出門。
+
+### A. 註冊 5 個新牌組
+
+`pubspec.yaml` 補 5 行 asset、`deck_loader.dart` 的 `_deckAssets` 補同樣
+5 個路徑,`starter_deck.json` 依指示排到清單最後。內容(210 張)完全沒有
+動過,是國王餅產好的。
+
+### B. 遊戲化與回饋
+
+- **B1 累計字數** `CardRepository.introducedCount()`(`isIntroduced==true`
+  筆數),三處顯示:首頁轉盤下方一行小字、學習完成畫面主要位置較大字級、
+  單字庫頁面頂端。
+- **B2 里程碑** 新增 `AppSettings` 表(key/value,`schemaVersion` 4→5),
+  沒有引入 `shared_preferences`。判斷邏輯抽成純函式
+  `lib/logic/milestone.dart` 的 `milestoneToCelebrate({total, lastCelebrated})`,
+  跨過多個門檻時只回傳最高的一個。完成畫面在 `_loadCompletionInfo()`
+  裡呼叫一次(只在第一次進入 `_Phase.done` 時算,不會重複觸發),命中時
+  寫回 `celebrated_milestone` 並顯示帶放大動畫的專屬文案。
+- **B3 完成文案輪替** `lib/logic/completion_messages.dart` 的文案池
+  (5 句,照抄 SPEC 12.4 建議池),`pickCompletionMessage()` 隨機挑一句;
+  里程碑觸發時改用 `milestoneMessage(n)`,不用池子裡的句子。
+- **B4 作答視覺回饋** `_ChoiceButton` 用 `TweenAnimationBuilder` 包一層:
+  答對(使用者選對的那個)150ms 放大回彈;答錯(選錯的那個)200ms 左右
+  晃動,正確答案同時變綠但不晃動;按「忘了」時 `isSelected` 恆為
+  false,天然不會晃動,不需要額外判斷。沒有引入動畫套件。
+- **B5 拉霸動畫漸慢定格** `home_screen.dart` 的 `_startRoll()` 從
+  `Timer.periodic` 固定間隔改成 `while` 迴圈搭配 `Future.delayed`,
+  delay 隨經過時間從 50ms 線性拉長到 300ms,總時長仍約 1.8 秒。
+- **B6 音效** 沒做,依指示(見 SPEC 12.8)。
+
+### C. 測試
+
+sandbox 依然沒有 Flutter SDK,新增 3 個檔案:
+
+| 檔案 | 案例數 | 涵蓋什麼 |
+|---|---|---|
+| `test/milestone_test.dart` | 8 | `milestoneToCelebrate()`:未達門檻不觸發、剛好達標觸發、已慶祝過不重複觸發、一次跨多階只回傳最高的、邊界值 |
+| `test/completion_messages_test.dart` | 6 | 文案池非空/無空字串、隨機挑選的結果一定來自池子、多次呼叫會覆蓋到不同句子、里程碑文案帶正確數字、文案不含評比字眼(基本關鍵字檢查) |
+| `test/app_settings_test.dart` | 8 | 累計字數與牌組數量無關、`AppSettings` 讀寫/覆蓋、key 不存在回傳預設值不 crash |
+
+新增 22 個,加上 v6 累計的 50 個,合計預期 72 個。麻煩本機跑:
+
+```
+dart run build_runner build --delete-conflicting-outputs
+flutter test
+```
+
+`database.dart` 這次加了 `AppSettings` 表,build_runner 這步必須跑。
+`test/scheduler_test.dart` 完全沒動。
+
+### 需要你本機驗證的項目(TASKS.md D 節)
+
+1. 單字庫看得到 **7 個**牌組、總數 **406** 張
+2. 既有牌組(如果你本機資料庫已經有「入門常用字」的學習進度)沒有被重置
+3. 首頁轉盤下方顯示「你認識了 N 個字」
+4. 答對有回彈、答錯有晃動、按「忘了」沒有晃動
+5. 轉盤動畫是漸慢定格而非等速
+6. 粗體抽查:`come down with` → `coming down with`、`try on` → `try it on`
+   (這兩個字在新牌組裡,不在我這輪動過的檔案清單裡,值得抽查)
+
+以及 G4(部署驗收,見上面 G3/G4 段落)。
+
+### Commit
+
+這輪切了 10 個 commit:
+
+1. `fix: remove flutter_dotenv, use build-time --dart-define for AI key`
+2. `fix: stop excluding web/ from git so PWA assets actually get deployed`
+3. `docs: sync CLAUDE.md, SPEC.md and TASKS.md to v7`
+4. `feat: add five themed vocabulary decks (210 cards)`
+5. `chore: register new deck assets in pubspec and loader`
+6. `feat: app settings table for milestone tracking`
+7. `feat: show cumulative word count on decks screen`
+8. `feat: show cumulative word count on home screen, ease the roll animation`
+9. `feat: milestone celebrations, rotating completion captions, answer feedback animations`
+10. `test: cover milestone logic, cumulative count, completion captions`
+
+（這份 PROGRESS.md 更新完會是第 11 個。）
+
+跟 TASKS.md F 節建議的切法不完全一樣,原因跟前幾輪一樣:`home_screen.dart`
+跟 `review_screen.dart` 裡好幾個功能(累計字數顯示 vs 拉霸動畫;里程碑 vs
+文案輪替 vs 答題動畫)彼此改在同一個檔案的鄰近程式碼,沒辦法乾淨切開,
+硬切會產生編不過的中間 commit。commit 9 因此把 B2+B3+B4 併在一起,
+commit message 裡有老實列出包含哪些東西。
+
+**`git push` 一樣跑不了**(sandbox 沒有 GitHub 認證),需要你本機執行
+`git push origin main`。
+
+### 沒做的事
+
+- SPEC 第 10 節第 10 步(PWA manifest 調整)本輪其實已經涵蓋在 G2 裡了,
+  不算「沒做」,但沒有額外去動圖示美術(國王餅說目前是佔位版本,美術階段
+  再換,不在這輪範圍)。
+- `assets/decks/*.json` 內容完全沒有動過。
+- 12.7 的禁止清單(streak、愛心、排行榜、推播督促、完成率/正確率、等級
+  經驗值)一項都沒做。
+- 12.8 音效沒做,依指示。
+
+---
+
 ## 這一輪(v6)做了什麼
 
 依 `docs/agent-sync/TASKS.md` 的 A(多牌組載入)、B(測試)、F(`exampleMatch`
