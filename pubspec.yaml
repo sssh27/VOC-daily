@@ -15,7 +15,6 @@ dependencies:
   sqlite3_flutter_libs: ^0.5.20
   path_provider: ^2.1.2
   path: ^1.9.0
-  flutter_dotenv: ^5.1.0
   http: ^1.2.1
   flutter_local_notifications: ^17.1.2
   intl: ^0.19.0
@@ -30,6 +29,5 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - .env
     - assets/decks/starter_deck.json
     - assets/decks/cruise_travel.json

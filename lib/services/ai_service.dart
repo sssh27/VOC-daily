@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// 依 SPEC.md 6.6 第 7 點分類的錯誤,generate_screen.dart 直接顯示
 /// [message] 即可,不需要自己再判斷錯誤類型。
@@ -42,14 +41,18 @@ class GeneratedCard {
 /// Move this call behind your own backend (e.g. a Firebase Cloud Function)
 /// so the API key is never bundled inside the app binary. Anyone can
 /// extract a key shipped in a compiled app and rack up your bill.
-/// For now (local dev only) it reads the key from .env directly.
+/// For now (local dev only / not part of the production flow, see
+/// SPEC.md 7.1) it reads the key from a build-time --dart-define, e.g.:
+///   flutter run -d chrome --dart-define=AI_API_KEY=sk-xxxx
 class AiService {
+  static const _apiKey = String.fromEnvironment('AI_API_KEY');
+
   static Future<List<GeneratedCard>> generateCards({
     required String topic,
     int count = 10,
   }) async {
-    final apiKey = dotenv.env['AI_API_KEY'];
-    if (apiKey == null || apiKey.isEmpty) {
+    final apiKey = _apiKey;
+    if (apiKey.isEmpty) {
       throw AiServiceException('尚未設定 API 金鑰');
     }
 
