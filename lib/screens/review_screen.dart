@@ -1,9 +1,13 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart' hide Card;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/database.dart';
 import '../logic/answer_grading.dart';
+import '../logic/completion_messages.dart';
 import '../logic/intro_queue.dart';
+import '../logic/milestone.dart';
 import '../logic/scheduler.dart';
 import '../providers.dart';
 import '../widgets/intro_card.dart';
@@ -46,6 +50,13 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
   _Phase _phase = _Phase.intro;
   bool _loading = true;
   bool _warehouseExhausted = false;
+
+  // 【v7】完成畫面內容(累計字數 + 里程碑/一般文案),只在第一次進入
+  // _Phase.done 時算一次,見 _loadCompletionInfo()。
+  bool _completionInfoLoaded = false;
+  int _totalIntroduced = 0;
+  int? _celebratingMilestone;
+  String _completionMessage = '';
 
   _DueMode? _dueMode;
   List<String>? _choices;
@@ -115,7 +126,12 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
       _dueMode = null;
     });
 
-    if (card == null || _phase == _Phase.intro || _phase == _Phase.done) {
+    if (_phase == _Phase.done) {
+      await _loadCompletionInfo();
+      return;
+    }
+
+    if (card == null || _phase == _Phase.intro) {
       return;
     }
 
@@ -151,6 +167,36 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
     if (_phase == _Phase.retry && _retryIndex >= _retryQueue.length) {
       _phase = _Phase.done;
     }
+  }
+
+  /// 【v7】完成畫面只計算一次:累計字數(12.2)+ 里程碑判斷(12.3)+
+  /// 文案(里程碑觸發用專屬文案,否則從文案池隨機挑,見 12.4)。
+  Future<void> _loadCompletionInfo() async {
+    if (_completionInfoLoaded) return;
+
+    final repo = ref.read(cardRepositoryProvider);
+    final total = await repo.introducedCount();
+    final lastCelebrated = await repo.celebratedMilestone();
+    final milestone = milestoneToCelebrate(
+      total: total,
+      lastCelebrated: lastCelebrated,
+    );
+
+    String message;
+    if (milestone != null) {
+      await repo.setCelebratedMilestone(milestone);
+      message = milestoneMessage(milestone);
+    } else {
+      message = pickCompletionMessage();
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _completionInfoLoaded = true;
+      _totalIntroduced = total;
+      _celebratingMilestone = milestone;
+      _completionMessage = message;
+    });
   }
 
   // ---------------------------------------------------------------------
@@ -307,27 +353,9 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
       return Scaffold(
         appBar: AppBar(title: const Text('學習')),
         body: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('今天做完了', style: TextStyle(fontSize: 20)),
-              if (_warehouseExhausted) ...[
-                const SizedBox(height: 8),
-                Text(
-                  '單字庫快用完了,去生成新的吧',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.copyWith(color: Colors.grey),
-                ),
-              ],
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst),
-                child: const Text('回首頁'),
-              ),
-            ],
-          ),
+          child: !_completionInfoLoaded
+              ? const CircularProgressIndicator()
+              : _buildCompletionContent(context),
         ),
       );
     }
@@ -348,6 +376,58 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
             ? _buildIntroMode(card)
             : _buildDueMode(card),
       ),
+    );
+  }
+
+  /// 完成畫面內容(SPEC.md 12.2–12.4)。里程碑觸發時用專屬文案 +
+  /// 一個短促的放大動畫;否則是文案池隨機挑的一句,兩種情況都要顯示
+  /// 「你認識了 N 個字」(累計字數,主要位置、較大字級)。
+  /// 仍然不顯示分數、正確率、答對幾題或任何評比。
+  Widget _buildCompletionContent(BuildContext context) {
+    final isMilestone = _celebratingMilestone != null;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (isMilestone)
+          TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0.6, end: 1.0),
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.elasticOut,
+            builder: (context, scale, child) {
+              return Transform.scale(scale: scale, child: child);
+            },
+            child: const Text('🎉', style: TextStyle(fontSize: 40)),
+          ),
+        if (isMilestone) const SizedBox(height: 8),
+        Text(
+          _completionMessage,
+          style: TextStyle(
+            fontSize: isMilestone ? 22 : 20,
+            fontWeight: isMilestone ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          '你認識了 $_totalIntroduced 個字',
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
+        if (_warehouseExhausted) ...[
+          const SizedBox(height: 12),
+          Text(
+            '單字庫快用完了,去生成新的吧',
+            style: Theme.of(context)
+                .textTheme
+                .bodySmall
+                ?.copyWith(color: Colors.grey),
+          ),
+        ],
+        const SizedBox(height: 24),
+        ElevatedButton(
+          onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst),
+          child: const Text('回首頁'),
+        ),
+      ],
     );
   }
 
@@ -480,18 +560,25 @@ class _ChoiceButton extends StatelessWidget {
   Widget build(BuildContext context) {
     Color? backgroundColor;
     Color? foregroundColor;
+    // 【v7/12.5】答對:正確選項綠 + 短促放大回彈。答錯:選錯的紅 +
+    // 輕微晃動,正確答案同時變綠(不晃動)。按「忘了」:isSelected 永遠是
+    // false(見 _buildDueMode 的呼叫端),所以不會晃動,只有正確答案變綠。
+    var bounce = false;
+    var shake = false;
 
     if (revealResult) {
       if (isCorrectAnswer) {
         backgroundColor = Colors.green;
         foregroundColor = Colors.white;
+        if (isSelected) bounce = true; // 使用者自己選對了
       } else if (isSelected) {
         backgroundColor = Colors.red;
         foregroundColor = Colors.white;
+        shake = true;
       }
     }
 
-    return ElevatedButton(
+    Widget button = ElevatedButton(
       onPressed: revealResult ? null : onTap,
       style: ElevatedButton.styleFrom(
         backgroundColor: backgroundColor,
@@ -502,5 +589,30 @@ class _ChoiceButton extends StatelessWidget {
       ),
       child: Text(label, textAlign: TextAlign.center),
     );
+
+    // 條件式包一層動畫 widget——只有在剛進入回饋狀態的那次 build 才會被
+    // 新建立,天然形成「只播一次」的觸發時機,不需要額外的 AnimationController。
+    if (bounce) {
+      button = TweenAnimationBuilder<double>(
+        tween: Tween(begin: 0.85, end: 1.0),
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.easeOutBack,
+        builder: (context, scale, child) =>
+            Transform.scale(scale: scale, child: child),
+        child: button,
+      );
+    } else if (shake) {
+      button = TweenAnimationBuilder<double>(
+        tween: const Tween(begin: 0.0, end: 1.0),
+        duration: const Duration(milliseconds: 200),
+        builder: (context, t, child) {
+          final offset = sin(t * pi * 4) * 6 * (1 - t);
+          return Transform.translate(offset: Offset(offset, 0), child: child);
+        },
+        child: button,
+      );
+    }
+
+    return button;
   }
 }
