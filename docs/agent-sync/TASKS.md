@@ -5,93 +5,174 @@
 
 ---
 
-## 上一輪 review 結果
+## 這一輪:三件事
 
-v5 全部完成,Shawn 本機測試通過。核心循環已完整可用。
+1. **註冊 5 個新牌組**(見 A)
+2. **遊戲化與回饋**(見 B)
+3. **移除 dotenv + PWA 部署**(見 G,**這是目前最高優先,它擋住所有部署**)
 
-**這一輪的重點是內容導入。時間敏感:Shawn 過幾天要搭郵輪,需要這批字能用。**
+`docs/SPEC.md` 新增第 12、13 節,改寫第 11 節,並修訂 6.1、6.4、7.4–7.6。
+請先讀完再動工。
+
+**建議順序:G1(修 build 阻斷)→ A → B → G2(部署)。**
+G1 沒修的話,乾淨環境根本 build 不起來,後面全部白做。
 
 ---
 
-## A. 【最優先】多牌組載入機制
+## A. 註冊 5 個新牌組
 
-`docs/SPEC.md` 第 7 節已改版為 **v6**,請先讀。
+我新增了 210 張卡,共 5 個主題牌組,已放在 `assets/decks/`。
+內容已通過粗體比對、跨牌組去重、欄位完整性、中文錯字四項檢查。
 
-我已經產好一個新牌組:`assets/decks/cruise_travel.json`(郵輪與旅遊實用,166 張)。
-但目前的 loader 載不進去,有兩個必須修的限制:
+| 檔案 | 牌組名稱 | 張數 |
+|---|---|---|
+| `kitchen_food.json` | 廚房與飲食 | 47 |
+| `home_cleaning.json` | 居家與清潔 | 44 |
+| `clothing_shopping.json` | 服飾購物與付款 | 40 |
+| `transport_directions.json` | 交通與方向 | 39 |
+| `health_symptoms.json` | 身體與小症狀 | 40 |
 
-| 現況 | 問題 |
-|---|---|
-| 只吃寫死的 `starter_deck.json` | 新牌組進不來 |
-| `hasAnyDeck()` 為 true 就整個跳過 | Shawn 資料庫已有資料,永遠拿不到新牌組 |
+### A1. `pubspec.yaml` 的 assets 補上五行
 
-### 修法
-
-1. `lib/services/starter_deck_loader.dart` → 改名 `lib/services/deck_loader.dart`,
-   class `StarterDeckLoader` → `DeckLoader`
-2. 維護內建牌組清單:
-   ```dart
-   static const _deckAssets = [
-     'assets/decks/starter_deck.json',
-     'assets/decks/cruise_travel.json',
-   ];
-   ```
-3. 方法改名 `importIfEmpty()` → `importMissingDecks()`
-4. 逐一檢查:**依 `Deck.name` 判斷是否已存在,不存在才匯入**
-5. **已存在的牌組不要覆蓋、不要更新** —— 會洗掉 Shawn 的學習進度
-6. 單一牌組匯入失敗時記錄錯誤但不要 crash,繼續處理下一個
-7. `pubspec.yaml` 的 assets 加入 `assets/decks/cruise_travel.json`
-8. `main.dart` 及其他呼叫端同步更新
-
-### 需要新增 repository method
-
-`hasAnyDeck()` 不夠用,需要能依名稱查詢,例如:
-
-```dart
-Future<bool> deckExistsByName(String name);
+```yaml
+    - assets/decks/kitchen_food.json
+    - assets/decks/home_cleaning.json
+    - assets/decks/clothing_shopping.json
+    - assets/decks/transport_directions.json
+    - assets/decks/health_symptoms.json
 ```
 
+### A2. `lib/services/deck_loader.dart` 的 `_deckAssets` 補上同樣五個路徑
+
+**順序把 `starter_deck.json` 放最後**,它是早期佔位測試資料,難度偏低。
+
 ---
 
-## B. 測試
+## B. 遊戲化與回饋(SPEC 第 12 節)
 
-1. `deckExistsByName()` 正確回傳存在/不存在
-2. 空資料庫 → 兩個牌組都被匯入
-3. 已有「入門常用字」→ 只匯入「郵輪與旅遊實用」,原牌組的卡片數與進度不變
-4. 兩個牌組都存在 → 不重複匯入,卡片總數不變
-5. asset 路徑不存在時不會 crash,其他牌組照常匯入
+### B0. 先讀 12.1 的設計立場
+
+採**累積型**,禁止**損失趨避型**。streak / 愛心 / 排行榜 / 等級經驗值一律不做,
+理由寫在 12.1(不只是產品偏好,是跟 SM-2 的間隔邏輯數學上衝突)。
+
+12.7 有完整的禁止清單,動工前確認一遍。
+
+### B1. 累計字數
+
+定義:`Cards` 表中 `isIntroduced == true` 的筆數。單調遞增。
+
+顯示三處:
+
+| 位置 | 呈現 |
+|---|---|
+| 首頁 | 轉盤下方一行小字「你認識了 N 個字」 |
+| 學習完成畫面 | 主要位置,較大字級 |
+| 單字庫頁面頂端 | 總計數字 |
+
+**首頁一定要顯示**,理由見 12.2(沒學習的日子也要看得到累積)。
+6.1 的禁止清單已同步修訂,累計字數不在禁止之列。
+
+### B2. 里程碑
+
+門檻:`25, 50, 100, 200, 350, 500, 750, 1000`
+
+跨越時,完成畫面改為特別版本(動畫 + 專屬文案)。**每個門檻只慶祝一次。**
+
+需要新增 `AppSettings` 表(key-value,text/text),用 key `celebrated_milestone`
+記錄已慶祝的最高門檻,預設 `0`。
+
+**不要引入 `shared_preferences` 或任何新套件**,用 Drift 建表。
+schema 版本要遞增,`onUpgrade` 加分支,改完跑:
+
+```
+dart run build_runner build --delete-conflicting-outputs
+```
+
+一次跨過多個門檻時**只慶祝最高的那個**,不要連彈好幾次。
+
+### B3. 完成畫面文案輪替
+
+從文案池隨機挑,不要固定「今天做完了」。池子與限制見 12.4。
+
+**限制很重要:** 不得提及數量/正確率/花費時間,不得有督促或提醒明天再來的語氣。
+
+### B4. 作答視覺回饋
+
+| 情況 | 回饋 |
+|---|---|
+| 答對 | 正確選項變綠 + 短促放大回彈(約 150ms) |
+| 答錯 | 選錯的變紅 + 輕微左右晃動(約 200ms),正確答案同時變綠 |
+| 按「忘了」 | 正確答案變綠,**不做晃動** |
+
+「忘了」不做晃動是刻意的——那是誠實回報,不該有懲罰感。
+
+用 `AnimatedScale` / `TweenAnimationBuilder` 即可,**不要引入動畫套件**。
+
+### B5. 拉霸動畫漸慢定格
+
+目前等速跳動 1.5 秒直接停。改成間隔由快漸慢(例如 50ms 起,逐步拉長到 300ms),
+總時長仍約 1.5–2 秒。
+
+這是全 App 黏著力最高的瞬間,值得把手感做好。
+
+### B6. 音效不做
+
+見 12.8。PWA 在 iOS 有音訊手勢限制,且需引入套件與音檔資產,本輪不碰。
+
+---
+
+## C. 測試
+
+1. 累計字數 = `isIntroduced == true` 的筆數,與牌組數量無關
+2. 里程碑:累計 24 → 不觸發;25 → 觸發並寫入 `celebrated_milestone = 25`
+3. 里程碑不重複:`celebrated_milestone` 已是 25 時,累計仍為 25 → 不再觸發
+4. 一次跨多階:`celebrated_milestone = 25`、累計跳到 120 → 只慶祝 100,寫入 100
+5. `AppSettings` 讀寫正確,key 不存在時回傳預設值不 crash
+6. 完成文案池:隨機挑選不會回傳空字串
+
+建議把里程碑判斷抽成純函式,例如:
+
+```dart
+int? milestoneToCelebrate({required int total, required int lastCelebrated});
+```
+
+這樣才好測,不要塞在 Widget State 裡。
 
 `flutter test` 必須全綠,`test/scheduler_test.dart` 依然**禁止修改**。
 
 ---
 
-## C. 驗證
+## D. 需要 Shawn 本機驗證的項目
 
-修完後請在 `PROGRESS.md` 註明需要 Shawn 本機驗證的項目:
+做完在 `PROGRESS.md` 列出:
 
-1. `flutter run -d chrome` 啟動後,單字庫頁面應看到**兩個**牌組
-2. 「郵輪與旅遊實用」卡片數為 **166**
-3. 「入門常用字」的已學進度沒有被重置
-4. 轉盤 → 開始,新字會從兩個牌組混合出現
-
----
-
-## D. 不要做的事
-
-- **不要刪除** `lib/services/ai_service.dart` 或 `lib/screens/generate_screen.dart`。
-  正式版本不依賴它們,但保留作為開發階段的產字工具。檔案裡的警告註解也不要刪。
-- **不要修改** `assets/decks/cruise_travel.json` 的內容。有錯誤請寫進 `QUESTIONS.md`,
-  由國王餅修正。
-- 不要自行往下做 PWA manifest 或 SPEC 第 10 節其他步驟。
+1. 單字庫看得到 **7 個**牌組、總數 **406** 張
+2. 既有牌組的學習進度沒有被重置
+3. 首頁轉盤下方顯示「你認識了 N 個字」
+4. 答對有回彈、答錯有晃動、按「忘了」沒有晃動
+5. 轉盤動畫是漸慢定格而非等速
+6. 粗體抽查:`come down with` → `coming down with`、`try on` → `try it on`
 
 ---
 
-## E. Commit
+## E. 不要做的事
 
-1. `refactor: rename starter deck loader to multi-deck loader`
-2. `feat: import missing decks by name instead of skipping when db non-empty`
-3. `feat: add cruise and travel vocabulary deck (166 cards)`
-4. `test: cover multi-deck import behaviour`
+- 不要修改任何 `assets/decks/*.json`。發現錯誤寫進 `QUESTIONS.md`,由國王餅修正。
+- 不要實作 12.7 禁止清單裡的任何項目。
+- 不要刪 `ai_service.dart` / `generate_screen.dart`。
+- 不要自行往下做 PWA manifest。
+
+---
+
+## F. Commit
+
+1. `feat: add five themed vocabulary decks (210 cards)`
+2. `chore: register new deck assets in pubspec and loader`
+3. `feat: app settings table for milestone tracking`
+4. `feat: show cumulative word count on home and completion screen`
+5. `feat: milestone celebration on completion screen`
+6. `feat: answer feedback animations and eased roll animation`
+7. `test: cover milestone logic and cumulative count`
 
 `git push` 若環境沒有認證,在 `PROGRESS.md` 註明,由 Shawn 本機執行。
 
@@ -101,48 +182,74 @@ Future<bool> deckExistsByName(String name);
 
 更新 `PROGRESS.md` 後停下來等 review。
 
+
 ---
 
-## F. 【追加】`exampleMatch` 欄位支援
+## G. 【最高優先】移除 dotenv + PWA 部署
 
-我在產內容時驗證發現:166 張裡有 10 張的粗體比對會失效,幾乎全是片語動詞的時態變化
-(`hang out` → `hung out`、`run into` → `ran into`、`look forward to` → `looking forward to`)。
-含空格的片語無法套用現有的詞形變化推測。
+### G1. 移除 flutter_dotenv —— 這是目前的建置阻斷點
 
-**解法:JSON 加選填欄位 `exampleMatch`,直接標明例句中要標粗的字串。**
-已經補進 `cruise_travel.json` 的那 10 張。
+**問題:** `main.dart` 有 `await dotenv.load(fileName: '.env')`,而 `.env` 在
+`.gitignore` 裡,同時被登記為 `pubspec.yaml` 的 asset。
 
-`docs/SPEC.md` 的 4.2、6.3、7.3 已更新,請照著做:
+**缺少被登記的 asset 時 `flutter build` 會直接失敗。** 也就是說任何乾淨環境
+(GitHub Actions、別台電腦重新 clone)都建置不起來。Shawn 本機能跑,
+純粹是因為那個檔案還留著。
 
-### F1. 資料庫
+正式版不使用 AI(見 SPEC 7.1),所以直接移除這個相依:
 
-`Cards` 表加欄位 `exampleMatch`(nullable text),`schemaVersion` 遞增,
-`onUpgrade` 加對應分支。改完記得跑:
+1. `pubspec.yaml` 的 assets **移除 `.env` 那行**
+2. `pubspec.yaml` 的 dependencies **移除 `flutter_dotenv`**
+3. `main.dart` **移除** `dotenv.load()` 與 `flutter_dotenv` 的 import
+4. `ai_service.dart` 改用 build-time 參數:
 
+```dart
+static const _apiKey = String.fromEnvironment('AI_API_KEY');
+
+if (_apiKey.isEmpty) {
+  throw Exception('AI_API_KEY 未設定。開發時請用 --dart-define=AI_API_KEY=... 啟動。');
+}
 ```
-dart run build_runner build --delete-conflicting-outputs
-```
 
-### F2. 比對邏輯
+**`ai_service.dart` 裡的安全警告註解仍然不要刪。**
 
-`lib/widgets/word_highlight.dart` 的比對改成依序判斷:
+改完確認 `flutter build web --release` 在沒有 `.env` 的情況下能成功。
 
-1. 有 `exampleMatch` → 精確比對這個字串,**優先於所有其他規則**
-2. 沒有 → 用 `word` 大小寫不敏感比對
-3. 仍找不到且 `word` 不含空格 → 現有的詞形變化推測
-4. 都找不到 → 整句原樣顯示
+### G2. PWA 部署
 
-**不要**在程式裡實作不規則動詞表或詞形還原規則。那是刻意避開的方向,
-理由寫在 SPEC 6.3。
+以下檔案**國王餅已經直接建好,不要重做、不要覆蓋**:
 
-### F3. Loader 與 repository
+| 檔案 | 說明 |
+|---|---|
+| `web/manifest.json` | 名稱 VOC-daily、主題色 `#3F51B5`、`display: standalone` |
+| `web/icons/Icon-{192,512}.png` | 一般圖示 |
+| `web/icons/Icon-maskable-{192,512}.png` | maskable 圖示 |
+| `web/favicon.png` | |
+| `.github/workflows/deploy.yml` | GitHub Actions 自動建置部署 |
 
-`deck_loader.dart` 解析 `exampleMatch`,`createDeckWithCards()` 簽章加對應參數
-(AI 生成的卡片傳 null)。
+**你要做的:**
 
-### F4. 測試
+1. 確認 `web/index.html` 的 `<title>` 與 manifest 一致(改成 `VOC-daily`)
+2. 確認 `index.html` 有正確的 `<meta name="theme-color" content="#3F51B5">`
+3. 確認 `.gitignore` **沒有**排除 `web/icons/` 或 `.github/`
+4. 確認 workflow 裡的 Flutter 版本(`3.44.8`)與 `pubspec.yaml` 的 SDK 限制相容
 
-1. 有 `exampleMatch` 時,標粗的是該字串而非 `word`
-2. `exampleMatch` 不在例句裡時,不 crash,退回整句原樣顯示
-3. 沒有 `exampleMatch` 時,現有的三段式邏輯行為不變(回歸測試)
-4. 片語 `hang out` + `exampleMatch: "hung out"` + 例句 `We hung out...` → 正確標粗
+**base-href 的坑(已在 workflow 處理,但要知道):**
+GitHub Pages 專案站台網址是 `https://sssh27.github.io/VOC-daily/`,不是根目錄。
+建置必須帶 `--base-href /VOC-daily/`,漏掉會整頁 404 白畫面。
+
+### G3. Shawn 要手動做的一次性設定(寫進 PROGRESS.md 提醒他)
+
+GitHub repo → **Settings** → **Pages** → **Source** 選 **GitHub Actions**
+(不是 Deploy from a branch)。只需設定一次。
+
+### G4. 驗收(寫進 PROGRESS.md 給 Shawn 對照)
+
+1. GitHub Actions workflow 綠燈
+2. 手機開 `https://sssh27.github.io/VOC-daily/` 正常顯示
+3. 瀏覽器選單有「加到主畫面」,加完桌面出現圖示
+4. 從桌面圖示開啟是全螢幕(沒有網址列)
+5. **開飛航模式後仍能完整使用**(字庫是打包的 asset,資料庫在瀏覽器本機)
+6. 關掉再開,學習進度還在
+
+第 5 點對郵輪情境很重要:船上網路又貴又慢,必須確保離線可用。
