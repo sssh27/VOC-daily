@@ -6,6 +6,77 @@
 
 ---
 
+## 這一輪(v9,雜項清理)做了什麼
+
+國王餅裁定「現在的狀態是可以部署了,這輪清最後的雜項」,三件事都做完了。
+
+### A. 移除 `word_highlight.dart` 死碼
+
+國王餅驗算後確認那個 `tokenRegex` fallback 分支**結構上不可能被執行到**
+(不是「目前剛好沒踩到」),裁定選項 1(移除),推翻我上輪傾向的選項 3。
+理由是死碼 + 錯誤文件比單獨任一個都糟,會誤導下一個讀規格的人。
+
+- `lib/widgets/word_highlight.dart`:拿掉 fallback 分支,比對邏輯改回
+  單純的三段式(`exampleMatch` → `word` 原始子字串比對 → 整句原樣)。
+  函式簽章、行為(對現在還會用到的路徑而言)完全沒變——因為那個分支本來
+  就打不到,移除它在定義上不可能改變任何現有測試的結果。
+- `docs/SPEC.md` 6.3 改成三段式描述,明確寫出「word 是較長字的字首時只
+  標到 word 自己的長度」,並記錄死碼移除的原因和版本(v9)。
+- `test/example_match_test.dart` 裡原本「如實記錄現在的行為」那個測試
+  的敘述改成「鎖定行為,v9 定案」,斷言本身沒變(`word=clean` 命中
+  `cleaning` 時只有 `clean` 五個字母粗體),因為這就是移除死碼後的
+  正式行為。
+
+### B. 持久化診斷 log 降噪
+
+`lib/data/database_connection/connection_web.dart` 的 `print(...)` 改成
+`kDebugMode` 包住的 `debugPrint(...)`,拿掉 `// ignore: avoid_print`。
+上一輪加這行是為了幫忙診斷 Shawn 回報的「沒有記憶效果」問題(其實是
+`flutter run` 沒固定 port 導致 origin 每次都變),診斷邏輯本身國王餅
+認可保留,只是不該讓正式版 console 一直印訊息。
+
+### C. README.md 全面改寫
+
+舊版還停在最早的骨架階段(Android 模擬器安裝流程、`.env` 設定 API key、
+「上架 App Store 前必做」),跟現況完全對不上。改寫成:
+
+- 專案簡介:拉霸決定新字量 + SM-2 排程 + 四選一測驗,PWA 部署
+- 專案結構更新到目前實際的檔案清單(`daily_roll.dart` / `intro_queue.dart`
+  / `milestone.dart` / `completion_messages.dart` / `deck_loader.dart` 等
+  都補上了)
+- 本機開發指令,**特別強調 `--web-port` 這個坑**(用一整段解釋原因,
+  避免下一個人重踩)
+- `build_runner` 提醒、`flutter test` 說明
+- AI 產字工具改用 `--dart-define=AI_API_KEY=...`,全部移除 `.env` 相關
+  說明
+- 加上線上網址 `https://sssh27.github.io/VOC-daily/`
+- 加一段指向 `docs/SPEC.md` / `docs/agent-sync/` / `CLAUDE.md` 的協作
+  文件說明(舊版完全沒提到雙 agent 協作這件事)
+
+### Commit
+
+4 個 commit,跟 TASKS.md E 節建議的順序一致,多一個 docs 同步 commit
+(SPEC.md/QUESTIONS.md/TASKS.md 你已經寫好但還沒進 git):
+
+1. `docs: sync SPEC.md, QUESTIONS.md and TASKS.md (word-highlight dead code ruling)`
+2. `refactor: remove unreachable morphology fallback in word highlighting`
+3. `chore: gate db storage diagnostic behind kDebugMode`
+4. `docs: rewrite README for current architecture and web-port caveat`
+
+（這份 PROGRESS.md 更新完會是第 5 個。）
+
+**`git push` 一樣跑不了**(sandbox 沒有 GitHub 認證),需要你本機執行
+`git push origin main`。
+
+### 沒做的事(依 D 節指示)
+
+- `assets/decks/*.json` 沒有動
+- SPEC 12.7 禁止清單一項都沒做
+- `ai_service.dart` / `generate_screen.dart` 沒刪,警告註解沒動
+- `.github/workflows/deploy.yml`、`web/manifest.json`、`web/icons/` 沒動
+
+---
+
 ## 補丁:Shawn 回報「每次打開都沒有記憶效果,沒有要複習的字」
 
 Shawn 實測後回報:每次重開 App,資料都像是重新開始,沒有卡片進入到期
