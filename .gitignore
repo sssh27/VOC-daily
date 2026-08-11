@@ -12,9 +12,14 @@ build/
 *.g.dart
 
 # Platform folders (generated locally via `flutter create .`)
+# NOTE(v8): /web/ used to be excluded here along with the other
+# platform folders, but web/ now holds hand-authored PWA assets that
+# must be committed for CI to build/deploy correctly — manifest.json,
+# icons/, index.html, favicon.png, and the manually-compiled
+# drift_worker.dart.js + sqlite3.wasm (see docs/agent-sync/PROGRESS.md
+# tech debt note on their non-official source). Do NOT re-exclude /web/.
 /android/
 /ios/
-/web/
 /macos/
 /linux/
 /windows/
