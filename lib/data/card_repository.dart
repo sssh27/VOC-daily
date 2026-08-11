@@ -123,6 +123,46 @@ class CardRepository {
     return row.read(_db.cards.id.count()) ?? 0;
   }
 
+  /// 【v7】累計字數:`isIntroduced == true` 的筆數(見 SPEC.md 12.2)。
+  /// 單調遞增,包含按過「我會了」的字,不計算掌握率或任何比值。
+  Future<int> introducedCount() async {
+    final query = _db.selectOnly(_db.cards)
+      ..addColumns([_db.cards.id.count()])
+      ..where(_db.cards.isIntroduced.equals(true));
+    final row = await query.getSingle();
+    return row.read(_db.cards.id.count()) ?? 0;
+  }
+
+  // ---------------------------------------------------------------------
+  // 【v7】AppSettings(里程碑進度,見 SPEC.md 12.3)
+  // ---------------------------------------------------------------------
+
+  static const _celebratedMilestoneKey = 'celebrated_milestone';
+
+  /// key 不存在時回傳 null,不 crash。
+  Future<String?> getSetting(String key) async {
+    final row = await (_db.select(_db.appSettings)
+          ..where((s) => s.key.equals(key)))
+        .getSingleOrNull();
+    return row?.value;
+  }
+
+  Future<void> setSetting(String key, String value) async {
+    await _db.into(_db.appSettings).insertOnConflictUpdate(
+          AppSettingsCompanion.insert(key: key, value: value),
+        );
+  }
+
+  /// 目前已慶祝過的最高里程碑門檻。key 不存在時預設 0(見 SPEC.md 12.3)。
+  Future<int> celebratedMilestone() async {
+    final raw = await getSetting(_celebratedMilestoneKey);
+    return int.tryParse(raw ?? '') ?? 0;
+  }
+
+  Future<void> setCelebratedMilestone(int value) {
+    return setSetting(_celebratedMilestoneKey, value.toString());
+  }
+
   // ---------------------------------------------------------------------
   // 6.4 學習佇列(v4:新字 + 到期字合併)
   // ---------------------------------------------------------------------

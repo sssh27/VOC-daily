@@ -56,14 +56,24 @@ class DailyRolls extends Table {
   BoolColumn get wasCapped => boolean().withDefault(const Constant(false))();
 }
 
-@DriftDatabase(tables: [Decks, Cards, DailyRolls])
+/// 【v7】key-value 設定表,目前只用來記錄里程碑進度(SPEC.md 12.3)。
+/// 刻意不引入 `shared_preferences`,一律用這張表存簡單設定。
+class AppSettings extends Table {
+  TextColumn get key => text()();
+  TextColumn get value => text()();
+
+  @override
+  Set<Column> get primaryKey => {key};
+}
+
+@DriftDatabase(tables: [Decks, Cards, DailyRolls, AppSettings])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   AppDatabase.forTesting(super.connection);
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -80,6 +90,9 @@ class AppDatabase extends _$AppDatabase {
           }
           if (from < 4) {
             await m.addColumn(cards, cards.exampleMatch);
+          }
+          if (from < 5) {
+            await m.createTable(appSettings);
           }
         },
       );
