@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -16,6 +15,7 @@ import 'review_screen.dart';
 /// 拉霸就地播放動畫(不再跳到獨立畫面,見 6.2 廢止說明)。
 ///
 /// 嚴格禁止顯示:積壓數字、連續天數、完成率、任何評比,以及「複習」兩個字。
+/// 【v7】累計字數不在禁止之列,要顯示(見 SPEC.md 12.2)。
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -24,17 +24,20 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  static const _rollDuration = Duration(milliseconds: 1500);
-  static const _tickInterval = Duration(milliseconds: 60);
+  // 【v7/12.6】拉霸動畫改成漸慢定格:間隔從 _minTickInterval 開始,隨著
+  // 時間經過線性拉長到 _maxTickInterval,總時長仍落在 1.5–2 秒。
+  static const _rollTotalDuration = Duration(milliseconds: 1800);
+  static const _minTickInterval = Duration(milliseconds: 50);
+  static const _maxTickInterval = Duration(milliseconds: 300);
   static const _flashCandidates = [0, 3, 4, 5, 6];
 
   bool _loading = true;
   DailyRoll? _todaysRoll;
   int _studyQueueCount = 0;
+  int _totalIntroduced = 0;
 
   bool _rolling = false;
   int _displayNumber = 0;
-  Timer? _rollTimer;
   final _flashRandom = Random();
 
   @override
@@ -43,51 +46,50 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _load();
   }
 
-  @override
-  void dispose() {
-    _rollTimer?.cancel();
-    super.dispose();
-  }
-
   Future<void> _load() async {
     final repo = ref.read(cardRepositoryProvider);
     final todaysRoll = await repo.todaysRoll();
     final queue = await repo.studyQueue();
+    final introduced = await repo.introducedCount();
     if (!mounted) return;
     setState(() {
       _todaysRoll = todaysRoll;
       _studyQueueCount = queue.length;
+      _totalIntroduced = introduced;
       _loading = false;
     });
   }
 
-  void _startRoll() {
+  Future<void> _startRoll() async {
     if (_rolling || _todaysRoll != null) return;
     setState(() => _rolling = true);
 
     final repo = ref.read(cardRepositoryProvider);
     final stopwatch = Stopwatch()..start();
+    final totalMs = _rollTotalDuration.inMilliseconds;
+    final minMs = _minTickInterval.inMilliseconds;
+    final maxMs = _maxTickInterval.inMilliseconds;
 
-    _rollTimer = Timer.periodic(_tickInterval, (timer) async {
-      if (stopwatch.elapsed >= _rollDuration) {
-        timer.cancel();
-        final backlog = await repo.backlogCount();
-        final result = roll.rollNewCardQuota(backlog);
-        await repo.recordRoll(quota: result.quota, wasCapped: result.wasCapped);
-        if (result.quota > 0) {
-          await repo.introduceNewCards(result.quota);
-        }
-        if (!mounted) return;
-        setState(() => _rolling = false);
-        await _load();
-        return;
-      }
+    while (stopwatch.elapsed < _rollTotalDuration) {
+      final progress = stopwatch.elapsed.inMilliseconds / totalMs;
+      final delayMs = minMs + (maxMs - minMs) * progress;
+      await Future.delayed(Duration(milliseconds: delayMs.round()));
       if (!mounted) return;
       setState(() {
         _displayNumber =
             _flashCandidates[_flashRandom.nextInt(_flashCandidates.length)];
       });
-    });
+    }
+
+    final backlog = await repo.backlogCount();
+    final result = roll.rollNewCardQuota(backlog);
+    await repo.recordRoll(quota: result.quota, wasCapped: result.wasCapped);
+    if (result.quota > 0) {
+      await repo.introduceNewCards(result.quota);
+    }
+    if (!mounted) return;
+    setState(() => _rolling = false);
+    await _load();
   }
 
   Future<void> _goStudy() async {
@@ -150,7 +152,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 16),
+            Text(
+              '你認識了 $_totalIntroduced 個字',
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.copyWith(color: Colors.grey[700]),
+            ),
+            const SizedBox(height: 24),
             ElevatedButton(
               onPressed: _studyQueueCount > 0 ? _goStudy : null,
               child: const Text('開始'),
