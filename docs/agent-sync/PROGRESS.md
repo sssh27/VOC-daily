@@ -6,6 +6,85 @@
 
 ---
 
+## 這一輪(視覺改版第一批)第二階段——字型到齊,B/C/E 全部做完了
+
+字型檔到位後,照國王餅更正過的順序(B → C → E)把剩下的都做完了,
+這一輪 A–E 五項全部結案。commit(接續上面 A/D 那次之後):
+
+1. `docs: sync TASKS.md for v10 second round (order correction, B unblocked)`
+2. `feat: add design system foundation (app_theme.dart, fonts, theme wiring)`
+3. `feat: apply design system tokens + remove AI entry point + translate UI to English`
+
+第 3 個 commit 把 B(套用到畫面)、C、E 三項綁在一起,因為它們動到的是
+`home_screen.dart`/`review_screen.dart`/`decks_screen.dart`/
+`completion_messages.dart` 同幾行,做完才想到要分開 commit 已經來不及乾淨
+拆開,commit message 裡有詳細說明各自改了什麼。
+
+### B. 設計系統
+
+`lib/theme/app_theme.dart`(新檔):`AppColors`(SPEC 15.1 五色 + 答對/答錯
+狀態色)、`AppTextStyles`(15.2 七個具名字級,不內建顏色,呼叫端自己疊
+`copyWith(color: ...)`)、`appTheme`(預設 `ElevatedButton`/`OutlinedButton`
+長成「選項按鈕」的樣子:白底、圓角 14、高度 56)、另外匯出一個
+`appPrimaryButtonStyle`(膠囊狀、高度 52,給少數幾個主按鈕用)。
+
+`pubspec.yaml` 只註冊 token 表實際用到的字重:Syne 700/800、
+Hanken Grotesk 400/600,沒有多包不需要的檔案。
+
+**幾個沒有唯一答案、我自己做了判斷的地方,麻煩你們看一下對不對:**
+
+- 首頁轉盤圈裡的四種文字(轉圈中的數字、🎰、放假/做完/今日新字提示)原本
+  字級都是隨手訂的(40/15/14/16px),SPEC 15.2 表只給了 7 個籠統的角色,
+  沒有逐一對應。我的映射:轉圈數字與 🎰 → `displayLarge`(SPEC 明確寫
+  「首頁轉盤數字」);放假文案 → `bodyStrong`;做完文案 → `caption`;
+  今日新字文案 → `bodyStrong`。這幾個是我按大小/語氣猜的最接近選項,
+  不是 SPEC 白紙黑字寫死的。
+- 完成畫面的文案(`_completionMessage`)原本里程碑觸發時會放大加粗
+  (22px bold vs 一般 20px normal)。SPEC 15.4 明講完成畫面內容只有
+  「caption 文案 + You know N words + HOME 按鈕」三樣,沒有提到里程碑要
+  加粗放大,所以我把這個放大加粗的區分拿掉了,里程碑和一般文案現在
+  都是同一個 `caption` 樣式(🎉 emoji 的彈跳動畫還在,只是文字本身
+  不再變大變粗)。如果这不是你們要的效果,跟我說一聲我再加回來。
+- 只有首頁 START 和完成畫面 HOME 用了膠囊狀主按鈕樣式;學習畫面裡
+  「下一個/我會了」「忘了」等其他按鈕都維持預設的選項按鈕樣式(白底、
+  圓角 14)。SPEC 15.3 只定義了「主按鈕」和「選項按鈕」兩種,沒有交代
+  這些配對出現的次要動作按鈕算哪一種,我把它們當選項按鈕處理。
+- `generate_screen.dart` 裡表單錯誤訊息(`Colors.red`)沒有對應的 SPEC
+  token(15.1 的狀態色註明「僅用於答題回饋」,不能借來用在這裡),
+  所以維持原樣沒有動,而且這個畫面在 C 之後已經沒有入口能到達。
+
+### C. 拿掉 Library 的 AI 生成入口
+
+`decks_screen.dart` 移除了 `_goToGenerate()`、`GenerateScreen` 的 import、
+底部的「+ AI 生成新單字」按鈕。`generate_screen.dart` 和
+`lib/services/ai_service.dart` 兩個檔案完全沒動(用 `git diff` 確認過
+`ai_service.dart` 是空 diff),牌組進度條與百分比維持顯示。
+
+**但完成畫面上還留著一句指向這個入口的提示文字**,已經寫進
+`QUESTIONS.md` 請你們裁示,詳見該檔案最上面那條 `[未回答]`。
+
+### E. 介面文字全英文
+
+`home_screen.dart`、`review_screen.dart`、`decks_screen.dart`、
+`completion_messages.dart` 照 TASKS.md 的對照表逐字換成英文,
+`test/completion_messages_test.dart` 的 `bannedWords` 也照給的清單換成
+中英雙語、比對改成大小寫不敏感。用程式掃過這四個檔案,確認沒有殘留的中文
+字串常數(卡片的 `meaning`/`exampleZh` 不受影響,那些是資料不是程式碼裡的
+字串)。全專案搜尋「複習」與「review」,確認 UI 字串裡沒有殘留
+(只剩程式碼識別字和 `review_screen.dart` 檔名,符合允許的例外)。
+
+沒有任何 widget test 會實例化 `HomeScreen`/`StudyScreen`/`DecksScreen`,
+所以這些文字改動不會動到任何既有測試的斷言,`flutter test` 邏輯上不受影響
+——**還是要麻煩你本機實跑一次確認**,我這邊沒有 Flutter 環境能跑。
+
+### 這輪 A–E 全部結案,等 review
+
+`git push` 一樣要你本機執行。除了上面提到的完成畫面死路文字那個問題
+需要裁示之外,沒有其他未完成的項目了。停在這裡等 review,不會自己往下做
+Onboarding/Settings/Study 流程視覺改版。
+
+---
+
 ## 這一輪(視覺改版第一批)做了什麼——⚠️ 卡在缺字型檔,只做完 A 和 D
 
 先看設計稿(`docs/design/` 九張圖)和 `docs/SPEC.md` 第 14、15 節,兩者都讀完
