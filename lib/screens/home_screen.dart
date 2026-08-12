@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/database.dart';
 import '../logic/daily_roll.dart' as roll;
 import '../providers.dart';
+import '../widgets/floating_pearls.dart';
 import 'decks_screen.dart';
 import 'review_screen.dart';
 
@@ -129,54 +130,59 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ],
       ),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            GestureDetector(
-              onTap: rolledToday ? null : _startRoll,
-              child: Container(
-                width: 160,
-                height: 160,
-                alignment: Alignment.center,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  shape: BoxShape.circle,
+      body: Stack(
+        children: [
+          const FloatingPearls(),
+          Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                GestureDetector(
+                  onTap: rolledToday ? null : _startRoll,
+                  child: Container(
+                    width: 160,
+                    height: 160,
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                      shape: BoxShape.circle,
+                    ),
+                    child: _buildCircleContent(
+                      rolledToday: rolledToday,
+                      isJackpot: isJackpot,
+                      wasCappedZero: wasCappedZero,
+                      roll: roll,
+                    ),
+                  ),
                 ),
-                child: _buildCircleContent(
-                  rolledToday: rolledToday,
-                  isJackpot: isJackpot,
-                  wasCappedZero: wasCappedZero,
-                  roll: roll,
+                const SizedBox(height: 16),
+                Text(
+                  '你認識了 $_totalIntroduced 個字',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.copyWith(color: Colors.grey[700]),
                 ),
-              ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: _studyQueueCount > 0 ? _goStudy : null,
+                  child: const Text('開始'),
+                ),
+                if (rolledToday && _studyQueueCount == 0) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    '今天沒有要學的了',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.copyWith(color: Colors.grey),
+                  ),
+                ],
+              ],
             ),
-            const SizedBox(height: 16),
-            Text(
-              '你認識了 $_totalIntroduced 個字',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall
-                  ?.copyWith(color: Colors.grey[700]),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: _studyQueueCount > 0 ? _goStudy : null,
-              child: const Text('開始'),
-            ),
-            if (rolledToday && _studyQueueCount == 0) ...[
-              const SizedBox(height: 12),
-              Text(
-                '今天沒有要學的了',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodySmall
-                    ?.copyWith(color: Colors.grey),
-              ),
-            ],
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

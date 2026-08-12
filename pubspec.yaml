@@ -36,3 +36,6 @@ flutter:
     - assets/decks/clothing_shopping.json
     - assets/decks/transport_directions.json
     - assets/decks/health_symptoms.json
+    # 銀色金屬珍珠(首頁背景裝飾)。1x/2x/3x 由 Flutter 依螢幕密度自動挑選,
+    # 只需宣告 1x 路徑,2.0x/ 與 3.0x/ 子資料夾會被自動解析。
+    - assets/images/pearl.png
