@@ -6,6 +6,116 @@
 
 ---
 
+## 這一輪(視覺改版第一批)做了什麼——⚠️ 卡在缺字型檔,只做完 A 和 D
+
+先看設計稿(`docs/design/` 九張圖)和 `docs/SPEC.md` 第 14、15 節,兩者都讀完
+才開始動工,確認過設計稿與 SPEC 衝突時以 SPEC 為準。
+
+### A. 首頁背景金屬珍珠 ✅ 完成
+
+- 新增 `lib/widgets/floating_pearls.dart`:`FloatingPearls` widget,內部
+  自己管 4 個 `AnimationController`,整個包在 `IgnorePointer` 裡。
+- 位置/大小照 SPEC 14.3 的表:#1 直徑 200、`left: -70px`、`top: 12%`;
+  #2 直徑 140、`right: -70px`、`top: 55%`;#3 直徑 90、`left: 8%`、
+  `top: 74%`;#4 直徑 56、`right: 14%`、`top: 20%`。水平用 px(#1/#2,
+  故意讓它們被邊緣裁切)或畫面寬度百分比(#3/#4),我用一個 `_PearlSpec`
+  資料類統一處理兩種單位。
+- 動畫照 SPEC 14.5:`Curves.easeInOut`(不是 linear)、
+  `AnimationController(...)..repeat(reverse: true)`,四顆週期 22/18/25/15
+  秒(互質,不會同步),起始相位錯開(`controller.value` 初始設
+  0.0/0.25/0.5/0.75)。
+- `AnimatedBuilder` 的 `child` 參數有用上,`Image.asset` 只建立一次傳進去
+  快取,`builder` 每幀只重建 `Positioned`,不重建圖片。
+- `dispose()` 釋放全部 4 個 controller。
+- `MediaQuery.of(context).disableAnimations == true` 時完全不呼叫
+  `repeat()`,珍珠停在 `initialPhase` 對應的靜止位置,不啟動 controller。
+- 素材路徑用 `assets/images/pearl.png`(沒有手動指定 2.0x/3.0x),沒有加
+  任何 `BoxShadow`/`ColorFiltered`/`Opacity`。
+- `home_screen.dart`:`Scaffold.body` 外層包一層 `Stack`,
+  `FloatingPearls()` 放第一個 child(最底層),原本的 `Center(...)` 整個
+  不動地放第二個 child。中央主氣泡的大小、位置、樣式一個字元都沒改。
+
+**驗收(SPEC 14.7 八點)—— 前 3、5、6、7、8 點我從程式碼結構可以確認,
+第 1、2、4 點需要你實際跑起來用眼睛看,我這邊沒有 Flutter/瀏覽器環境:**
+
+| # | 項目 | 狀態 |
+|---|---|---|
+| 1 | 4 顆銀色金屬珍珠,大小明顯不同、分布不對稱 | 程式碼位置/大小照表寫死,**需要你跑起來確認實際畫面** |
+| 2 | 其中 2 顆被畫面左右邊緣裁切 | #1(`left:-70px`)、#2(`right:-70px`)照 SPEC 設定,**需要你確認裁切比例看起來對不對** |
+| 3 | 珍珠邊緣乾淨,沒有灰色外圈或方形邊界 | ✅ 沒有加任何濾鏡/陰影,直接用素材原圖,程式碼層面確認 |
+| 4 | 珍珠緩慢上下飄浮,四顆節奏不一致 | 週期 22/18/25/15 秒互質 + 相位錯開,**這條 SPEC 特別要求用眼睛看,麻煩你實測** |
+| 5 | 點擊珍珠位置,下方按鈕仍能正常觸發 | ✅ 整個 `FloatingPearls` 包在 `IgnorePointer` 裡,不會攔截點擊 |
+| 6 | 珍珠沒有蓋住任何文字或按鈕 | ✅ 珍珠 #3(`top:74%`)刻意避開 START 按鈕與文字位置,若你實測發現小螢幕(高度 < 600dp)被壓到,把 #3 的 `top` 調到 78%,不要動文字位置(SPEC 14.4 已經預留這個備案) |
+| 7 | 中央主氣泡、字級、顏色、間距與改版前完全相同 | ✅ 只在外面包了一層 `Stack`,`Center(...)` 內容完全沒動 |
+| 8 | `flutter test` 全綠 | 沒有測試碰到 `HomeScreen`/`FloatingPearls`,理論上不受影響,**麻煩你本機跑一次確認** |
+
+### D. 學習完成畫面改垂直置中 ✅ 已經是這樣,沒有改動程式碼
+
+檢查 `lib/screens/review_screen.dart` 現在的完成畫面(`_buildCompletionContent`,
+不是 TASKS.md 提到的 `_buildDoneMode`,那個名稱在目前的程式碼裡不存在)——
+它已經是：
+
+```dart
+body: Center(
+  child: !_completionInfoLoaded
+      ? const CircularProgressIndicator()
+      : _buildCompletionContent(context),
+),
+```
+
+`Center` 包住一個 `mainAxisSize: MainAxisSize.min` 的 `Column`,這是
+Flutter 裡讓內容在可用空間裡水平 + 垂直都置中的標準寫法,視覺效果跟
+TASKS.md 描述的「外層 Column 加 `mainAxisAlignment: MainAxisAlignment.center`
+並撐滿整個可用高度」是同一個結果,只是實作手法不同。
+
+**我判斷這裡不需要改動**,所以沒有動這個檔案。我猜 TASKS.md 這段可能是
+照 Stitch 設計稿(`05-study-complete.png`,靠上對齊、下方大片空白)寫的,
+沒有對照到目前實際的程式碼——C 那段你自己也提到「先前根據設計稿判斷…
+實際讀 code 之後發現有兩項是我誤判」,這應該是同一類狀況。
+
+**麻煩你實際跑起來看一下這個畫面**,如果它現在看起來真的還是靠上對齊,
+那代表有我沒看出來的其他原因(例如某個父層 widget 的約束問題),請告訴我,
+我再深入查。如果它看起來已經是置中的,這項就當作已完成。
+
+### ⚠️ B、C、E 卡住,原因:缺字型檔
+
+`assets/fonts/` 目前完全是空的(不存在這個資料夾),沒有 Syne 或
+Hanken Grotesk 的任何 TTF 檔。TASKS.md 已經預期到這個狀況,並指示
+「先做 A 和 D,B/C 等檔案到齊再做」——所以我照做,B、C 都還沒動。
+
+**E(介面文字改英文)我也一併保留**,雖然它本身不需要字型檔,但 TASKS.md
+的執行順序明確寫「A → B → C → D → E,不要跳」,而且 E 的理由是
+「B/C/D 會搬動這些字串的位置,先翻會白做兩次」——目前 C 還沒做(它會
+拿掉 `decks_screen.dart` 的 AI 生成按鈕,改動那個檔案的結構),所以照順序
+E 也還不該做。
+
+**麻煩 Shawn 把 Syne 和 Hanken Grotesk 的 static TTF 檔放進
+`assets/fonts/`**(記得是 `static/` 資料夾底下的固定字重檔,不是
+`VariableFont` 版本,否則 Flutter 上字重會失效)。字型到齊後跟我說一聲,
+我就接著做 B → C → E。
+
+### Commit
+
+這輪 2 個 commit:
+
+1. `docs: sync CLAUDE.md, SPEC.md, TASKS.md for visual redesign round (v10); add design references`
+2. `feat: add floating pearls background decoration to home screen`
+
+（這份 PROGRESS.md 更新完會是第 3 個。）
+
+**`git push` 一樣跑不了**(sandbox 沒有 GitHub 認證),需要你本機執行
+`git push origin main`。
+
+### 沒做的事
+
+- B(設計系統 token)、C(拿掉 Library 的 AI 生成入口)、E(介面文字英文化)
+  都卡在缺字型檔 + 執行順序,詳見上面說明
+- `assets/decks/*.json` 沒有動
+- Onboarding、Settings 畫面沒有做(依指示,規格還沒定案)
+- Study 流程的互動邏輯、選項產生方式、計分方式沒有動
+
+---
+
 ## 這一輪(v9,雜項清理)做了什麼
 
 國王餅裁定「現在的狀態是可以部署了,這輪清最後的雜項」,三件事都做完了。
