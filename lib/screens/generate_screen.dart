@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers.dart';
 import '../services/ai_service.dart';
+import '../theme/app_theme.dart';
 
 /// AI 生成畫面。依 SPEC.md 6.6。
 ///
