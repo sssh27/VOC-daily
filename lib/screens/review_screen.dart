@@ -10,6 +10,7 @@ import '../logic/intro_queue.dart';
 import '../logic/milestone.dart';
 import '../logic/scheduler.dart';
 import '../providers.dart';
+import '../theme/app_theme.dart';
 import '../widgets/intro_card.dart';
 import '../widgets/question_card.dart';
 
@@ -344,14 +345,14 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
   Widget build(BuildContext context) {
     if (_loading) {
       return Scaffold(
-        appBar: AppBar(title: const Text('學習')),
+        appBar: AppBar(title: const Text('STUDY')),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     if (_phase == _Phase.done) {
       return Scaffold(
-        appBar: AppBar(title: const Text('學習')),
+        appBar: AppBar(title: const Text('STUDY')),
         body: Center(
           child: !_completionInfoLoaded
               ? const CircularProgressIndicator()
@@ -363,13 +364,13 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
     final card = _currentCard;
     if (card == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('學習')),
+        appBar: AppBar(title: const Text('STUDY')),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('學習')),
+      appBar: AppBar(title: const Text('STUDY')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: _phase == _Phase.intro
@@ -397,35 +398,34 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
             builder: (context, scale, child) {
               return Transform.scale(scale: scale, child: child);
             },
-            child: const Text('🎉', style: TextStyle(fontSize: 40)),
+            child: Text(
+              '🎉',
+              style:
+                  AppTextStyles.displayLarge.copyWith(color: AppColors.primary),
+            ),
           ),
         if (isMilestone) const SizedBox(height: 8),
         Text(
           _completionMessage,
-          style: TextStyle(
-            fontSize: isMilestone ? 22 : 20,
-            fontWeight: isMilestone ? FontWeight.bold : FontWeight.normal,
-          ),
+          style: AppTextStyles.caption.copyWith(color: AppColors.tertiary),
         ),
         const SizedBox(height: 16),
         Text(
-          '你認識了 $_totalIntroduced 個字',
-          style: Theme.of(context).textTheme.headlineSmall,
+          'You know $_totalIntroduced words',
+          style: AppTextStyles.displayMedium.copyWith(color: AppColors.primary),
         ),
         if (_warehouseExhausted) ...[
           const SizedBox(height: 12),
           Text(
-            '單字庫快用完了,去生成新的吧',
-            style: Theme.of(context)
-                .textTheme
-                .bodySmall
-                ?.copyWith(color: Colors.grey),
+            'Your word bank is running low',
+            style: AppTextStyles.body.copyWith(color: AppColors.tertiary),
           ),
         ],
         const SizedBox(height: 24),
         ElevatedButton(
+          style: appPrimaryButtonStyle,
           onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst),
-          child: const Text('回首頁'),
+          child: const Text('HOME'),
         ),
       ],
     );
@@ -449,14 +449,14 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
             Expanded(
               child: OutlinedButton(
                 onPressed: _locked ? null : _introNext,
-                child: const Text('下一個'),
+                child: const Text('NEXT'),
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: ElevatedButton(
                 onPressed: _locked ? null : _introAlreadyKnown,
-                child: const Text('我會了'),
+                child: const Text('I KNOW THIS'),
               ),
             ),
           ],
@@ -481,7 +481,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
           const SizedBox(height: 24),
           ElevatedButton(
             onPressed: _locked ? null : _confirmDueInfo,
-            child: const Text('下一個'),
+            child: const Text('NEXT'),
           ),
         ],
       );
@@ -518,21 +518,18 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
           OutlinedButton(
             onPressed: _locked ? null : () => _answerQuiz(gaveUp: true),
             style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.grey[700],
-              side: BorderSide(color: Colors.grey[400]!),
+              foregroundColor: AppColors.tertiary,
+              side: const BorderSide(color: AppColors.tertiary),
               padding: const EdgeInsets.symmetric(vertical: 14),
             ),
-            child: const Text('忘了'),
+            child: const Text('I FORGOT'),
           ),
           if (_locked && card.exampleZh.isNotEmpty) ...[
             const SizedBox(height: 16),
             Text(
               card.exampleZh,
               textAlign: TextAlign.center,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(color: Colors.grey[700]),
+              style: AppTextStyles.body.copyWith(color: AppColors.tertiary),
             ),
           ],
         ],
@@ -568,12 +565,12 @@ class _ChoiceButton extends StatelessWidget {
 
     if (revealResult) {
       if (isCorrectAnswer) {
-        backgroundColor = Colors.green;
-        foregroundColor = Colors.white;
+        backgroundColor = AppColors.correctBackground;
+        foregroundColor = AppColors.correctForeground;
         if (isSelected) bounce = true; // 使用者自己選對了
       } else if (isSelected) {
-        backgroundColor = Colors.red;
-        foregroundColor = Colors.white;
+        backgroundColor = AppColors.incorrectBackground;
+        foregroundColor = AppColors.incorrectForeground;
         shake = true;
       }
     }

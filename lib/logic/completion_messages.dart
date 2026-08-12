@@ -11,11 +11,11 @@ library completion_messages;
 import 'dart:math';
 
 const completionMessagePool = [
-  '今天做完了',
-  '收工',
-  '就這樣,結束',
-  '今天的份跑完了',
-  '好了,可以去做別的事了',
+  'Done for today',
+  "That's a wrap",
+  'All finished',
+  "Today's batch is done",
+  'All done, go do something else',
 ];
 
 /// 從文案池隨機挑一句。[random] 可注入以便測試。
@@ -27,4 +27,4 @@ String pickCompletionMessage({Random? random}) {
 /// 里程碑觸發時使用的專屬文案,取代一般文案池。
 /// 里程碑本身就是累積型的數字(SPEC 12.2 允許顯示累計字數),不算評比,
 /// 所以直接把門檻數字寫進文案裡沒問題。
-String milestoneMessage(int milestone) => '你已經認識 $milestone 個字了';
+String milestoneMessage(int milestone) => "That's $milestone words";

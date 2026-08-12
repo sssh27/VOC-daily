@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/database.dart';
 import '../logic/daily_roll.dart' as roll;
 import '../providers.dart';
+import '../theme/app_theme.dart';
 import '../widgets/floating_pearls.dart';
 import 'decks_screen.dart';
 import 'review_screen.dart';
@@ -110,7 +111,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     if (_loading) {
       return Scaffold(
-        appBar: AppBar(title: const Text('VOC-daily')),
+        appBar: AppBar(title: const Text('VOC · DAILY')),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
@@ -122,7 +123,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('VOC-daily'),
+        title: const Text('VOC · DAILY'),
         actions: [
           IconButton(
             icon: const Icon(Icons.menu),
@@ -144,8 +145,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     height: 160,
                     alignment: Alignment.center,
                     padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primaryContainer,
+                    decoration: const BoxDecoration(
+                      color: AppColors.secondary,
                       shape: BoxShape.circle,
                     ),
                     child: _buildCircleContent(
@@ -158,25 +159,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  '你認識了 $_totalIntroduced 個字',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.copyWith(color: Colors.grey[700]),
+                  'You know $_totalIntroduced words',
+                  style: AppTextStyles.displayMedium
+                      .copyWith(color: AppColors.primary),
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
+                  style: appPrimaryButtonStyle,
                   onPressed: _studyQueueCount > 0 ? _goStudy : null,
-                  child: const Text('開始'),
+                  child: const Text('START'),
                 ),
                 if (rolledToday && _studyQueueCount == 0) ...[
                   const SizedBox(height: 12),
                   Text(
-                    '今天沒有要學的了',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodySmall
-                        ?.copyWith(color: Colors.grey),
+                    'Nothing to study today',
+                    style: AppTextStyles.caption
+                        .copyWith(color: AppColors.tertiary),
                   ),
                 ],
               ],
@@ -194,36 +192,43 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     required DailyRoll? roll,
   }) {
     if (_rolling) {
-      return Text('$_displayNumber', style: const TextStyle(fontSize: 40));
+      return Text(
+        '$_displayNumber',
+        style: AppTextStyles.displayLarge.copyWith(color: AppColors.primary),
+      );
     }
     if (!rolledToday) {
-      return const Column(
+      return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('🎰', style: TextStyle(fontSize: 40)),
-          SizedBox(height: 8),
-          Text('轉一下'),
+          Text(
+            '🎰',
+            style:
+                AppTextStyles.displayLarge.copyWith(color: AppColors.primary),
+          ),
+          const SizedBox(height: 8),
+          const Text('SPIN'),
         ],
       );
     }
     if (isJackpot) {
-      return const Text(
-        '🎉 今天放假,\n沒有新字',
+      return Text(
+        'DAY OFF\nNo new words',
         textAlign: TextAlign.center,
-        style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+        style: AppTextStyles.bodyStrong.copyWith(color: AppColors.primary),
       );
     }
     if (wasCappedZero) {
-      return const Text(
-        '今天先把\n之前的做完就好',
+      return Text(
+        'Just finish\nwhat you have',
         textAlign: TextAlign.center,
-        style: TextStyle(fontSize: 14),
+        style: AppTextStyles.caption.copyWith(color: AppColors.primary),
       );
     }
     return Text(
-      '今日新字:\n${roll!.quota} 個',
+      'NEW TODAY\n${roll!.quota}',
       textAlign: TextAlign.center,
-      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+      style: AppTextStyles.bodyStrong.copyWith(color: AppColors.primary),
     );
   }
 }

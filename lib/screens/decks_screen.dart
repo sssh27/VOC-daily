@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/database.dart';
 import '../providers.dart';
-import 'generate_screen.dart';
+import '../theme/app_theme.dart';
 
 /// 單字庫(SPEC.md 6.5,v4:原「牌組列表」降級為次要畫面)。
 /// 從首頁右上角 ☰ 進入,不是主流程的一部分。用途只有兩個:看看庫存、
@@ -51,19 +51,12 @@ class _DecksScreenState extends ConsumerState<DecksScreen> {
     });
   }
 
-  Future<void> _goToGenerate() async {
-    await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const GenerateScreen()),
-    );
-    _load();
-  }
-
   @override
   Widget build(BuildContext context) {
     final rows = _rows;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('單字庫')),
+      appBar: AppBar(title: const Text('LIBRARY')),
       body: rows == null
           ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
@@ -74,8 +67,9 @@ class _DecksScreenState extends ConsumerState<DecksScreen> {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 20),
                     child: Text(
-                      '你認識了 $_totalIntroduced 個字',
-                      style: Theme.of(context).textTheme.titleLarge,
+                      'You know $_totalIntroduced words',
+                      style: AppTextStyles.displayMedium
+                          .copyWith(color: AppColors.primary),
                     ),
                   );
                 }
@@ -88,29 +82,29 @@ class _DecksScreenState extends ConsumerState<DecksScreen> {
                     children: [
                       Text(
                         row.deck.name,
-                        style: Theme.of(context).textTheme.titleMedium,
+                        style: AppTextStyles.bodyStrong
+                            .copyWith(color: AppColors.primary),
                       ),
                       const SizedBox(height: 4),
-                      Text('已學 ${row.learned} / ${row.total} 字'),
+                      Text(
+                        '${row.learned} / ${row.total} learned',
+                        style: AppTextStyles.body
+                            .copyWith(color: AppColors.tertiary),
+                      ),
                       const SizedBox(height: 4),
                       ClipRRect(
                         borderRadius: BorderRadius.circular(4),
-                        child: LinearProgressIndicator(value: progress),
+                        child: LinearProgressIndicator(
+                          value: progress,
+                          color: AppColors.primary,
+                          backgroundColor: AppColors.tertiary,
+                        ),
                       ),
                     ],
                   ),
                 );
               },
             ),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: ElevatedButton(
-            onPressed: _goToGenerate,
-            child: const Text('+ AI 生成新單字'),
-          ),
-        ),
-      ),
     );
   }
 }

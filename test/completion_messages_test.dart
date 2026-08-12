@@ -37,11 +37,16 @@ void main() {
     expect(message, isNotEmpty);
   });
 
-  test('文案池的內容不得提及正確率、時間等評比字眼(基本檢查)', () {
-    const bannedWords = ['正確率', '花費', '分鐘', '秒', '%'];
+  test('文案池的內容不得提及正確率、時間等評比字眼(基本檢查,大小寫不敏感)',
+      () {
+    const bannedWords = [
+      '正確率', '花費', '分鐘', '秒', '%',
+      'accuracy', 'streak', 'score', 'minutes', 'seconds', 'correct',
+    ];
     for (final message in completionMessagePool) {
+      final lower = message.toLowerCase();
       for (final banned in bannedWords) {
-        expect(message.contains(banned), isFalse,
+        expect(lower.contains(banned.toLowerCase()), isFalse,
             reason: '"$message" 不應該包含 "$banned"');
       }
     }
