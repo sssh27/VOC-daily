@@ -6,6 +6,22 @@
 
 ---
 
+## 補充:本機測試筆記(`flutter run -d chrome` 綁定 port 失敗)
+
+Shawn 本機 `flutter run -d chrome --web-port=8080` 遇到
+`SocketException: ... errno = 10013`(Windows 拒絕綁定該 port)。
+**這跟之前診斷過的「隨機 port 導致資料庫看起來重置」是不同問題**——
+這次是 Windows 本身不給綁定 8080(可能被其他程式占用或在系統排除範圍),
+不是資料庫或程式碼的問題。解法:換一個沒被占用/排除的 port
+(例如 `--web-port=8090`),但**之後每次都固定用同一個 port**,理由同
+之前的診斷(瀏覽器儲存綁定在 origin,port 換了等於換了新網站)。
+
+另外 `pubspec.lock` 也在本機重新產生過(移除了舊版遺留的
+`flutter_dotenv` 條目,是先前拿掉 dotenv 套件後這是第一次真的在本機跑
+`flutter pub get`/`flutter test` 清乾淨),已 commit。
+
+---
+
 ## 這一輪(視覺改版第一批)第二階段——字型到齊,B/C/E 全部做完了
 
 字型檔到位後,照國王餅更正過的順序(B → C → E)把剩下的都做完了,
