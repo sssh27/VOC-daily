@@ -6,6 +6,140 @@
 
 ---
 
+## v11 這一輪(虹彩背景 + 金屬圖示)A–D 全部做完了
+
+照 A → B → C → D → E 順序做的,A 是最優先的 bug 修復,做完才動後面幾項。
+
+### A. 修「學習畫面單字看不見」bug ✅
+
+`lib/widgets/intro_card.dart`、`lib/widgets/question_card.dart` 兩個檔案
+（上一輪 B 漏掉的)全部照國王餅給的對照表遷移完了:卡片底色
+`primaryContainer` → `AppColors.surface`,圓角 16 → 20,加上 SPEC 15.3
+的統一陰影,單字/音標/釋義/例句/中譯全部換成 `AppTextStyles` token,
+`Divider` 換成 `AppColors.secondary`。順帶檢查了
+`lib/widgets/word_highlight.dart`,粗體例句的 `TextStyle` 從沒有指定顏色
+的 `FontWeight.bold` 改成明確的 `FontWeight.w700` + `AppColors.primary`
+(`FontWeight.bold` 本來就是 `FontWeight.w700` 的別名,`test/example_match_test.dart`
+比對的是 `FontWeight.bold` 這個值,不受影響,還是綠的)。
+
+**A-4 驗證指令的實際輸出(修完之後、還沒做 D 的金屬圖示之前跑的一次):**
+
+```
+$ grep -rn "primaryContainer\|Colors\.grey\|Colors\.black\|Colors\.white\|textTheme\." lib --include=*.dart | grep -v "app_theme.dart" | grep -v "database.g.dart"
+(no output)
+```
+
+**D 做完、加了 `chrome_icon.dart` 之後又跑了一次,這次的輸出:**
+
+```
+$ grep -rn "primaryContainer\|Colors\.grey\|Colors\.black\|Colors\.white\|textTheme\." lib --include=*.dart | grep -v "app_theme.dart" | grep -v "database.g.dart"
+lib/widgets/chrome_icon.dart:37:      child: Icon(icon, size: size, color: Colors.white),
+```
+
+這一行是 TASKS.md D-2 明確允許的例外(`ShaderMask` 底下的 `Icon` 需要不透明
+底色才能被漸層完整蓋掉),程式碼裡已經在那一行加了註解說明原因。
+
+### B. 網頁版寬度上限 ✅
+
+`lib/main.dart` 的 `MaterialApp` 加了 `builder`,`Center` + `ConstrainedBox`
+`maxWidth: 430`,全域一次,沒有在個別畫面裡重複包。`child` 用
+`child ?? const SizedBox.shrink()` 處理 null 的情況。
+
+### C. 虹彩流動背景 ✅
+
+新增 `lib/widgets/iridescent_background.dart`,匯出 `IridescentBackground`。
+位移/縮放/旋轉的數學照 SPEC 16.3 的表(A 層過掃描×1.6、額外縮放
+`1+0.05sin(a)`、位移 `70sin(a)`/`110cos(0.7a)`;B 層過掃描×1.6、位移
+`-70cos(0.8a)`/`-110sin(0.6a)`、旋轉 `4°sin(0.5a)`),全部用 `double`,
+沒有任何 `round()`/`toInt()`。只有一個 `AnimationController`(60 秒,
+`repeat()`,不是 `repeat(reverse: true)`),跟珍珠、中央氣泡的
+controller 分開。整個背景包 `IgnorePointer` → `RepaintBoundary` →
+`ClipRect` → `Stack`,最底層墊 `AppColors.neutral` 的 `ColoredBox` 防止
+閃白。`MediaQuery.disableAnimations` 為 true 時完全不啟動 controller。
+
+**C-4:soft light 混合選了 `CustomPainter` + `Canvas.saveLayer`,不是
+`ShaderMask` 或 `ColorFiltered`。理由(檔案開頭也寫了):**
+
+- `ColorFiltered` 的 `ColorFilter.mode(color, blendMode)` 是拿「單一顏色」
+  跟 widget 混合,不是兩張圖之間混合,做不到
+- `ShaderMask` 可以用 `ImageShader` 湊出兩張圖的混合,但沒有獨立的
+  「整體不透明度」通道——這裡同時要「B 層 softLight 混合」+「B 層維持
+  0.5 不透明度」兩件事,`ShaderMask` 只能做前者,外面硬疊 `Opacity`
+  會連 A 層一起變淡,不對
+- `Canvas.saveLayer(bounds, paint)` 的 `paint` 可以同時設 `blendMode`
+  和 `color` 的 alpha,Skia 合成回底圖時是「先用 blendMode 混合,
+  再用 alpha 跟底圖線性插值」,剛好符合 SPEC 要的效果,還省了一層
+  `Opacity`
+
+這個做法需要把兩張圖從 `Image.asset` widget 改成 `dart:ui` 的 `ui.Image`
+(用 `rootBundle.load` + `ui.instantiateImageCodec` 在 `initState` 載入
+一次,存進 state,不是每幀重載)。`AnimatedBuilder` 每幀只重建
+`CustomPaint`/`_IridescentPainter`(輕量物件),圖片解碼只發生一次,
+效能上跟「`AnimatedBuilder` 的 `child` 快取 `Image.asset`」這個要求
+的精神是一樣的,只是因為換了實作方式,快取的對象從 widget 變成
+底層的 `ui.Image`。
+
+`home_screen.dart` 的 `Stack` 加了第三層(最底層):
+`IridescentBackground` → `FloatingPearls` → 原本的 `Center(...)`,
+照 SPEC 16.5 的順序。`FloatingPearls` 本來就沒有自己的背景,沒有動它。
+
+### D. 拉霸金屬圖示 + 中央氣泡飄浮 ✅
+
+- `home_screen.dart` 的 `_buildCircleContent`,未轉狀態的
+  `Column(🎰 + SPIN)` 整個換成單一個
+  `ChromeIcon(Icons.casino_outlined, size: 56)`,沒有文字、沒有
+  `Column`/`SizedBox`。轉動中、轉完的狀態完全沒動。
+- 新增 `lib/widgets/chrome_icon.dart`:`ShaderMask` + `BlendMode.srcATop`
+  疊銀色漸層(色階照 SPEC 16.8 給的五段),底下的 `Icon` 用
+  `Colors.white`(唯一允許的例外,已加註解)。
+- 未轉狀態的骰子圖示加了呼吸動畫:縮放 1.0↔1.04,單趟 2.4 秒,
+  `Curves.easeInOut`,`repeat(reverse: true)`。轉動中(`_rolling`)或
+  轉完(`rolledToday`)都不會呼吸,靠 `_syncAnimations()` 統一控管。
+- 中央主氣泡(整個拉霸圓圈)加了飄浮動畫:±6px、單趟 19 秒(刻意跟
+  珍珠的 22/18/25/15 不同)、只做垂直位移。`_rolling == true` 時
+  `_syncAnimations()` 會呼叫 `.stop()` 暫停,轉完之後恢復
+  `repeat(reverse: true)`。
+- `review_screen.dart` 完成畫面的里程碑慶祝,`Text('🎉')` 換成
+  `ChromeIcon(Icons.auto_awesome, size: 40)`,外層原有的
+  `TweenAnimationBuilder` 放大彈跳動畫保留不動。
+- 兩個新 controller(`_breatheController`、`_bubbleController`)跟
+  `MediaQuery.disableAnimations` 掛鉤:true 時兩個都不啟動、停在
+  初始值(靜止畫面),邏輯集中在 `_syncAnimations()` 一個方法裡,
+  在 `_load()` 完成後、`_startRoll()` 開始/結束時都會呼叫一次。
+
+全專案掃過一次彩色 emoji(🎰🎉),確認只剩doc comment 裡提到這兩個字,
+UI 實際渲染的內容(`Text(...)`/`Icon(...)`)裡沒有殘留。
+
+### E. 整體驗收(SPEC 16.12)
+
+逐點標明「程式碼已確認」或「需 Shawn 實機確認」,**沒有 Flutter/瀏覽器
+環境,以下沒有一項是我自己看畫面驗證過的**:
+
+| # | 驗收項目 | 狀態 |
+|---|---|---|
+| 1 | 背景不是單色,看得到虹彩流動材質 | 需 Shawn 實機確認 |
+| 2 | 盯著看 30 秒花紋會變形,不是整片平移 | 需 Shawn 實機確認(程式碼結構上是兩層獨立變換 + softLight 混合,理論上會變形,但沒有實際看過畫面) |
+| 3 | 畫面四邊沒有硬邊/黑邊/空白 | 需 Shawn 實機確認(過掃描 ×1.6 的數字有照抄,但裁切效果沒看過) |
+| 4 | 動起來滑順,沒有跳格/雜點/色階斷帶 | 需 Shawn 實機確認(位移全用 double、沒有 round/toInt 這點程式碼已確認,但整體滑順度要看畫面) |
+| 5 | 金屬珍珠疊在背景上像同一家族 | 需 Shawn 實機確認 |
+| 6 | 所有文字與按鈕仍清楚可讀 | 需 Shawn 實機確認 |
+| 7 | 拉霸圓圈沒有文字,只有銀色骰子圖示,會極輕微呼吸 | 結構上程式碼已確認(Column/SPIN 已移除,只剩 ChromeIcon);呼吸動畫的視覺效果需 Shawn 實機確認 |
+| 8 | 完成畫面慶祝圖示是銀色金屬,沒有彩色 emoji | 程式碼已確認(grep 全專案確認 UI 內容沒有殘留 emoji) |
+| 9 | 視窗拉寬時內容維持在中央 430px | 程式碼已確認寫法(`MaterialApp.builder` + `ConstrainedBox`);實際效果需 Shawn 實機確認 |
+| 10 | 中央氣泡極慢飄浮,拉霸轉動時暫停 | 結構上程式碼已確認(`_syncAnimations()` 邏輯);視覺效果需 Shawn 實機確認 |
+| 11 | 減少動態效果開啟後,以上動畫全部停止 | 程式碼已確認(`iridescent_background.dart`、`floating_pearls.dart`、`_breatheController`、`_bubbleController` 全部有 `disableAnimations` 判斷) |
+| 12 | `flutter test` 全綠 | 需 Shawn 本機執行確認 |
+
+### flutter test
+
+我沒有 Flutter 環境能跑,麻煩你本機執行一次。這輪唯一可能影響既有測試的
+改動是 `word_highlight.dart` 的 `FontWeight.bold` → `FontWeight.w700`
+(值相同,`test/example_match_test.dart` 應該不受影響,詳見上面 A 段)。
+沒有任何 widget test 會實例化 `HomeScreen`/`StudyScreen`,所以 D 的動畫
+改動理論上也不會動到既有測試。
+
+---
+
 ## 補充:本機測試筆記(`flutter run -d chrome` 綁定 port 失敗)
 
 Shawn 本機 `flutter run -d chrome --web-port=8080` 遇到
