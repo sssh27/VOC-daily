@@ -45,11 +45,18 @@ class AppColors {
 class AppTextStyles {
   AppTextStyles._();
 
+  // 【修 bug】Syne 是筆畫比較「滿」的展示型字體,不給 height 的話 Flutter
+  // 用字型本身回報的行高算,會太緊,下伸部(g/y 的尾巴)在某些瀏覽器/縮放
+  // 比例下會被裁掉(Shawn 實測回報:"upgrade" 的 g 尾巴被吃掉)。
+  // 全部 7 個 token 都給明確的 height,不只是出事的 headline,避免同一個
+  // 問題之後在別的字級重演。
+
   /// Syne 64 / 800。首頁轉盤數字。
   static const displayLarge = TextStyle(
     fontFamily: 'Syne',
     fontSize: 64,
     fontWeight: FontWeight.w800,
+    height: 1.2,
   );
 
   /// Syne 34 / 800。「You know N words」、Library 標題。
@@ -57,6 +64,7 @@ class AppTextStyles {
     fontFamily: 'Syne',
     fontSize: 34,
     fontWeight: FontWeight.w800,
+    height: 1.2,
   );
 
   /// Syne 28 / 700。單字本身。
@@ -64,6 +72,7 @@ class AppTextStyles {
     fontFamily: 'Syne',
     fontSize: 28,
     fontWeight: FontWeight.w700,
+    height: 1.3,
   );
 
   /// Hanken Grotesk 15 / 400。定義、例句、選項。
@@ -71,6 +80,7 @@ class AppTextStyles {
     fontFamily: 'Hanken Grotesk',
     fontSize: 15,
     fontWeight: FontWeight.w400,
+    height: 1.4,
   );
 
   /// Hanken Grotesk 15 / 600。按鈕文字。
@@ -78,6 +88,7 @@ class AppTextStyles {
     fontFamily: 'Hanken Grotesk',
     fontSize: 15,
     fontWeight: FontWeight.w600,
+    height: 1.4,
   );
 
   /// Hanken Grotesk 11 / 600,全大寫 + 寬字距。小標籤。
@@ -86,6 +97,7 @@ class AppTextStyles {
     fontSize: 11,
     fontWeight: FontWeight.w600,
     letterSpacing: 1.6,
+    height: 1.4,
   );
 
   /// Hanken Grotesk 13 / 400。音標、輔助說明。
@@ -93,6 +105,7 @@ class AppTextStyles {
     fontFamily: 'Hanken Grotesk',
     fontSize: 13,
     fontWeight: FontWeight.w400,
+    height: 1.4,
   );
 }
 
