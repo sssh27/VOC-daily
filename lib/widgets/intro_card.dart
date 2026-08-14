@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_theme.dart';
 import 'word_highlight.dart';
 
 /// 認識卡(SPEC.md 6.3b,v4 新增)。新字第一次出現時使用,**只給看,不考**。
@@ -30,41 +31,45 @@ class IntroCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primaryContainer,
-        borderRadius: BorderRadius.circular(16),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0F22243A), // #22243A 6%
+            blurRadius: 24,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             word,
-            style: Theme.of(context).textTheme.headlineSmall,
+            style: AppTextStyles.headline.copyWith(color: AppColors.primary),
             textAlign: TextAlign.center,
           ),
           if (phonetic.isNotEmpty) ...[
             const SizedBox(height: 4),
             Text(
               phonetic,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(color: Colors.grey),
+              style: AppTextStyles.caption.copyWith(color: AppColors.tertiary),
             ),
           ],
           const SizedBox(height: 12),
           Text(
             meaning,
-            style: Theme.of(context).textTheme.titleMedium,
+            style: AppTextStyles.body.copyWith(color: AppColors.primary),
             textAlign: TextAlign.center,
           ),
           if (example.isNotEmpty) ...[
             const SizedBox(height: 16),
-            const Divider(),
+            const Divider(color: AppColors.secondary, height: 1, thickness: 1),
             const SizedBox(height: 8),
             RichText(
               textAlign: TextAlign.center,
               text: TextSpan(
-                style: DefaultTextStyle.of(context).style,
+                style: AppTextStyles.body.copyWith(color: AppColors.primary),
                 children: highlightWordSpans(
                   example,
                   word,
@@ -78,10 +83,7 @@ class IntroCard extends StatelessWidget {
             Text(
               exampleZh,
               textAlign: TextAlign.center,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(color: Colors.grey[700]),
+              style: AppTextStyles.caption.copyWith(color: AppColors.tertiary),
             ),
           ],
         ],

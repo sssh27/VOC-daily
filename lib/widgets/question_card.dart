@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_theme.dart';
 import 'word_highlight.dart';
 
 /// 題目卡片(SPEC.md 6.3)。單面顯示,不可翻面 —— 翻卡模式已被否決。
@@ -26,25 +27,29 @@ class QuestionCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primaryContainer,
-        borderRadius: BorderRadius.circular(16),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0F22243A), // #22243A 6%
+            blurRadius: 24,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             word,
-            style: Theme.of(context).textTheme.headlineSmall,
+            style: AppTextStyles.headline.copyWith(color: AppColors.primary),
             textAlign: TextAlign.center,
           ),
           if (phonetic.isNotEmpty) ...[
             const SizedBox(height: 4),
             Text(
               phonetic,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(color: Colors.grey),
+              style: AppTextStyles.caption.copyWith(color: AppColors.tertiary),
             ),
           ],
           if (example.isNotEmpty) ...[
@@ -52,7 +57,7 @@ class QuestionCard extends StatelessWidget {
             RichText(
               textAlign: TextAlign.center,
               text: TextSpan(
-                style: DefaultTextStyle.of(context).style,
+                style: AppTextStyles.body.copyWith(color: AppColors.primary),
                 children: highlightWordSpans(
                   example,
                   word,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_theme.dart';
+
 /// 在 [example] 裡把目標字出現的地方標成粗體,不挖空——目標單字已經
 /// 顯示在題目上方,挖空沒有意義。
 ///
@@ -57,7 +59,10 @@ List<InlineSpan> highlightWordSpans(
 }
 
 List<InlineSpan> _spans(String example, int start, int end) {
-  const highlightStyle = TextStyle(fontWeight: FontWeight.bold);
+  const highlightStyle = TextStyle(
+    fontWeight: FontWeight.w700,
+    color: AppColors.primary,
+  );
   return [
     TextSpan(text: example.substring(0, start)),
     TextSpan(text: example.substring(start, end), style: highlightStyle),
