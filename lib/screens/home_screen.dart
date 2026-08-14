@@ -7,7 +7,9 @@ import '../data/database.dart';
 import '../logic/daily_roll.dart' as roll;
 import '../providers.dart';
 import '../theme/app_theme.dart';
+import '../widgets/chrome_icon.dart';
 import '../widgets/floating_pearls.dart';
+import '../widgets/iridescent_background.dart';
 import 'decks_screen.dart';
 import 'review_screen.dart';
 
@@ -25,7 +27,8 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen>
+    with TickerProviderStateMixin {
   // 【v7/12.6】拉霸動畫改成漸慢定格:間隔從 _minTickInterval 開始,隨著
   // 時間經過線性拉長到 _maxTickInterval,總時長仍落在 1.5–2 秒。
   static const _rollTotalDuration = Duration(milliseconds: 1800);
@@ -42,10 +45,70 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _displayNumber = 0;
   final _flashRandom = Random();
 
+  // 【v11/16.7】拉霸圖示的呼吸動畫,只有「未轉」狀態有(見 _syncAnimations)。
+  late final AnimationController _breatheController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 2400),
+  );
+
+  // 【v11/16.6】中央主氣泡的飄浮動畫,拉霸轉動中暫停。
+  late final AnimationController _bubbleController = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 19),
+  );
+
+  bool _reducedMotion = false;
+  bool _animationsReady = false;
+
   @override
   void initState() {
     super.initState();
     _load();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_animationsReady) return;
+    _animationsReady = true;
+    _reducedMotion = MediaQuery.of(context).disableAnimations;
+    _syncAnimations();
+  }
+
+  @override
+  void dispose() {
+    _breatheController.dispose();
+    _bubbleController.dispose();
+    super.dispose();
+  }
+
+  /// 依目前狀態(轉盤是否轉動中、是否已經轉過、是否關閉動態效果)決定
+  /// 拉霸圖示的呼吸動畫、中央氣泡的飄浮動畫該不該跑(SPEC 16.6/16.7/16.10)。
+  void _syncAnimations() {
+    if (!_animationsReady) return;
+
+    if (_reducedMotion) {
+      _breatheController.stop();
+      _bubbleController.stop();
+      return;
+    }
+
+    // 拉霸圖示呼吸:只有「未轉」狀態有,轉動中或轉完都不要。
+    final rolledToday = _todaysRoll != null;
+    if (!rolledToday && !_rolling) {
+      if (!_breatheController.isAnimating) {
+        _breatheController.repeat(reverse: true);
+      }
+    } else {
+      _breatheController.stop();
+    }
+
+    // 中央氣泡:拉霸轉動中暫停,其餘時間都飄浮。
+    if (_rolling) {
+      _bubbleController.stop();
+    } else if (!_bubbleController.isAnimating) {
+      _bubbleController.repeat(reverse: true);
+    }
   }
 
   Future<void> _load() async {
@@ -60,11 +123,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       _totalIntroduced = introduced;
       _loading = false;
     });
+    _syncAnimations();
   }
 
   Future<void> _startRoll() async {
     if (_rolling || _todaysRoll != null) return;
     setState(() => _rolling = true);
+    _syncAnimations();
 
     final repo = ref.read(cardRepositoryProvider);
     final stopwatch = Stopwatch()..start();
@@ -91,6 +156,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
     if (!mounted) return;
     setState(() => _rolling = false);
+    _syncAnimations();
     await _load();
   }
 
@@ -133,29 +199,43 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       body: Stack(
         children: [
+          const IridescentBackground(),
           const FloatingPearls(),
           Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                GestureDetector(
-                  onTap: rolledToday ? null : _startRoll,
-                  child: Container(
-                    width: 160,
-                    height: 160,
-                    alignment: Alignment.center,
-                    padding: const EdgeInsets.all(16),
-                    decoration: const BoxDecoration(
-                      color: AppColors.secondary,
-                      shape: BoxShape.circle,
-                    ),
-                    child: _buildCircleContent(
-                      rolledToday: rolledToday,
-                      isJackpot: isJackpot,
-                      wasCappedZero: wasCappedZero,
-                      roll: roll,
+                AnimatedBuilder(
+                  animation: _bubbleController,
+                  child: GestureDetector(
+                    onTap: rolledToday ? null : _startRoll,
+                    child: Container(
+                      width: 160,
+                      height: 160,
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.all(16),
+                      decoration: const BoxDecoration(
+                        color: AppColors.secondary,
+                        shape: BoxShape.circle,
+                      ),
+                      child: _buildCircleContent(
+                        rolledToday: rolledToday,
+                        isJackpot: isJackpot,
+                        wasCappedZero: wasCappedZero,
+                        roll: roll,
+                      ),
                     ),
                   ),
+                  builder: (context, child) {
+                    // SPEC 16.6:中央主氣泡飄浮,±6px,只做垂直位移。
+                    final eased =
+                        Curves.easeInOut.transform(_bubbleController.value);
+                    final offset = (eased - 0.5) * 2 * 6.0;
+                    return Transform.translate(
+                      offset: Offset(0, offset),
+                      child: child,
+                    );
+                  },
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -198,17 +278,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       );
     }
     if (!rolledToday) {
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            '🎰',
-            style:
-                AppTextStyles.displayLarge.copyWith(color: AppColors.primary),
-          ),
-          const SizedBox(height: 8),
-          const Text('SPIN'),
-        ],
+      // SPEC 16.7:圓圈裡不要有任何文字,只有一個金屬骰子圖示,
+      // 未轉狀態加極輕微的呼吸動畫補償可觸碰性。
+      return AnimatedBuilder(
+        animation: _breatheController,
+        child: const ChromeIcon(Icons.casino_outlined, size: 56),
+        builder: (context, child) {
+          final eased = Curves.easeInOut.transform(_breatheController.value);
+          final scale = 1.0 + 0.04 * eased;
+          return Transform.scale(scale: scale, child: child);
+        },
       );
     }
     if (isJackpot) {

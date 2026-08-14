@@ -11,6 +11,7 @@ import '../logic/milestone.dart';
 import '../logic/scheduler.dart';
 import '../providers.dart';
 import '../theme/app_theme.dart';
+import '../widgets/chrome_icon.dart';
 import '../widgets/intro_card.dart';
 import '../widgets/question_card.dart';
 
@@ -398,11 +399,7 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
             builder: (context, scale, child) {
               return Transform.scale(scale: scale, child: child);
             },
-            child: Text(
-              '🎉',
-              style:
-                  AppTextStyles.displayLarge.copyWith(color: AppColors.primary),
-            ),
+            child: const ChromeIcon(Icons.auto_awesome, size: 40),
           ),
         if (isMilestone) const SizedBox(height: 8),
         Text(
