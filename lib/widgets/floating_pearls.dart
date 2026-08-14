@@ -44,6 +44,11 @@ class _PearlSpec {
 }
 
 /// SPEC.md 14.3(位置與大小)+ 14.5(飄浮動畫)的四顆珍珠參數表。
+///
+/// 【實驗】Shawn 要求先把 14.5 表訂的位移幅度整組 ×2 試試看視覺效果
+/// (原始值:10/8/6/5px)。**這是暫時的手動微調,還沒有回寫進
+/// `docs/SPEC.md` 14.5——如果 Shawn 確認喜歡這個幅度,麻煩讓國王餅把
+/// SPEC 的表更新成新數字,免得文件跟程式碼對不上。**
 const _pearlSpecs = [
   _PearlSpec(
     diameter: 200,
@@ -51,7 +56,7 @@ const _pearlSpecs = [
     hValue: -70,
     hIsPx: true,
     topPercent: 0.12,
-    amplitude: 10,
+    amplitude: 20,
     period: Duration(seconds: 22),
     initialPhase: 0.0,
   ),
@@ -61,7 +66,7 @@ const _pearlSpecs = [
     hValue: -70,
     hIsPx: true,
     topPercent: 0.55,
-    amplitude: 8,
+    amplitude: 16,
     period: Duration(seconds: 18),
     initialPhase: 0.25,
   ),
@@ -71,7 +76,7 @@ const _pearlSpecs = [
     hValue: 0.08,
     hIsPx: false,
     topPercent: 0.74,
-    amplitude: 6,
+    amplitude: 12,
     period: Duration(seconds: 25),
     initialPhase: 0.5,
   ),
@@ -81,7 +86,7 @@ const _pearlSpecs = [
     hValue: 0.14,
     hIsPx: false,
     topPercent: 0.20,
-    amplitude: 5,
+    amplitude: 10,
     period: Duration(seconds: 15),
     initialPhase: 0.75,
   ),
