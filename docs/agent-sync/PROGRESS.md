@@ -6,6 +6,25 @@
 
 ---
 
+## 補充:v11 上線後 Shawn 回報的 overflow bug(已修)
+
+Shawn 實機截圖:學習畫面四選一 + I FORGOT 按鈕,矮螢幕(桌面瀏覽器開發
+視窗)最下面出現黃黑警告條「BOTTOM OVERFLOWED BY 4.7 PIXELS」。
+
+**原因:** B 那輪把 `appTheme` 的 `ElevatedButton`/`OutlinedButton` 預設
+`minimumSize` 訂成 SPEC 15.3 的選項按鈕高度 56(改版前是 Material 預設,
+大概 36–48),四個選項 + I FORGOT 五個按鈕疊起來變高了一截。
+`review_screen.dart` 的 `body` 一直是 `Padding` 直接包 `Column`,沒有
+捲動容器,矮螢幕裝不下就整個 overflow。這是版面本來就沒做捲動保護,
+只是按鈕變高之後才被撐爆,不是這次改動本身寫錯。
+
+**修法:** `body` 的 `Padding` 換成 `SingleChildScrollView`(保留原本的
+`padding: EdgeInsets.all(16)`),容得下就不捲、容不下就能捲,不影響
+正常手機螢幕的視覺。只動這一個檔案的這一處,沒有動互動邏輯/選項產生/
+計分。
+
+---
+
 ## v11 這一輪(虹彩背景 + 金屬圖示)A–D 全部做完了
 
 照 A → B → C → D → E 順序做的,A 是最優先的 bug 修復,做完才動後面幾項。

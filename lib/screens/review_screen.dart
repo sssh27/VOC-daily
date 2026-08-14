@@ -372,7 +372,12 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('STUDY')),
-      body: Padding(
+      // 包 SingleChildScrollView:選項按鈕改成 SPEC 15.3 的高度 56 之後,
+      // 矮螢幕(例如桌面瀏覽器開發模式的視窗)容不下四個選項 + I FORGOT,
+      // 沒有捲動容器會整個 Column overflow(RenderFlex overflowed by N
+      // pixels 的黃黑警告條)。這只是版面安全網,不影響一般手機螢幕的
+      // 視覺(內容還是那麼多,只是現在容得下就不捲、容不下就能捲)。
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: _phase == _Phase.intro
             ? _buildIntroMode(card)
