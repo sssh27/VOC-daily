@@ -19,6 +19,15 @@ class VocabApp extends StatelessWidget {
     return MaterialApp(
       title: 'Vocab SRS',
       theme: appTheme,
+      // SPEC 16.9:網頁版寬度上限,全域一次,不在各畫面各包一次。
+      // 430 是設計稿基準寬度,超出的區域露出 scaffoldBackgroundColor
+      // (AppColors.neutral)。
+      builder: (context, child) => Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 430),
+          child: child ?? const SizedBox.shrink(),
+        ),
+      ),
       home: const _AppBootstrap(),
     );
   }
