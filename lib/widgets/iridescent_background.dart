@@ -41,9 +41,14 @@ class _IridescentBackgroundState extends State<IridescentBackground>
   // 只有這一個 controller,珍珠(floating_pearls.dart)與中央氣泡各自有
   // 自己的,不共用(SPEC 16.3)。是 repeat(),不是 repeat(reverse: true)——
   // 整個運動用三角函數構成,本身週期封閉,反向播放會出現折返感。
+  //
+  // 【實驗】SPEC 16.3/16.11 原本訂 60 秒一圈(刻意慢速,不搶注意力)。
+  // Shawn 要求先 ×2 快試試看,這裡先減半成 30 秒。還沒回寫進
+  // `docs/SPEC.md`,如果 Shawn 確認喜歡這個速度,麻煩讓國王餅更新 16.3
+  // 的表跟 16.11 的說明,免得文件跟程式碼對不上。
   late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: const Duration(seconds: 60),
+    duration: const Duration(seconds: 30),
   );
 
   ui.Image? _imageA;

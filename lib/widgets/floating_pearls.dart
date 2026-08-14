@@ -46,9 +46,10 @@ class _PearlSpec {
 /// SPEC.md 14.3(位置與大小)+ 14.5(飄浮動畫)的四顆珍珠參數表。
 ///
 /// 【實驗】Shawn 要求先把 14.5 表訂的位移幅度整組 ×2 試試看視覺效果
-/// (原始值:10/8/6/5px)。**這是暫時的手動微調,還沒有回寫進
-/// `docs/SPEC.md` 14.5——如果 Shawn 確認喜歡這個幅度,麻煩讓國王餅把
-/// SPEC 的表更新成新數字,免得文件跟程式碼對不上。**
+/// (原始值:10/8/6/5px),後來又要求週期(速度)也 ×2 快
+/// (原始值:22/18/25/15 秒,現在減半)。**這是暫時的手動微調,還沒有
+/// 回寫進 `docs/SPEC.md` 14.5——如果 Shawn 確認喜歡這個幅度/速度,
+/// 麻煩讓國王餅把 SPEC 的表更新成新數字,免得文件跟程式碼對不上。**
 const _pearlSpecs = [
   _PearlSpec(
     diameter: 200,
@@ -57,7 +58,7 @@ const _pearlSpecs = [
     hIsPx: true,
     topPercent: 0.12,
     amplitude: 20,
-    period: Duration(seconds: 22),
+    period: Duration(milliseconds: 11000),
     initialPhase: 0.0,
   ),
   _PearlSpec(
@@ -67,7 +68,7 @@ const _pearlSpecs = [
     hIsPx: true,
     topPercent: 0.55,
     amplitude: 16,
-    period: Duration(seconds: 18),
+    period: Duration(milliseconds: 9000),
     initialPhase: 0.25,
   ),
   _PearlSpec(
@@ -77,7 +78,7 @@ const _pearlSpecs = [
     hIsPx: false,
     topPercent: 0.74,
     amplitude: 12,
-    period: Duration(seconds: 25),
+    period: Duration(milliseconds: 12500),
     initialPhase: 0.5,
   ),
   _PearlSpec(
@@ -87,7 +88,7 @@ const _pearlSpecs = [
     hIsPx: false,
     topPercent: 0.20,
     amplitude: 10,
-    period: Duration(seconds: 15),
+    period: Duration(milliseconds: 7500),
     initialPhase: 0.75,
   ),
 ];
