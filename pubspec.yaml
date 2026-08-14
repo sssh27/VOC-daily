@@ -39,6 +39,10 @@ flutter:
     # 銀色金屬珍珠(首頁背景裝飾)。1x/2x/3x 由 Flutter 依螢幕密度自動挑選,
     # 只需宣告 1x 路徑,2.0x/ 與 3.0x/ 子資料夾會被自動解析。
     - assets/images/pearl.png
+    # 虹彩流動背景的兩層材質(SPEC 第 16 節)。刻意用 WebP,
+    # 兩張加起來只有 34KB,離線首載成本可忽略。
+    - assets/images/iridescent_a.webp
+    - assets/images/iridescent_b.webp
   # 視覺設計系統字型(SPEC.md 15.2)。只打包 lib/theme/app_theme.dart 七個
   # 具名字級 token 實際用到的字重,static 固定字重檔(不是 VariableFont),
   # 理由是離線(郵輪無網路)一定要顯示得出來,不用 google_fonts 套件。

@@ -3,312 +3,470 @@
 > 國王餅(規格方)指派的工作。由上往下做,做完更新 `PROGRESS.md`。
 > 有疑問寫進 `QUESTIONS.md`(標題用 `## [未回答] ...`),不要自己猜。
 >
-> 上一輪的工作單已歸檔到 `archive/TASKS_v9.md`。
+> 上一輪(v10)的工作單已歸檔到 `archive/TASKS_v10.md`。
 
 ---
 
-## 這一輪是什麼
+## 上一輪 review 結果
 
-**視覺改版第一批。** 範圍是:背景裝飾、設計系統(顏色/字型/圓角)、
-以及三處版面修正。
+A(珍珠)、B(設計系統)、C(拿掉 AI 入口)、E(介面英文)都完成了。
+D 你判斷「現況已經置中、不用改」是對的,那是我開錯單。
 
-因為要建立設計系統,**這一輪你會大量改動顏色、字級、圓角** ——
-這是被授權的,但**只能照 `docs/SPEC.md` 第 15 節的 token 表照抄,
-一個色碼、一個字級都不准自己發明**。
-
-**不在這一輪範圍內、不准動的:**
-
-- 排程演算法、拉霸邏輯、資料庫 schema
-- 卡片內容(`assets/decks/*.json` 一個字都不要改)
-- Study 流程的互動邏輯、選項產生方式、計分方式
-- Onboarding 與 Settings 畫面(目前根本還沒實作,這輪不做)
-- `lib/services/ai_service.dart`(整個檔案連註解一起保留)
+**但 Shawn 實機跑起來發現一個嚴重 bug,原因是我的工作單漏了檔案,不是你的錯。**
+詳情看下面 A。
 
 ---
 
-## 動工前先做兩件事
+## 這一輪的順序與依賴
 
-**1. 看設計稿。** `docs/design/` 有 9 張 Stitch 產出、Shawn 已確認的畫面圖。
-用 Read 工具實際打開來看,不要只讀檔名猜內容。這輪會動到的:
+**A → B → C → D → E,照順序做,不要跳。**
 
-- `01-home-ready-to-start.png`
-- `02-home-not-yet-spun.png`
-- `05-study-complete.png`
-- `06-library.png`
-- `09-design-system.png`(色票與字型總覽)
-
-**2. 讀 `docs/SPEC.md` 第 14 節與第 15 節。** 那是規格。
-
-**設計稿與 SPEC 衝突時,一律以 SPEC 為準。** 已知不一致寫在
-`docs/design/README.md`。設計稿只是給你看「大概長怎樣」,
-精確數值全部來自 SPEC。
+- **A 是壞掉的畫面,必須最先修。** 沒修好之前做其他項目沒有意義
+- B(寬度上限)會改變所有畫面的實際寬度,要在 C 之前做,
+  否則你調背景時看到的比例是錯的
+- C(背景)必須在 D(氣泡飄浮 / 圖示)之前,因為 D 要疊在 C 上面看對比
+- E 是最後的整體驗收
 
 ---
 
-## 執行順序
+## A. 修「學習畫面單字看不見」——最優先
 
-**照 A → B → C → D → E 的順序做,不要跳。**
+### 現象
 
-- B 會大幅改動所有畫面的樣式,先做完 A 再做 B,不然珍珠會被 B 的改動蓋掉
-- E(改英文)放最後,因為 B/C/D 會搬動這些字串的位置,先翻會白做兩次
+進入學習畫面,卡片變成深墨色底,單字和釋義完全看不到,
+只看得到音標和中文例句。
 
-> **第二輪更新(2026-08-12):** A 已完成、D 確認不用做。
-> **B 仍卡在缺字型檔,C 和 E 現在可以做了** ——
-> 順序改成 **C → E**,B 等 Shawn 把字型放進 `assets/fonts/` 再回頭補。
-> C 只動一個按鈕、E 只換字串,兩者都不碰樣式,不會跟之後的 B 打架。
+### 原因(我的疏失)
 
----
+上一輪 B 我列的檔案清單只寫了 `lib/screens/` 底下四個檔,**漏掉 `lib/widgets/`**。
+所以這兩個檔完全沒被遷移到設計系統:
 
-## A. 首頁背景金屬珍珠 + 飄浮動畫
+- `lib/widgets/intro_card.dart`
+- `lib/widgets/question_card.dart`
 
-**完整規格:`docs/SPEC.md` 第 14 節。** 那裡有素材路徑、四顆珍珠的
-尺寸/位置表、動畫參數表、圖層順序、效能要求、驗收條件。
+它們還在用 `Theme.of(context).colorScheme.primaryContainer` 當卡片底色。
+新的 `ColorScheme.light(primary: #22243A)` 讓 Material 3 推導出來的
+`primaryContainer` 變成深色,而卡片內文字用預設的 `onSurface`(也是 `#22243A`),
+**深字壓深底,字沒有不見,是被同色吃掉。**
 
-素材我已經處理好、`pubspec.yaml` 也註冊完了。**你不用碰素材,
-也不要重新產生或裁切它。**
+### A-1 `lib/widgets/intro_card.dart`
 
-### 檔案
+外層 `Container` 的 `decoration`:
 
-- 新增:`lib/widgets/floating_pearls.dart`
-- 修改:`lib/screens/home_screen.dart`
-
-### 要做的
-
-1. `floating_pearls.dart` 匯出一個 `FloatingPearls` widget
-   - 內部自己管四個 `AnimationController`
-   - 整個 widget 外層包 `IgnorePointer`
-   - 用 `Stack` + `Positioned` 擺四顆,位置照 SPEC 14.3 的表
-2. 在 `home_screen.dart` 的 `Scaffold.body` 外面包一層 `Stack`,
-   `FloatingPearls` 放第一個 child(最底層),原本的 `Center(...)` 放第二個
-3. 四顆的位移曲線用 `Curves.easeInOut`,週期照 SPEC 14.5 的表
-   - **起始相位一定要錯開**,四個 controller 用不同的初始 `value`
-     (例如 0.0 / 0.25 / 0.5 / 0.75),否則四顆會整齊同步,看起來很假
-4. `AnimatedBuilder` 的 `child` 參數要用上,把 `Image.asset` 傳進去快取,
-   避免每一幀重建
-5. `dispose()` 釋放全部四個 controller
-
-### 絕對不要
-
-- **不要改中央那顆主圓圈的大小、位置或樣式。** 這一輪它完全不動。
-- **不要給珍珠加 `BoxShadow`、`ColorFiltered`、`Opacity` 或任何濾鏡。**
-  PNG 素材本身就是最終樣子。之前 Stitch 一直自作主張在球外面加灰色外圈,
-  我們花了很多輪才修掉,不要重蹈覆轍。
-- **不要用 `Image.asset('assets/images/2.0x/pearl.png')`。**
-  只寫 `assets/images/pearl.png`,Flutter 會自動依螢幕密度挑 2x/3x。
-
-### 驗收
-
-照 SPEC 14.7 的八點逐項確認,結果寫進 `PROGRESS.md`。
-第 4 點(四顆節奏不同步)**請實際跑起來用眼睛看**,不要只看程式碼推斷。
-
----
-
-## B. 建立設計系統(顏色 / 字型 / 圓角)
-
-**完整規格:`docs/SPEC.md` 第 15 節。**
-
-### 前置條件:字型檔
-
-`assets/fonts/` 要有 Syne 與 Hanken Grotesk 的 **static TTF** 檔。
-Shawn 會從 Google Fonts 下載放進去。
-
-**陷阱提醒:** Google Fonts 下載下來的 zip 裡通常同時有
-`Syne-VariableFont_wght.ttf` 和一個 `static/` 資料夾。
-**Flutter 請用 `static/` 底下的固定字重檔**(例如 `Syne-Bold.ttf`、
-`Syne-ExtraBold.ttf`),不要用 VariableFont 版本,那個在 Flutter 上
-字重會失效、全部變同一種粗細。
-
-如果你開工時字型檔還不在,**只有 B 要等,A / C / D / E 都不受影響照做**,
-並在 `PROGRESS.md` 明確寫「B 卡在缺字型檔」。
-
-> **更正(v10 第二輪):** 上一版這裡誤寫成「B/C 等檔案到齊再做」,
-> 把 C 也綁進字型的前置條件,那是我寫錯了。C 只是拿掉一個按鈕,
-> E 只是換字串,兩者都跟字型無關。已解除。
-
-### 檔案
-
-- 新增:`lib/theme/app_theme.dart`
-- 修改:`pubspec.yaml`、`lib/main.dart`,以及四個 screen 檔
-
-### 要做的
-
-1. `app_theme.dart` 定義三樣東西:
-   - `AppColors`:照 SPEC 15.1 的表,五個基本色 + 兩組狀態色
-   - `AppTextStyles`:照 SPEC 15.2 的字級表,七個具名 style
-   - `appTheme`:一個 `ThemeData`,把上面兩者接上去
-2. `pubspec.yaml` 的 `fonts:` 區塊註冊兩套字型,`weight` 要跟實際檔案對應
-3. `main.dart` 把 `theme:` 換成 `appTheme`
-4. 四個 screen(`home_screen`、`review_screen`、`decks_screen`、
-   `generate_screen`)改成引用 `AppColors` / `AppTextStyles`
-
-### 這一步是「機械式替換」,不是重新設計
-
-**你要做的是把寫死的數值換成 token,不是重排版面。**
-
-具體來說:
-- 看到 `Colors.grey[700]` → 換成 `AppColors.tertiary`
-- 看到 `TextStyle(fontSize: 40)` → 換成對應的 `AppTextStyles.displayLarge`
-- 看到 `Theme.of(context).textTheme.headlineSmall` → 換成具名 style
-
-**不要**趁機調整 `SizedBox` 的高度、不要改 `Column` 的排列、
-不要新增或刪除任何 widget。版面的調整只做 D 那一項,其他都維持原樣。
-
-### 絕對不要
-
-- **不要用 `google_fonts` 套件。** 字型走本地 asset,理由是離線(郵輪無網路)
-  一定要顯示得出來,而且不引入新套件。
-- **不要自己新增 SPEC 沒列的顏色。** 需要新色階就停下來寫 `QUESTIONS.md`。
-- **不要動 `assets/decks/*.json`。**
-
----
-
-## C. 拿掉 Library 的 AI 生成入口
-
-### 背景更正
-
-我先前根據設計稿判斷 Library 要改的地方,實際讀 code 之後發現有兩項是我誤判:
-
-- 「MODULE 01/02/03」標籤 → **程式碼裡根本沒有**,那是 Stitch 自己編的,不用處理
-- 牌組名稱寫死 → **本來就是動態的**(`repo.allDecks()`),不用處理
-
-所以 C 只剩一件事。
-
-### 要做的
-
-`lib/screens/decks_screen.dart`:拿掉「+ AI 生成新單字」按鈕
-(約在第 110 行)以及它的 `_goToGenerate` 方法和 `generate_screen.dart` 的 import。
-
-### 注意
-
-- **`lib/services/ai_service.dart` 和 `lib/screens/generate_screen.dart`
-  兩個檔案完整保留,一個字都不要刪。** 只是把 Library 上的入口拿掉,
-  之後做完後端代理還要接回來。`ai_service.dart` 裡的警告註解尤其不准刪。
-- 牌組的進度條與百分比 **保留**。這是 Shawn 裁定的例外,見 CLAUDE.md
-  「例外二」。**這個例外只適用 Library,首頁和學習流程仍然完全禁止。**
-
----
-
-## D. 學習完成畫面改為垂直置中 —— ✅ 已結案,不用做
-
-**這一項是我開錯的,你的判斷是對的。**
-
-我當時是看 Stitch 設計稿 `05-study-complete.png` 上面靠上對齊、下半部一大片
-空白,就直接當成程式碼的問題開單,而且憑印象編了一個 `_buildDoneMode` 的
-函式名稱,實際上不存在。
-
-真實情況:`review_screen.dart` 的完成畫面是
-`body: Center(child: _buildCompletionContent(...))` 加上
-`Column(mainAxisSize: min)`,**本來就是垂直置中的**。要修的是設計稿,不是程式碼。
-
-你沒有為了交差硬改一個沒壞的東西,而是回報「找不到這個函式、現況已經符合」,
-這是對的做法。**以後遇到 TASKS 描述跟程式碼對不上,都照這樣處理。**
-
----
-
-## E. 介面文字改英文
-
-Shawn 決定介面要全英文。**範圍已經確認過了,只改「介面」,不改「內容」。**
-
-### 界線:哪些改、哪些不改
-
-| 改 | 不改 |
+| 現在 | 改成 |
 |---|---|
-| 按鈕、標題、提示、狀態文字 | 卡片的 `meaning`(中文釋義)|
-| 完成畫面的文案池 | 卡片的 `exampleZh`(中文例句翻譯)|
-| | `assets/decks/*.json` 任何欄位 |
-| | 程式碼註解、`QUESTIONS.md`、`PROGRESS.md` |
-| | `throw` 出來的錯誤訊息(內部用,不露給使用者)|
+| `color: Theme.of(context).colorScheme.primaryContainer` | `color: AppColors.surface` |
+| `borderRadius: BorderRadius.circular(16)` | `BorderRadius.circular(20)`(SPEC 15.3) |
+| (無陰影) | 加 SPEC 15.3 的統一陰影(見下) |
 
-四選一的選項仍然是中文釋義,這是刻意的,**不要自作主張翻成英文**。
-Shawn 明確裁定:英→中的方向難度剛好,改成英英會拉高錯誤率。
-
-### 完整字串對照表
-
-**照抄,不要自己改寫措辭。** 大小寫也照抄(全大寫的就是全大寫)。
-
-> 行號是我寫這份文件時的狀態,**A 已經改過 `home_screen.dart`,行號會有偏移。
-> 一律以「原文」欄的字串內容去搜尋定位,不要照行號硬跳。**
-
-`lib/screens/home_screen.dart`
-
-| 行 | 原文 | 改成 |
-|---|---|---|
-| 112 / 124 | `VOC-daily` | `VOC · DAILY` |
-| 157 | `你認識了 $n 個字` | `You know $n words` |
-| 166 | `開始` | `START` |
-| 171 | `今天沒有要學的了` | `Nothing to study today` |
-| 199 | `轉一下` | `SPIN` |
-| 205 | `🎉 今天放假,\n沒有新字` | `DAY OFF\nNo new words` |
-| 212 | `今天先把\n之前的做完就好` | `Just finish\nwhat you have` |
-| 218 | `今日新字:\n$n 個` | `NEW TODAY\n$n` |
-
-`lib/screens/review_screen.dart`
-
-| 行 | 原文 | 改成 |
-|---|---|---|
-| 347/354/366/372 | `學習` | `STUDY` |
-| 412 | `你認識了 $n 個字` | `You know $n words` |
-| 418 | `單字庫快用完了,去生成新的吧` | `Your word bank is running low` |
-| 428 | `回首頁` | `HOME` |
-| 452 / 484 | `下一個` | `NEXT` |
-| 459 | `我會了` | `I KNOW THIS` |
-| 525 | `忘了` | `I FORGOT` |
-
-`lib/screens/decks_screen.dart`
-
-| 行 | 原文 | 改成 |
-|---|---|---|
-| 66 | `單字庫` | `LIBRARY` |
-| 77 | `你認識了 $n 個字` | `You know $n words` |
-| 94 | `已學 $x / $y 字` | `$x / $y learned` |
-
-`lib/logic/completion_messages.dart` — 整個文案池換掉:
+統一陰影,全專案只用這一種:
 
 ```dart
-const completionMessagePool = [
-  'Done for today',
-  "That's a wrap",
-  'All finished',
-  "Today's batch is done",
-  'All done, go do something else',
-];
-
-String milestoneMessage(int milestone) => "That's $milestone words";
+BoxShadow(
+  color: Color(0x0F22243A),   // #22243A 6%
+  blurRadius: 24,
+  offset: Offset(0, 8),
+)
 ```
 
-### 順帶要改的測試
+內部各段文字:
 
-`test/completion_messages_test.dart` 最後一個測試的 `bannedWords` 目前只有中文,
-文案改英文後那個檢查形同虛設。把清單改成:
+| 元素 | 現在 | 改成 |
+|---|---|---|
+| 單字 `word` | `textTheme.headlineSmall` | `AppTextStyles.headline.copyWith(color: AppColors.primary)` |
+| 音標 `phonetic` | `bodyMedium` + `Colors.grey` | `AppTextStyles.caption.copyWith(color: AppColors.tertiary)` |
+| 釋義 `meaning` | `textTheme.titleMedium` | `AppTextStyles.body.copyWith(color: AppColors.primary)` |
+| 例句 `RichText` 的基底 style | `DefaultTextStyle.of(context).style` | `AppTextStyles.body.copyWith(color: AppColors.primary)` |
+| 中文翻譯 `exampleZh` | `bodyMedium` + `Colors.grey[700]` | `AppTextStyles.caption.copyWith(color: AppColors.tertiary)` |
+
+`Divider` 改成 `Divider(color: AppColors.secondary, height: 1, thickness: 1)`。
+
+### A-2 `lib/widgets/question_card.dart`
+
+同樣三處:`primaryContainer` → `AppColors.surface`、
+單字 → `AppTextStyles.headline` + `AppColors.primary`、
+音標 → `AppTextStyles.caption` + `AppColors.tertiary`。
+圓角同樣改 20,同樣加上面那個陰影。
+
+### A-3 順帶檢查
+
+`lib/widgets/word_highlight.dart` 裡如果有寫死顏色或 `textTheme.*`,
+一併照上表遷移。粗體標示的部分維持 `FontWeight.w700`,顏色用 `AppColors.primary`。
+
+### A-4 做完自己驗一次(這一步不可以省)
+
+在專案根目錄跑:
+
+```bash
+grep -rn "primaryContainer\|Colors\.grey\|Colors\.black\|Colors\.white\|textTheme\." lib --include=*.dart | grep -v "app_theme.dart" | grep -v "database.g.dart"
+```
+
+**預期結果是「完全沒有輸出」。** 有輸出就是還沒改乾淨。
+
+**把這條指令的實際輸出原封不動貼進 `PROGRESS.md`。**
+上一輪就是少了這一步才漏掉 `lib/widgets/`。
+
+---
+
+## B. 網頁版寬度上限
+
+**規格:SPEC 16.9。**
+
+現在 web 版沒有最大寬度,按鈕會整條拉滿貼到瀏覽器邊緣。
+
+### 要做的
+
+`lib/main.dart` 的 `MaterialApp` 加上 `builder`:
 
 ```dart
-const bannedWords = [
-  '正確率', '花費', '分鐘', '秒', '%',
-  'accuracy', 'streak', 'score', 'minutes', 'seconds', 'correct',
-];
+builder: (context, child) => Center(
+  child: ConstrainedBox(
+    constraints: const BoxConstraints(maxWidth: 430),
+    child: child,
+  ),
+),
 ```
 
-並確認比對是**大小寫不敏感**的(把 message 轉小寫再比)。
+- `child` 可能為 null,要處理(`child ?? const SizedBox.shrink()`)
+- 430 是設計稿基準寬度,不要改成別的數字
+- 兩側超出的區域會露出 `scaffoldBackgroundColor`,也就是 `AppColors.neutral`,
+  這是預期行為
 
-### 不用動的檔案
+### 絕對不要
 
-`lib/screens/generate_screen.dart` 在 C 之後已經沒有入口進得去,
-這輪**不用翻譯它**,維持中文即可。
+- **不要在每個畫面各包一次。** 全域一次就好
+- 不要用 `MediaQuery` 判斷平台再決定要不要包。手機上畫面本來就小於
+  430,包了也不影響
 
-### 驗收
+---
 
-1. 全 App 走一遍(首頁三種狀態 → 學習 → 完成 → Library),
-   **介面上看不到任何中文**,除了四選一的選項和卡片釋義
-2. 全專案搜尋「複習」和「review」,UI 字串裡一個都沒有
-   (`review_screen.dart` 這個**檔名**可以留,那是程式碼不是介面)
-3. `flutter test` 全綠
+## C. 虹彩流動背景
+
+**完整規格:SPEC 第 16 節,尤其 16.1、16.3、16.4、16.5。**
+下面是逐步實作指引,但**數值一律以 SPEC 的表為準**。
+
+材質我已經產生好、`pubspec.yaml` 也註冊完了。**你不用碰素材。**
+
+```
+assets/images/iridescent_a.webp    1400×2000   37KB
+assets/images/iridescent_b.webp    1400×2000   32KB
+```
+
+### C-1 新增 `lib/widgets/iridescent_background.dart`
+
+一個 `StatefulWidget`,名字叫 `IridescentBackground`,沒有必填參數。
+
+**結構由外到內:**
+
+```
+IgnorePointer
+└── RepaintBoundary
+    └── ClipRect
+        └── Stack (fit: StackFit.expand)
+            ├── Container(color: AppColors.neutral)     ← 墊底,防止載入前閃白
+            ├── A 層  (AnimatedBuilder → Transform)
+            └── B 層  (Opacity 0.5 + BlendMode.softLight)
+```
+
+### C-2 動畫控制器
+
+```dart
+late final AnimationController _c = AnimationController(
+  vsync: this,
+  duration: const Duration(seconds: 60),
+);
+```
+
+在 `didChangeDependencies` 裡,若 `!MediaQuery.of(context).disableAnimations`
+才 `_c.repeat()`。
+
+- **是 `repeat()`,不是 `repeat(reverse: true)`。**
+  整個運動由 `sin` / `cos` 構成,本身就週期封閉,反向播放會出現折返感
+- 只有這一個 controller。珍珠和中央氣泡各自有自己的,**不要共用**
+- `dispose()` 要釋放
+
+### C-3 兩層的變換
+
+設 `t = _c.value`,`a = 2 * math.pi * t`:
+
+```dart
+// A 層
+final scaleA = 1.6 * (1.0 + 0.05 * math.sin(a));
+final dxA    = 70.0  * math.sin(a);
+final dyA    = 110.0 * math.cos(0.7 * a);
+
+// B 層
+const scaleB = 1.6;
+final dxB    = -70.0  * math.cos(0.8 * a);
+final dyB    = -110.0 * math.sin(0.6 * a);
+final rotB   = 4.0 * math.pi / 180.0 * math.sin(0.5 * a);   // 4 度,注意是弧度
+```
+
+每一層的組法(順序不能顛倒):
+
+```dart
+Transform.translate(
+  offset: Offset(dx, dy),
+  child: Transform.rotate(          // A 層沒有旋轉,可省略這層
+    angle: rot,
+    child: Transform.scale(
+      scale: scale,
+      child: child,                 // ← AnimatedBuilder 的 child
+    ),
+  ),
+)
+```
+
+`child` 是:
+
+```dart
+Image.asset(
+  'assets/images/iridescent_a.webp',
+  fit: BoxFit.cover,
+  filterQuality: FilterQuality.medium,
+)
+```
+
+#### 過掃描 ×1.6 是必要的,不是保險
+
+我第一版沒加,結果 B 層旋轉時四個角會轉出畫面外,
+邊緣出現硬邊和空白——那正是 Shawn 說的「粗糙」。
+1.6 是實測後能同時容納 ±70px 位移與 4° 旋轉的最小值,**再小會露邊**。
+
+驗收第 3 點就是在檢查這個。
+
+### C-4 混合
+
+B 層外面包:
+
+```dart
+Opacity(
+  opacity: 0.5,
+  child: ShaderMask(...)   // 不需要 ShaderMask,見下
+)
+```
+
+soft light 的做法:用 `BlendMode.softLight` 的 `ColorFiltered` 做不到
+(那是拿單色去混),要用 **`Stack` + `BlendMode`**:
+
+```dart
+Opacity(
+  opacity: 0.5,
+  child: ColorFiltered(          // ← 不要這樣做
+    ...
+  ),
+)
+```
+
+**正確做法是把 B 層放進一個 `BlendMask`:** Flutter 的做法是在
+`Stack` 裡對 B 層用 `Positioned.fill` 包一個
+`Opacity(opacity: 0.5, child: ...)`,再讓整個 `Stack` 的
+B 層 child 外面套:
+
+```dart
+// B 層最外層
+Positioned.fill(
+  child: Opacity(
+    opacity: 0.5,
+    child: _blendSoftLight(bLayerWidget),
+  ),
+)
+```
+
+其中 `_blendSoftLight` 用 `ShaderMask` 做不到,要用
+**`BackdropFilter` 也做不到**。正確的 API 是給 `Stack` 裡的那一層包一個
+自訂的 `CustomPaint` 或直接用 `ImageFiltered`——
+
+**這裡我不確定 Flutter 最乾淨的寫法是哪一個,所以:
+請你先查一下 `BlendMode.softLight` 在 Flutter widget 樹裡最簡潔的套用方式
+(候選:`ColorFiltered`、`ShaderMask`、`CustomPainter` 直接
+`canvas.saveLayer(paint..blendMode = BlendMode.softLight)`),
+選一個實作,並在 `PROGRESS.md` 說明你選了哪個、為什麼。**
+
+我的傾向是 `CustomPainter` + `saveLayer`,因為那是唯一能精確控制
+兩個 image 之間 blend mode 的方式,而且可以順便省掉一層 `Opacity`
+(直接把 `paint.color = Color.fromRGBO(0,0,0,0.5)` 當 alpha)。
+但你實作起來如果發現有更簡單的做法,採用你的,只要說明理由。
+
+**不用做的事:執行時不要再調對比。** 對比已經預先烘進素材,
+我實測過:不套後製對比,畫面標準差 6.90,套了是 7.68,幾乎一樣,
+但少一道每幀全畫面運算,而且不會把 8-bit 色階斷帶一起放大。
+
+### C-5 避免顆粒感與卡頓(SPEC 16.4,逐條照做)
+
+1. 兩層的 `Image.asset` 都要 `filterQuality: FilterQuality.medium`。
+   預設的 `low` 在縮放旋轉時會有閃爍鋸齒。**不要用 `high`**,
+   web 上成本明顯偏高而看不出差別
+2. 位移量一律 `double`,**絕對不要 `round()` / `toInt()`**。
+   60 秒一圈、位移只有 ±70px,每幀位移不到 0.02px,
+   一取整就會變成「每隔幾秒跳一格」的階梯狀移動
+3. 整個背景包 `RepaintBoundary`,否則每幀會連帶重繪首頁其他內容
+4. `AnimatedBuilder` 的 `child` 一定要用,`builder` 裡不要呼叫 `Image.asset`
+5. **不要在執行時套 `ImageFilter.blur` 或 `BackdropFilter`**,
+   模糊已經烘進素材,執行時全畫面模糊在 web 上非常貴
+6. **不要自己加雜訊或 dither**,素材裡已經有 σ≈0.0016 的細顆粒
+
+### C-6 接到首頁
+
+`home_screen.dart` 目前的 `Stack` 改成三層,順序照 SPEC 16.5:
+
+```dart
+body: Stack(
+  children: [
+    const IridescentBackground(),   // 新增,最底層
+    const FloatingPearls(),         // 既有
+    Center(...),                    // 既有內容
+  ],
+),
+```
+
+`FloatingPearls` 目前有自己的背景嗎?沒有的話不用動它。
+
+### C-7 絕對不要
+
+- **不要用 `FragmentProgram` 或任何 shader。**
+  Flutter Web 的 CanvasKit 不支援(flutter/flutter#114121 仍開著),
+  本專案目標平台就是 Web,寫了不會動
+- **不要引入任何第三方套件**
+- **不要調材質的顏色、亮度、飽和度**
+- **不要因為「看起來好像沒在動」就把 60 秒改快。**
+  慢是刻意的,見 SPEC 16.11
+
+---
+
+## D. 拉霸圖示、金屬圖示、中央氣泡飄浮
+
+### D-1 拿掉「SPIN」文字(SPEC 16.7)
+
+**拉霸圓圈裡不要出現任何文字。**
+
+`home_screen.dart` 的 `_buildCircleContent`,未轉狀態目前是:
+
+```dart
+Column(
+  children: [
+    Text('🎰', style: TextStyle(fontSize: 40)),
+    SizedBox(height: 8),
+    Text('SPIN'),
+  ],
+)
+```
+
+改成**只有一個金屬骰子圖示**,尺寸 56,置中,`Column` 和 `SizedBox` 都不要了。
+
+轉動中、轉完的狀態維持現狀,不要動。
+
+#### 可觸碰性補償
+
+拿掉文字後少了「這裡可以點」的暗示,所以未轉狀態的圖示加一個
+極輕微的呼吸動畫:
+
+- 縮放 `1.0 ↔ 1.04`
+- 單趟 **2.4 秒**
+- `Curves.easeInOut`
+- `repeat(reverse: true)`
+- **只有未轉狀態有**,轉完之後不要
+
+### D-2 金屬圖示(SPEC 16.8)
+
+新增一個小 widget,建議放 `lib/widgets/chrome_icon.dart`:
+
+```dart
+class ChromeIcon extends StatelessWidget {
+  final IconData icon;
+  final double size;
+  const ChromeIcon(this.icon, {super.key, required this.size});
+
+  static const _gradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Color(0xFFE2E5EE),
+      Color(0xFF969BAF),
+      Color(0xFF3E4356),
+      Color(0xFF22243A),
+      Color(0xFF787F92),
+    ],
+    stops: [0.00, 0.30, 0.60, 0.85, 1.00],
+  );
+
+  @override
+  Widget build(BuildContext context) => ShaderMask(
+    blendMode: BlendMode.srcATop,          // ← 不是 srcIn
+    shaderCallback: (r) => _gradient.createShader(r),
+    child: Icon(icon, size: size, color: Colors.white),
+  );
+}
+```
+
+用它替換兩處 emoji:
+
+| 位置 | 圖示 | 尺寸 |
+|---|---|---|
+| `home_screen.dart` 拉霸未轉 | `Icons.casino_outlined` | 56 |
+| `review_screen.dart` 完成畫面里程碑 | `Icons.auto_awesome` | 40 |
+
+里程碑那處外面既有的 `TweenAnimationBuilder` 放大動畫保留,
+只把 `Text('🎉')` 換成 `ChromeIcon`。
+
+#### 為什麼圖示的色階比珍珠深
+
+我把三組色階實際畫在虹彩背景上比對過:沿用珍珠那組
+(最深只到 `#6E7484`)在淺背景上幾乎看不見。
+小尺寸圖示需要比大面積物件更強的明暗差才讀得出形狀。
+
+**這兩組色階不要互換、不要統一。**
+珍珠用第 14 節的 PNG 素材,圖示用上面這組漸層。
+
+#### 注意
+
+- `blendMode` 用 `BlendMode.srcATop`。用 `srcIn` 會把圖示的透明區域一起填掉
+- 底下的 `Icon` 顏色要給 `Colors.white`(會被漸層蓋掉,但不給的話
+  某些情況會拿到透明)。**這是 `app_theme.dart` 以外唯一允許出現
+  `Colors.white` 的地方**,請在該行加註解說明原因,免得下次 grep 檢查誤判
+
+### D-3 中央氣泡飄浮(SPEC 16.6)
+
+- 位移 **±6px**,單趟週期 **19 秒**,`Curves.easeInOut`,`repeat(reverse: true)`
+- 19 秒刻意跟四顆珍珠的 22/18/25/15 都不同,**不要改成一樣的**
+- **只做垂直位移。** 不旋轉、不縮放、不改透明度
+- **拉霸轉動中(`_rolling == true`)時暫停飄浮**,不然兩個動畫會打架
+  (實作:`_rolling` 時 `controller.stop()`,結束後 `repeat(reverse: true)`)
+
+---
+
+## E. 整體驗收
+
+照 SPEC 16.12 的十二點逐項確認,結果寫進 `PROGRESS.md`。
+
+**你沒有 Flutter / 瀏覽器環境,所以請明確區分:**
+
+- 哪幾點你從程式碼結構可以確認
+- 哪幾點必須 Shawn 實機看(尤其第 2、3、4、7 點,那些是動態與視覺品質)
+
+不要把「程式碼寫成這樣所以應該沒問題」寫成已驗證。
+
+---
+
+## 這一輪不要做的事
+
+- 不要動 Study 流程的互動邏輯、選項產生方式、計分方式
+- 不要動排程演算法、拉霸邏輯、資料庫 schema
+- 不要動 `assets/decks/*.json`(牌組名稱還是中文是已知的,下一輪處理)
+- 不要動 `lib/services/ai_service.dart` 與 `lib/screens/generate_screen.dart`
+- 不要做 Onboarding 和 Settings,那兩個畫面還沒開始
+- 不要動 `lib/logic/scheduler.dart` 與 `test/scheduler_test.dart`(永久規則)
 
 ---
 
 ## 做完之後
 
-**停下來等 review。** 不要自行往下做 Onboarding、Settings、
-或 Study 流程的視覺改版,那些規格還沒定案,提前做會白做。
+**停下來等 review。**
 
-`PROGRESS.md` 請寫清楚:每一項的完成狀態、`flutter test` 結果、
-以及 A 的驗收八點你實際觀察到什麼。
+`PROGRESS.md` 請寫清楚這五件事:
+
+1. A ~ D 每一項的完成狀態
+2. **A-4 那條 grep 指令的實際輸出原文**
+3. C-4 你選了哪種方式做 soft light 混合,以及為什麼
+4. `flutter test` 的結果
+5. SPEC 16.12 十二點,逐點標明「程式碼已確認」或「需 Shawn 實機確認」
